@@ -1,9 +1,13 @@
+import type { ReactNode } from 'react';
+
 import type { AiStatus, Readiness, ScenarioStatus } from '../state/readiness';
 
 export interface StatusScreenProps {
   readiness: Readiness;
   refreshing: boolean;
   onRefresh: () => void;
+  /** Optional extra panels, such as the fixture readiness and scene preview of Phase 2. */
+  scene?: ReactNode;
 }
 
 const SCENARIO_LABELS: Record<ScenarioStatus, string> = {
@@ -71,7 +75,7 @@ function AiRows({ ai }: { ai: AiStatus }) {
   );
 }
 
-export function StatusScreen({ readiness, refreshing, onRefresh }: StatusScreenProps) {
+export function StatusScreen({ readiness, refreshing, onRefresh, scene }: StatusScreenProps) {
   return (
     <div className="screen">
       <header className="screen__header">
@@ -124,6 +128,8 @@ export function StatusScreen({ readiness, refreshing, onRefresh }: StatusScreenP
             <li>This screen only calls GET /health and GET /api/ai/status.</li>
           </ul>
         </section>
+
+        {scene}
       </main>
 
       <footer className="screen__footer">The control tower is standing by.</footer>

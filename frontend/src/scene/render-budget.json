@@ -1,0 +1,22 @@
+{
+  "capturedAt": "2026-09-22",
+  "targetFps": 60,
+  "minimumAcceptableFps": 30,
+  "perAsset": {
+    "maxTriangles": 1500,
+    "maxDrawCalls": 4,
+    "maxTextureCount": 2,
+    "maxTextureBytes": 131072,
+    "maxFileBytes": 262144
+  },
+  "stage": {
+    "maxTriangles": 20000,
+    "maxDrawCalls": 32,
+    "maxTextureCount": 8,
+    "maxTextureBytes": 1048576,
+    "maxMemoryProxyBytes": 33554432,
+    "maxInstanceCount": 24
+  },
+  "memoryProxyBytesPerInstance": 1024,
+  "measurementNotes": "Deterministic budgets only. FPS and GPU memory are host specific and are never reported as measured unless a browser run records them."
+}

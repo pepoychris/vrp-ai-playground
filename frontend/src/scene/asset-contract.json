@@ -1,0 +1,166 @@
+{
+  "generator": "roboroute-nexus-phase2-fixture-generator",
+  "assetBasePath": "/assets/models",
+  "assets": [
+    {
+      "id": "robotVehicle",
+      "fileName": "robot-vehicle.glb",
+      "label": "Robot vehicle",
+      "sceneName": "RobotVehicleScene",
+      "rootNode": "RobotVehicle",
+      "material": {
+        "name": "RobotVehicleShell",
+        "paletteKey": "robotShell",
+        "metallicFactor": 0.25,
+        "roughnessFactor": 0.55,
+        "emissivePaletteKey": null
+      },
+      "nodes": [
+        { "name": "RobotVehicle", "translation": [0, 0, 0], "children": [] }
+      ],
+      "placeholderStates": [],
+      "clips": [
+        {
+          "state": "idle",
+          "clipName": "idle",
+          "durationSeconds": 2.0,
+          "channels": [
+            {
+              "node": "RobotVehicle",
+              "path": "translation",
+              "times": [0, 1, 2],
+              "vectors": [[0, 0, 0], [0, 0.04, 0], [0, 0, 0]]
+            }
+          ]
+        },
+        {
+          "state": "move",
+          "clipName": "move",
+          "durationSeconds": 1.5,
+          "channels": [
+            {
+              "node": "RobotVehicle",
+              "path": "rotation",
+              "times": [0, 0.75, 1.5],
+              "vectors": [[0, 0, 0], [0, 180, 0], [0, 360, 0]]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "robotClaw",
+      "fileName": "robot-claw.glb",
+      "label": "Robotic claw",
+      "sceneName": "RobotClawScene",
+      "rootNode": "RobotClaw",
+      "material": {
+        "name": "RobotClawMetal",
+        "paletteKey": "clawMetal",
+        "metallicFactor": 0.55,
+        "roughnessFactor": 0.35,
+        "emissivePaletteKey": null
+      },
+      "nodes": [
+        { "name": "RobotClaw", "translation": [0, 0, 0], "children": ["ClawFingerLeft", "ClawFingerRight"] },
+        { "name": "ClawFingerLeft", "translation": [-0.12, 0.3, 0], "children": [] },
+        { "name": "ClawFingerRight", "translation": [0.12, 0.3, 0], "children": [] }
+      ],
+      "placeholderStates": [],
+      "clips": [
+        {
+          "state": "grab",
+          "clipName": "grab",
+          "durationSeconds": 0.9,
+          "channels": [
+            {
+              "node": "ClawFingerLeft",
+              "path": "rotation",
+              "times": [0, 0.3, 0.9],
+              "vectors": [[0, 0, 0], [0, 0, -32], [0, 0, 0]]
+            },
+            {
+              "node": "ClawFingerRight",
+              "path": "rotation",
+              "times": [0, 0.3, 0.9],
+              "vectors": [[0, 0, 0], [0, 0, 32], [0, 0, 0]]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "barrier",
+      "fileName": "barrier.glb",
+      "label": "Robot barrier",
+      "sceneName": "BarrierScene",
+      "rootNode": "Barrier",
+      "material": {
+        "name": "BarrierArmMaterial",
+        "paletteKey": "barrierArm",
+        "metallicFactor": 0.3,
+        "roughnessFactor": 0.5,
+        "emissivePaletteKey": null
+      },
+      "nodes": [
+        { "name": "Barrier", "translation": [0, 0, 0], "children": ["BarrierPost", "BarrierArm"] },
+        { "name": "BarrierPost", "translation": [0, 0, 0], "children": [] },
+        { "name": "BarrierArm", "translation": [0, 0.95, 0], "children": [] }
+      ],
+      "placeholderStates": [],
+      "clips": [
+        {
+          "state": "deploy",
+          "clipName": "deploy",
+          "durationSeconds": 1.0,
+          "channels": [
+            {
+              "node": "BarrierArm",
+              "path": "rotation",
+              "times": [0, 1],
+              "vectors": [[0, 0, -72], [0, 0, 0]]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "depotLandmark",
+      "fileName": "depot-landmark.glb",
+      "label": "Depot landmark",
+      "sceneName": "DepotLandmarkScene",
+      "rootNode": "DepotLandmark",
+      "material": {
+        "name": "DepotStructureMaterial",
+        "paletteKey": "depotStructure",
+        "metallicFactor": 0.2,
+        "roughnessFactor": 0.65,
+        "emissivePaletteKey": null
+      },
+      "nodes": [
+        { "name": "DepotLandmark", "translation": [0, 0, 0], "children": [] }
+      ],
+      "placeholderStates": ["idle"],
+      "clips": []
+    },
+    {
+      "id": "buildingFixture",
+      "fileName": "building-fixture.glb",
+      "label": "Building fixture",
+      "sceneName": "BuildingFixtureScene",
+      "rootNode": "BuildingFixture",
+      "material": {
+        "name": "BuildingShellMaterial",
+        "paletteKey": "buildingShell",
+        "metallicFactor": 0.1,
+        "roughnessFactor": 0.8,
+        "emissivePaletteKey": null
+      },
+      "nodes": [
+        { "name": "BuildingFixture", "translation": [0, 0, 0], "children": [] }
+      ],
+      "placeholderStates": ["idle"],
+      "clips": []
+    }
+  ]
+}

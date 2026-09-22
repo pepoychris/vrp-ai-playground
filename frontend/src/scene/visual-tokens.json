@@ -1,0 +1,101 @@
+{
+  "capturedAt": "2026-09-22",
+  "palette": {
+    "surface": "#14161a",
+    "surfaceRaised": "#1b1e23",
+    "surfaceQuiet": "#171a1f",
+    "border": "#2a2f37",
+    "text": "#e7e9ee",
+    "textMuted": "#9aa2ae",
+    "accent": "#f0b429",
+    "ground": "#20262e",
+    "sky": "#111317",
+    "robotShell": "#f0b429",
+    "robotTrim": "#2f3742",
+    "robotBeacon": "#7fd1c1",
+    "clawMetal": "#8e99a8",
+    "barrierArm": "#f0b429",
+    "depotStructure": "#4a5361",
+    "depotBeacon": "#e2e8f0",
+    "buildingShell": "#37404c"
+  },
+  "statusColors": {
+    "idle": "#7f8896",
+    "loading": "#f0b429",
+    "ready": "#4bbd7a",
+    "running": "#4bbd7a",
+    "paused": "#f0b429",
+    "degraded": "#e0a33a",
+    "error": "#d9604f",
+    "unavailable": "#d9604f"
+  },
+  "typography": {
+    "familyStack": "'Segoe UI', system-ui, -apple-system, sans-serif",
+    "monoStack": "Consolas, ui-monospace, SFMono-Regular, monospace",
+    "sizes": {
+      "heading": 22,
+      "body": 15,
+      "caption": 13,
+      "label": 12,
+      "sectionTitle": 12
+    },
+    "weights": {
+      "regular": 400,
+      "strong": 600
+    },
+    "letterSpacing": {
+      "body": "0",
+      "label": "0.08em"
+    },
+    "lineHeight": 1.5
+  },
+  "spacing": {
+    "unit": 4,
+    "xs": 4,
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 24,
+    "xxl": 32,
+    "panelRadius": 8,
+    "controlRadius": 6
+  },
+  "lighting": {
+    "background": "#111317",
+    "ambient": { "color": "#8fa3bf", "intensity": 0.55 },
+    "key": { "color": "#ffd9a0", "intensity": 2.1, "position": [6, 10, 6] },
+    "fill": { "color": "#9fc4ff", "intensity": 0.65, "position": [-7, 6, -5] },
+    "rim": { "color": "#f0b429", "intensity": 0.85, "position": [0, 4, -9] },
+    "fog": { "color": "#111317", "near": 24, "far": 72 },
+    "ground": { "color": "#20262e", "roughness": 0.95, "metalness": 0.0 }
+  },
+  "icons": {
+    "library": "none-installed",
+    "size": { "sm": 16, "md": 20 },
+    "strokeWidth": 1.75,
+    "names": {
+      "loading": "loader",
+      "ready": "check",
+      "degraded": "triangle-alert",
+      "error": "octagon-alert",
+      "retry": "rotate-ccw",
+      "assets": "boxes",
+      "scene": "box"
+    }
+  },
+  "motion": {
+    "duration": { "fast": 140, "base": 220, "slow": 420, "camera": 600 },
+    "easing": {
+      "standard": "cubic-bezier(0.2, 0, 0, 1)",
+      "emphasis": "cubic-bezier(0.3, 0, 0.1, 1)",
+      "exit": "cubic-bezier(0.4, 0, 1, 1)"
+    },
+    "reducedMotionDuration": 1,
+    "states": {
+      "idle": { "duration": 2000, "loop": true },
+      "move": { "duration": 1500, "loop": true },
+      "grab": { "duration": 900, "loop": false },
+      "deploy": { "duration": 1000, "loop": false }
+    }
+  }
+}
