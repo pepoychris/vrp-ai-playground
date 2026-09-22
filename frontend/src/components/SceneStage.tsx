@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { CitySelection, CityShell } from '../city/city-shell';
 import type { CityPoint } from '../city/dataset';
@@ -13,6 +13,11 @@ import {
   type GesturePlacement,
 } from '../city/vehicle-gesture';
 import type { SceneAssetBundle } from '../scene/load-assets';
+import {
+  describeRendererDetail,
+  describeRendererStats,
+  readRendererStats,
+} from '../scene/renderer-stats';
 import {
   barrierById,
   type ScenarioSnapshot,
@@ -56,6 +61,8 @@ const KEYBOARD_PAN_PIXELS = 28;
 const CLICK_SLOP_PIXELS = 3;
 const DEFAULT_STAGE_WIDTH = 720;
 const DEFAULT_STAGE_HEIGHT = 420;
+/** The frame-rate reading is averaged over this window, and only while animating. */
+const RENDER_STATS_WINDOW_MS = 500;
 
 function stageWidth(canvas: HTMLCanvasElement): number {
   return canvas.clientWidth || DEFAULT_STAGE_WIDTH;
@@ -160,6 +167,22 @@ export function SceneStage({
   const [selection, setSelection] = useState<string | null>(null);
   const [gestureNote, setGestureNote] = useState<string | null>(null);
   const [clock, setClock] = useState<SimulationState>(simulationState({ running: false }));
+  const [renderStats, setRenderStats] = useState<string | null>(null);
+  const [renderStatsDetail, setRenderStatsDetail] = useState<string | null>(null);
+  const [rendererError, setRendererError] = useState<string | null>(null);
+
+  /**
+   * Publish the last frame's telemetry.
+   *
+   * `renderer.info` is only valid until the next frame, so this is called right after a
+   * `render()` or from the animation loop's measuring window. A renderer that exposes no
+   * `info` — no WebGL context, or a test double — publishes nothing instead of zeros.
+   */
+  const publishRendererStats = useCallback((fps: number | null) => {
+    const stats = readRendererStats(shellRef.current?.renderer ?? null);
+    setRenderStats(describeRendererStats(stats, fps));
+    setRenderStatsDetail(describeRendererDetail(stats, fps));
+  }, []);
 
   useEffect(() => {
     relocateRef.current = onRelocateVehicle;
@@ -248,10 +271,15 @@ export function SceneStage({
             `${report.landmarkCount} landmark`,
         );
         if (active.rendererError) {
+          // No WebGL context: the stage explains what happened instead of showing an
+          // empty canvas, and every scenario control keeps working.
+          setRendererError(active.rendererError);
           setStatus('unavailable');
           return;
         }
+        setRendererError(null);
         setStatus('ready');
+        publishRendererStats(null);
 
         if (typeof ResizeObserver !== 'undefined') {
           observer = new ResizeObserver(() => {
@@ -594,7 +622,7 @@ export function SceneStage({
       gestureRef.current = null;
       shell?.dispose();
     };
-  }, [bundle]);
+  }, [bundle, publishRendererStats]);
 
   // Routes and vehicles always come from the published snapshot, never from a local
   // reconstruction of it. A new revision drops any gesture in flight.
@@ -608,7 +636,8 @@ export function SceneStage({
       barriers: barrierPlacements(snapshot, active.network, selectedBarrierRef.current),
     });
     active.render();
-  }, [snapshot, status]);
+    publishRendererStats(null);
+  }, [snapshot, status, publishRendererStats]);
 
   // Barrier selection is a view-only change: it repaints the barrier layer and never
   // recomputes a plan, so it stays out of the snapshot sync above.
@@ -617,7 +646,8 @@ export function SceneStage({
     if (!active || status !== 'ready' || !snapshot) return;
     active.updateBarriers(barrierPlacements(snapshot, active.network, selectedBarrierId));
     active.render();
-  }, [snapshot, status, selectedBarrierId]);
+    publishRendererStats(null);
+  }, [snapshot, status, selectedBarrierId, publishRendererStats]);
 
   // The animation loop runs only while the simulation is running, and it advances the
   // clock in bounded ticks with the same rule the backend publishes.
@@ -625,6 +655,8 @@ export function SceneStage({
     if (status !== 'ready' || !snapshot?.simulation.running) return;
     let frame = 0;
     let last = performance.now();
+    let windowStart = last;
+    let framesInWindow = 0;
     const step = (timestamp: number) => {
       const active = shellRef.current;
       const current = snapshotRef.current;
@@ -645,40 +677,100 @@ export function SceneStage({
         ),
       );
       active.render();
+      framesInWindow += 1;
+      const windowMs = timestamp - windowStart;
+      if (windowMs >= RENDER_STATS_WINDOW_MS) {
+        // The only frame rate this application can report honestly: frames it actually
+        // rendered while the simulation was animating, over a fixed window.
+        publishRendererStats((framesInWindow * 1000) / windowMs);
+        framesInWindow = 0;
+        windowStart = timestamp;
+      }
       frame = requestAnimationFrame(step);
     };
     frame = requestAnimationFrame(step);
     return () => cancelAnimationFrame(frame);
-  }, [status, snapshot?.simulation.running, snapshot?.simulation.speedMultiplier]);
+  }, [
+    status,
+    snapshot?.simulation.running,
+    snapshot?.simulation.speedMultiplier,
+    publishRendererStats,
+  ]);
+
+  // A stopped simulation has no meaningful frame rate, so the reading drops the FPS rather
+  // than leaving the last animated value on screen.
+  useEffect(() => {
+    if (snapshot?.simulation.running) return;
+    publishRendererStats(null);
+  }, [snapshot?.simulation.running, publishRendererStats]);
 
   const degraded = status === 'unavailable' || status === 'failed';
   const notes: string[] = [];
   if (status === 'waiting') notes.push('Waiting for the fixture assets.');
-  if (status === 'unavailable') {
-    notes.push('The preview is unavailable because this browser did not provide a WebGL context.');
-  }
-  if (status === 'failed') notes.push('The city preview could not be started on this device.');
   if (status === 'ready' && summary) notes.push(summary);
-  if (status === 'ready' && snapshot && snapshot.vehicles.length > 0) {
+  if (status === 'ready' && snapshot) {
     notes.push(
-      `Claw: right-click a robot, drag it onto a road node and release · ` +
-        `${clock.running ? 'simulation running' : 'simulation stopped'} at x${clock.speedMultiplier}`,
+      `${clock.running ? 'Simulation running' : 'Simulation stopped'} at x${clock.speedMultiplier}`,
     );
   }
   if (status === 'ready' && gestureNote) notes.push(gestureNote);
   if (status === 'ready' && selection) notes.push(selection);
 
   return (
-    <section className="panel" aria-labelledby="stage-heading">
-      <h2 id="stage-heading">City view</h2>
+    <section className="panel scene-stage" aria-labelledby="stage-heading">
+      <div className="scene-stage__head">
+        <h2 id="stage-heading">City view</h2>
+        {renderStats ? (
+          <p
+            className="stage__stats"
+            data-testid="renderer-stats"
+            title={renderStatsDetail ?? undefined}
+          >
+            {renderStats}
+          </p>
+        ) : null}
+      </div>
+
+      <ul className="stage__tools" aria-label="City controls">
+        <li>Left drag pans the city · scroll wheel zooms · arrow keys pan and 0 resets the view.</li>
+        <li title="Right-click a robot, drag it onto a road node and release the button.">
+          Right drag on a robot drops it with the claw onto the nearest road node.
+        </li>
+        <li
+          title="Arm the closure tool, then drag on the city to drop a barrier. Select a barrier on
+            the map or in the closure list and press Delete, or use Reopen road, to remove it."
+        >
+          Arm the closure tool, then left drag on a road to block it in both directions. Select a
+          barrier and press Delete, or use Reopen road, to remove it.
+        </li>
+      </ul>
+
       <div className={degraded ? 'stage stage--degraded' : 'stage'}>
         <canvas
           ref={canvasRef}
           className="stage__canvas"
           role="img"
           tabIndex={0}
+          title="Left drag pans, the scroll wheel zooms, right drag on a robot uses the claw"
           aria-label="Isometric view of the local robot city, its road graph, the depot and the fleet"
         />
+        {degraded ? (
+          <div className="stage__fallback" role="status">
+            <p className="stage__fallback-title">
+              {status === 'unavailable'
+                ? 'WebGL is not available in this browser'
+                : 'The city preview could not start'}
+            </p>
+            <p className="stage__fallback-note">
+              {status === 'unavailable'
+                ? 'Enable hardware acceleration, or open the app in a browser with WebGL2, and reload the page. The colony controls keep working.'
+                : 'Reload the page to try again. The scenario itself is kept by the backend.'}
+            </p>
+            {rendererError ? (
+              <p className="stage__fallback-detail">Renderer reported: {rendererError}</p>
+            ) : null}
+          </div>
+        ) : null}
         {notes.length > 0 ? (
           <div className="stage__overlay">
             {notes.map((note) => (

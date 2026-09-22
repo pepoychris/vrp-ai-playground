@@ -16,6 +16,13 @@ LoadingManager-driven asset readiness surface, the animation vocabulary
 (`idle`, `move`, `grab`, `deploy`) and the renderer/resource budgets with a
 deterministic benchmark.
 
+Phases 3–8 add the city and its road graph, the deterministic scenario, bounded routing
+with KPIs, the simulation clock and the robotic claw, the robotic barriers and road
+closures, and the local Qwen copilot. **Phase 9 makes that whole flow demonstrable**: the
+install stream reaches the browser frame by frame, the AI panel mirrors the backend, the
+city is the primary surface of the control tower, and the demo is documented and
+reproducible from a clean volume.
+
 ## Stack
 
 | Service | Image / base | Host port | Networks | Purpose |
@@ -35,10 +42,11 @@ through it, and Phase 8 needs outbound Internet access once, on user request, to
 download the model.
 
 The frontend container is a small Node static server that also proxies `/health` and
-`/api/*` to the API on the same origin. That proxy buffers upstream responses, which
-is fine for the JSON endpoints of this phase; the Phase 8 SSE endpoints
-(`/api/ai/model/install/events` and the scenario event stream) must not be routed
-through it and need a dedicated streaming path.
+`/api/*` to the API on the same origin, so no CORS configuration exists and Ollama stays
+unreachable from the browser. The proxy buffers JSON responses, which keeps their
+`content-length` correct, and forwards `text/event-stream` responses frame by frame: the
+Phase 8 install progress (`/api/ai/model/install/events`) advances on screen while the
+download is still running instead of arriving in one step at the end.
 
 ## Quickstart
 
@@ -55,6 +63,36 @@ to override a port, the Ollama probe timeout or the SQLite path.
 Expected after a cold start: the frontend reports the API as available, the scenario
 as `IDLE` with no vehicles and no orders, and the AI as not installed and not loaded.
 No model is downloaded and none is preloaded.
+
+## Demo sequence (3–5 minutes)
+
+The full narration, timings and expected observations are in
+[`frontend/docs/phase-9-integration-runbook.md`](frontend/docs/phase-9-integration-runbook.md).
+
+1. `docker compose up --build`, then open <http://localhost:8080>. Expect API `Online`,
+   simulation `Stopped`, model `Not installed`, core `Not loaded`.
+2. Colony controls: 2 vehicles, 6 orders, seed `20260922` → **Deploy Fleet**, **Generate
+   Orders**, then **Optimize Routes**. The city draws the road graph and the KPIs fill in.
+3. **Start Simulation**, change speed, **Pause Simulation**; right-drag a robot with the
+   claw onto another road node and watch the plan recompute.
+4. **Arm closure tool**, drag across a road to block it both ways, read the affected orders
+   and the KPI delta, then **Reopen road**.
+5. AI copilot: **Install Qwen Core** (first run only, with live progress), **Activate AI
+   core**, ask a question, decide the proposal, then **Build shift report** and download it.
+6. **Reset Colony** and deploy the same seed again: the scenario is identical.
+
+Step 5 is the phase's acceptance for the model lifecycle: the bar must advance before the
+download finishes, and the panel must report `Installed` from the backend rather than from
+the last frame it happened to see.
+
+## What Phase 9 fixed
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| The install bar filled only at the end | The same-origin proxy buffered every upstream body, including `text/event-stream` | Event streams are streamed through; JSON stays buffered and keeps its `content-length` |
+| The panel showed *Service Unavailable / Model Not installed* while `GET /api/ai/status` said the model was installed | The panel only updated from stream frames, never from the status endpoint | The panel reads the authoritative status on mount, after install and after activation, and merges observations so a delayed frame cannot regress a confirmed state |
+| **Activate AI core** stayed disabled next to `modelInstalled: true` | It depended on the same stale panel state | It is enabled as soon as the status says the model is installed and not loaded |
+| The city was a small incidental card | One shared 16:9 stage for every panel | The city spans the page on desktop, with visible claw/barrier instructions and a WebGL fallback that explains itself |
 
 ## Implemented in Phase 1
 
@@ -147,10 +185,13 @@ npm run dev        # http://localhost:5173, proxying /health and /api to :8000
 # Backend: health, AI status, contract shape, startup side effects, compose guard
 .\.venv\Scripts\python.exe -m unittest discover -s api/tests -t .
 
-# Frontend: type check, production build, unit tests
+# Frontend: type check, production build, unit tests (including the streaming proxy)
 cd frontend
 npm run build
 npm test
+
+# Frontend: focused Phase 9 suites (streaming proxy, AI status sync, renderer telemetry)
+npx vitest run server/static-server.test.mjs src/state/ai-copilot.test.ts src/state/readiness.test.ts src/components/AiCopilotPanel.test.tsx src/scene/renderer-stats.test.ts
 
 # Frontend: deterministic asset benchmark and fixture contract check
 npm run benchmark:assets
@@ -212,14 +253,19 @@ pip chooses the wheel that matches the build platform.
 
 ## Phase boundaries
 
-Implemented now: the Compose stack, the persistent volumes, the two read endpoints,
-the global `IDLE` state, the inactive status screen, the visual tokens, the local
-fixture asset library with its deterministic generator, the asset readiness surface,
-the animation vocabulary and the renderer/resource budgets with their benchmark.
+Implemented now (Phases 0–9): the Compose stack, the persistent volumes, the readiness and
+AI status endpoints, the Three.js city and its road graph with `nearestRoadNode()` /
+`nearestRoadEdge()`, the deterministic scenario with fleet, orders, bounded OR-Tools
+optimisation and KPIs, the simulation clock, the robotic claw, the robotic barriers and
+road closures, the local Qwen copilot (install with streamed progress, activation, grounded
+chat, shift report, human-confirmed proposals), and the Phase 9 demo/verification
+documentation.
 
-Not implemented here, and owned by later phases: the Three.js city and its road graph,
-`nearestRoadNode()`/`nearestRoadEdge()`, scenario/fleet/order/route/simulation
-endpoints and SSE, OR-Tools optimisation, SQLite scenario persistence, model
-installation, preloading, chat, reports and authentication. The fixture assets are
-stand-ins, not final art; replacing them is allowed as long as the asset contract and
-the budgets in `frontend/src/scene/render-budget.json` stay green.
+Out of scope for the MVP and owned by no phase: authentication and multi-user support, real
+maps, geocoding, GPS, real traffic or weather, a mobile application, model training or
+fine-tuning, RAG or a vector store, image processing, large-fleet optimisation, and
+exposing Ollama publicly.
+
+The fixture assets are procedural stand-ins, not final art; replacing them is allowed as
+long as the asset contract and the budgets in `frontend/src/scene/render-budget.json` stay
+green.
