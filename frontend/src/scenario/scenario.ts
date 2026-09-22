@@ -9,6 +9,27 @@ export const DEFAULT_SEED = 20260922;
 export type VehicleStatus = 'AVAILABLE' | 'EN_ROUTE' | 'DELAYED' | 'BLOCKED' | 'FINISHED';
 export type OrderStatus = 'PENDING' | 'ASSIGNED' | 'DELIVERED' | 'DELAYED' | 'UNASSIGNED';
 export type Priority = 'LOW' | 'NORMAL' | 'URGENT';
+export type ScenarioStatus = 'IDLE' | 'READY' | 'OPTIMIZING' | 'RUNNING' | 'PAUSED';
+
+/**
+ * The simulation clock of one revision. `tick` is the authoritative counter and
+ * `elapsedSeconds` is derived from it, so the two can never disagree.
+ */
+export interface SimulationState {
+  running: boolean;
+  speedMultiplier: number;
+  tick: number;
+  elapsedSeconds: number;
+}
+
+/** The command that produced a revision, as published by the API. */
+export interface AppliedCommand {
+  commandId: string;
+  kind: string;
+  appliedAgainstRevision: number;
+  rebased: boolean;
+  replayed: boolean;
+}
 
 export interface Vehicle {
   vehicleId: string;
@@ -103,7 +124,7 @@ export interface ScenarioSnapshot {
   scenarioId: string;
   scenarioRevision: number;
   previousRevision: number | null;
-  status: 'IDLE' | 'READY' | 'OPTIMIZING' | 'RUNNING' | 'PAUSED';
+  status: ScenarioStatus;
   seed: number;
   graph: { cityId: string; graphVersion: number; nodes: unknown[]; edges: unknown[] };
   vehicles: Vehicle[];
@@ -112,8 +133,8 @@ export interface ScenarioSnapshot {
   blockedEdgeIds: string[];
   routePlan: RoutePlan | null;
   kpis: KpiSnapshot | null;
-  simulation: { running: boolean; speedMultiplier: number; tick: number; elapsedSeconds: number };
-  appliedCommand: unknown | null;
+  simulation: SimulationState;
+  appliedCommand: AppliedCommand | null;
   emittedAt: string;
 }
 

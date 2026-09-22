@@ -1,4 +1,4 @@
-"""Phase 5 exposes readiness, scenario generation and bounded optimisation."""
+"""Phase 6 exposes readiness, scenario generation, bounded optimisation and simulation."""
 
 from __future__ import annotations
 
@@ -26,6 +26,9 @@ EXPECTED_PRODUCT_ROUTES = {
     "/api/scenarios/{scenario_id}/vehicles/generate",
     "/api/scenarios/{scenario_id}/orders/generate",
     "/api/scenarios/{scenario_id}/optimize",
+    "/api/scenarios/{scenario_id}/simulation/start",
+    "/api/scenarios/{scenario_id}/simulation/pause",
+    "/api/scenarios/{scenario_id}/vehicles/{vehicle_id}/position",
 }
 DOC_ROUTE_PATHS = {"/openapi.json", "/docs", "/docs/oauth2-redirect", "/redoc"}
 FORBIDDEN_PATH_FRAGMENTS = (
@@ -38,7 +41,7 @@ FORBIDDEN_PATH_FRAGMENTS = (
 
 
 class RouteSurfaceTests(unittest.IsolatedAsyncioTestCase):
-    def test_exposes_exactly_the_phase_4_product_routes(self) -> None:
+    def test_exposes_exactly_the_phase_6_product_routes(self) -> None:
         app, _ = build_app(handler_with_paths(models_payload(), models_payload()))
         paths = {route.path for route in app.routes}
 
@@ -48,12 +51,12 @@ class RouteSurfaceTests(unittest.IsolatedAsyncioTestCase):
             for fragment in FORBIDDEN_PATH_FRAGMENTS:
                 self.assertNotIn(fragment, path)
 
-    def test_phase4_exposes_only_declared_mutations(self) -> None:
+    def test_phase6_exposes_only_declared_mutations(self) -> None:
         app, _ = build_app(handler_with_paths(models_payload(), models_payload()))
 
         for route in app.routes:
             methods = getattr(route, "methods", None) or set()
-            if methods & {"POST", "DELETE"}:
+            if methods & {"POST", "DELETE", "PATCH"}:
                 self.assertTrue(route.path.startswith("/api/scenarios"), route.path)
             else:
                 self.assertFalse({"POST", "PUT", "PATCH", "DELETE"} & methods, route.path)

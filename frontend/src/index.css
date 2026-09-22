@@ -230,6 +230,20 @@ body {
   padding: 8px 10px;
 }
 
+.control-grid select {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  padding: 8px 10px;
+}
+
+.simulation-controls {
+  margin-top: 16px;
+}
+
 .button-row {
   display: flex;
   flex-wrap: wrap;
@@ -309,6 +323,10 @@ body {
 }
 
 .stage__canvas--dragging {
+  cursor: grabbing;
+}
+
+.stage__canvas--grabbing {
   cursor: grabbing;
 }
 

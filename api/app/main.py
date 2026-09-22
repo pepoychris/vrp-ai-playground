@@ -1,7 +1,8 @@
-"""FastAPI application for the RoboRoute Nexus backend (MVP Phase 5).
+"""FastAPI application for the RoboRoute Nexus backend (MVP Phase 6).
 
-Phase 5 adds bounded shortest-path routing, deterministic fleet/order generation,
-route plans, KPI snapshots and reset. No scenario is generated during startup.
+Phase 6 adds the simulation clock (start, pause, speed) and the claw relocation
+command on top of the Phase 4/5 scenario, fleet, order, route-plan and KPI surface. No
+scenario is generated during startup.
 
 Starting this application performs no network call, no database write and no model
 download. There is no startup hook: scenario generation only happens after an
@@ -17,18 +18,22 @@ from .contracts import AiStatus, HealthResponse
 from .ollama_client import OllamaProbe
 from .scenario import (
     FleetGenerateRequest,
+    OptimizeRequest,
     OrdersGenerateRequest,
     ScenarioCreateRequest,
-    OptimizeRequest,
     ScenarioResetResponse,
     ScenarioRevisionResponse,
     ScenarioStore,
+    SimulationPauseRequest,
+    SimulationStartRequest,
+    VehiclePositionRequest,
 )
 
 API_TITLE = "RoboRoute Nexus API"
 API_SUMMARY = (
-    "Last-mile control tower backend. Phase 5 exposes deterministic scenarios, "
-    "bounded route optimisation, KPIs, reset, and AI readiness."
+    "Last-mile control tower backend. Phase 6 exposes deterministic scenarios, bounded "
+    "route optimisation, KPIs, simulation clock control, claw relocation, reset and AI "
+    "readiness."
 )
 
 
@@ -149,6 +154,73 @@ def create_app(
                 resolved_request.timeLimitSeconds,
                 command_id=resolved_request.commandId,
                 client_revision=resolved_request.scenarioRevision,
+            )
+        )
+
+    @app.post(
+        "/api/scenarios/{scenario_id}/simulation/start",
+        response_model=ScenarioRevisionResponse,
+        tags=["scenarios"],
+    )
+    async def start_simulation(
+        scenario_id: str, request: SimulationStartRequest | None = None
+    ) -> ScenarioRevisionResponse:
+        """Start or resume the simulation, optionally at a new bounded speed.
+
+        The clock lives in the snapshot; ticks never create a revision. A repeated
+        ``commandId`` is replayed, and a stale client revision is rebased, exactly like
+        every other command in the frozen envelope.
+        """
+        resolved_request = request or SimulationStartRequest()
+        return ScenarioRevisionResponse.model_validate(
+            app.state.scenario_store.start_simulation(
+                scenario_id,
+                resolved_request.speedMultiplier,
+                command_id=resolved_request.commandId,
+                client_revision=resolved_request.scenarioRevision,
+            )
+        )
+
+    @app.post(
+        "/api/scenarios/{scenario_id}/simulation/pause",
+        response_model=ScenarioRevisionResponse,
+        tags=["scenarios"],
+    )
+    async def pause_simulation(
+        scenario_id: str, request: SimulationPauseRequest | None = None
+    ) -> ScenarioRevisionResponse:
+        """Pause the running simulation, or report ``SIMULATION_NOT_RUNNING``."""
+        resolved_request = request or SimulationPauseRequest()
+        return ScenarioRevisionResponse.model_validate(
+            app.state.scenario_store.pause_simulation(
+                scenario_id,
+                command_id=resolved_request.commandId,
+                client_revision=resolved_request.scenarioRevision,
+            )
+        )
+
+    @app.patch(
+        "/api/scenarios/{scenario_id}/vehicles/{vehicle_id}/position",
+        response_model=ScenarioRevisionResponse,
+        tags=["scenarios"],
+    )
+    async def relocate_vehicle(
+        scenario_id: str,
+        vehicle_id: str,
+        request: VehiclePositionRequest,
+    ) -> ScenarioRevisionResponse:
+        """Drop one vehicle on the nearest road node and re-plan exactly once.
+
+        A drop outside the claw radius answers ``422 SNAP_OUT_OF_RADIUS`` and publishes
+        no revision, so an invalid gesture cannot overwrite a newer scenario revision.
+        """
+        return ScenarioRevisionResponse.model_validate(
+            app.state.scenario_store.relocate_vehicle(
+                scenario_id,
+                vehicle_id,
+                request.position.model_dump(),
+                command_id=request.commandId,
+                client_revision=request.scenarioRevision,
             )
         )
 
