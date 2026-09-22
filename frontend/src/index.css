@@ -366,6 +366,83 @@ body {
   margin-top: 7px;
 }
 
+/* Local AI copilot. The panel keeps the same quiet, work-focused language as the rest of
+   the control tower: status chips, one progress bar, plain buttons, no model picker. */
+.ai-copilot .ai-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ai-heading {
+  margin: 20px 0 0;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+
+.ai-chat .ai-heading,
+.ai-report .ai-heading,
+.ai-answer .ai-heading {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.ai-question {
+  display: block;
+  margin-top: 12px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.ai-question textarea {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  resize: vertical;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  padding: 9px 11px;
+}
+
+.ai-question textarea:disabled {
+  opacity: 0.6;
+}
+
+.ai-answer__text {
+  margin: 10px 0 0;
+  white-space: pre-wrap;
+}
+
+.ai-references {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.ai-references li {
+  font-family: var(--rr-font-family-mono, 'Cascadia Mono', 'Consolas', monospace);
+}
+
+.ai-proposal {
+  margin-top: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 12px 14px 14px;
+}
+
+.ai-proposal .ai-heading {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
 .progress {
   overflow: hidden;
   height: 6px;

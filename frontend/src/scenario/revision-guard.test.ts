@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { ScenarioSnapshot } from './scenario';
 import {
+  acceptAiAnswer,
   acceptCommandResponse,
   acceptSnapshot,
   acceptTick,
@@ -126,5 +127,19 @@ describe('pending command rule', () => {
     const otherId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
     const overlapping = beginCommand(applied, otherId);
     expect(settleCommand(overlapping, commandId).pendingCommandId).toBe(otherId);
+  });
+});
+
+describe('AI answer grounding rule', () => {
+  it('accepts an answer only for the revision the user is looking at', () => {
+    const guard = acceptSnapshot(createRevisionGuard(), snapshot(5)).state;
+
+    expect(acceptAiAnswer(guard, 5)).toBe(true);
+    expect(acceptAiAnswer(guard, 4)).toBe(false);
+    expect(acceptAiAnswer(guard, 6)).toBe(false);
+  });
+
+  it('refuses every answer before a scenario exists', () => {
+    expect(acceptAiAnswer(createRevisionGuard(), 1)).toBe(false);
   });
 });

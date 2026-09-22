@@ -28,11 +28,14 @@ export class HttpError extends Error {
 
 export class ApiRequestError extends Error {
   readonly status: number;
+  /** Frozen contract error code, when the backend answered with the error envelope. */
+  readonly code: string | null;
 
-  constructor(status: number, path: string, message: string) {
+  constructor(status: number, path: string, message: string, code: string | null = null) {
     super(`${path} failed with HTTP ${status}: ${message}`);
     this.name = 'ApiRequestError';
     this.status = status;
+    this.code = code;
   }
 }
 
@@ -69,16 +72,38 @@ async function mutation<T>(
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   if (!response.ok) {
-    let message = response.statusText || 'request failed';
-    try {
-      const payload = (await response.json()) as { detail?: string };
-      if (typeof payload.detail === 'string') message = payload.detail;
-    } catch {
-      // The status and path are enough when an upstream response is not JSON.
-    }
-    throw new ApiRequestError(response.status, path, message);
+    const { message, code } = await readError(response);
+    throw new ApiRequestError(response.status, path, message, code);
   }
   return (await response.json()) as T;
+}
+
+/**
+ * Read a failure body.
+ *
+ * The AI endpoints answer with the frozen `errorResponse` envelope while the scenario
+ * endpoints answer with FastAPI's `detail`, so both shapes are understood here.
+ */
+async function readError(response: Response): Promise<{ message: string; code: string | null }> {
+  let message = response.statusText || 'request failed';
+  let code: string | null = null;
+  try {
+    const payload = (await response.json()) as {
+      detail?: unknown;
+      error?: { code?: unknown; message?: unknown };
+    };
+    if (payload && typeof payload.error === 'object' && payload.error !== null) {
+      if (typeof payload.error.message === 'string' && payload.error.message) {
+        message = payload.error.message;
+      }
+      if (typeof payload.error.code === 'string') code = payload.error.code;
+    } else if (typeof payload.detail === 'string') {
+      message = payload.detail;
+    }
+  } catch {
+    // The status and path are enough when an upstream response is not JSON.
+  }
+  return { message, code };
 }
 
 export function createScenario<T>(seed: number): Promise<T> {
@@ -233,4 +258,116 @@ export function removeBarrier<T>(
     `/api/scenarios/${encodeURIComponent(scenarioId)}/barriers/${encodeURIComponent(barrierId)}`,
     { commandId: options.commandId ?? createCommandId(), scenarioRevision },
   );
+}
+
+// --------------------------------------------------------------------------------------
+// Local AI copilot (frozen endpoints 13-20)
+// --------------------------------------------------------------------------------------
+
+/**
+ * Paths of the AI surface.
+ *
+ * The browser still cannot reach Ollama: every one of these calls goes to the backend,
+ * which is the only component on the internal network that knows where Ollama lives.
+ */
+export const AI_PATHS = {
+  status: '/api/ai/status',
+  install: '/api/ai/model/install',
+  installEvents: '/api/ai/model/install/events',
+  activate: '/api/ai/activate',
+  chat: '/api/ai/chat',
+  shiftReport: '/api/ai/reports/shift',
+} as const;
+
+export function proposalPath(proposalId: string): string {
+  return `/api/ai/proposals/${encodeURIComponent(proposalId)}`;
+}
+
+/**
+ * Ask the backend to download the fixed model.
+ *
+ * The body is empty on purpose: the model is not a request parameter. The answer is the
+ * install job, and `202` means this call started the download.
+ */
+export function installModel<T>(): Promise<T> {
+  return mutation<T>('POST', AI_PATHS.install, {});
+}
+
+/** Preload the installed model. This never downloads anything. */
+export function activateModel<T>(): Promise<T> {
+  return mutation<T>('POST', AI_PATHS.activate, {});
+}
+
+export interface ChatTurn {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+/**
+ * Ask one question about the scenario revision the user is looking at.
+ *
+ * `scenarioRevision` travels with the question so the answer can be tagged with the
+ * revision it was grounded on; an answer for an older revision is discarded by the caller.
+ */
+export function askCopilot<T>(
+  scenarioId: string,
+  scenarioRevision: number,
+  messages: ChatTurn[],
+  options: CommandOptions = {},
+): Promise<T> {
+  return mutation<T>('POST', AI_PATHS.chat, {
+    scenarioId,
+    commandId: options.commandId ?? createCommandId(),
+    scenarioRevision,
+    messages,
+  });
+}
+
+/** Build the shift report: deterministic metrics plus the model's narrative. */
+export function requestShiftReport<T>(
+  scenarioId: string,
+  scenarioRevision: number,
+  options: CommandOptions = {},
+): Promise<T> {
+  return mutation<T>('POST', AI_PATHS.shiftReport, {
+    scenarioId,
+    commandId: options.commandId ?? createCommandId(),
+    scenarioRevision,
+  });
+}
+
+/** Apply one proposal the human just confirmed. */
+export function confirmProposal<T>(
+  proposalId: string,
+  scenarioRevision: number,
+  options: CommandOptions = {},
+): Promise<T> {
+  return mutation<T>('POST', `${proposalPath(proposalId)}/confirm`, {
+    commandId: options.commandId ?? createCommandId(),
+    scenarioRevision,
+  });
+}
+
+/** Record the rejection of one proposal. It never executes the suggested action. */
+export function rejectProposal<T>(
+  proposalId: string,
+  scenarioRevision: number,
+  options: CommandOptions = {},
+): Promise<T> {
+  return mutation<T>('POST', `${proposalPath(proposalId)}/reject`, {
+    commandId: options.commandId ?? createCommandId(),
+    scenarioRevision,
+  });
+}
+
+/**
+ * Subscribe to the install progress stream.
+ *
+ * Returns `null` where the environment has no `EventSource`, so a caller can fall back to
+ * polling the AI status instead of crashing.
+ */
+export function openInstallStream(): EventSource | null {
+  const source = globalThis.EventSource;
+  if (typeof source !== 'function') return null;
+  return new source(AI_PATHS.installEvents);
 }

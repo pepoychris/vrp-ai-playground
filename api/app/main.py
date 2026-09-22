@@ -1,21 +1,38 @@
-"""FastAPI application for the RoboRoute Nexus backend (MVP Phase 7).
+"""FastAPI application for the RoboRoute Nexus backend (MVP Phase 8).
 
 Phase 6 added the simulation clock (start, pause, speed) and the claw relocation
-command; Phase 7 adds the robotic barrier: a road closure bound to one stable edge id
-that blocks both directions and recomputes the plan once. No scenario is generated
-during startup.
+command; Phase 7 added the robotic barrier; Phase 8 adds the local Qwen copilot: an
+explicit model install with recoverable progress, an explicit activation, grounded chat
+and shift reports, and human-confirmed action proposals.
 
 Starting this application performs no network call, no database write and no model
-download. There is no startup hook: scenario generation only happens after an
-explicit request from the frontend.
+download. There is no startup hook: scenario generation, model installation and model
+preloading all happen only after an explicit request from the frontend.
 """
 
 from __future__ import annotations
 
-from fastapi import FastAPI, status
+from fastapi import FastAPI, Request, Response, status
+from fastapi.responses import JSONResponse, StreamingResponse
 
-from .config import MODEL_NAME, SERVICE_NAME, SERVICE_VERSION, Settings
-from .contracts import AiStatus, HealthResponse
+from .config import SERVICE_NAME, SERVICE_VERSION, Settings
+from .ai import (
+    AiChatRequest,
+    AiCopilot,
+    AiEmptyRequest,
+    AiError,
+    AiProposalCommandRequest,
+    AiReportRequest,
+    read_json_body,
+    validate_payload,
+)
+from .contracts import (
+    AiChatResponse,
+    AiReportResponse,
+    AiStatus,
+    HealthResponse,
+    InstallJob,
+)
 from .ollama_client import OllamaProbe
 from .scenario import (
     BarrierPlaceRequest,
@@ -34,10 +51,18 @@ from .scenario import (
 
 API_TITLE = "RoboRoute Nexus API"
 API_SUMMARY = (
-    "Last-mile control tower backend. Phase 7 exposes deterministic scenarios, bounded "
+    "Last-mile control tower backend. Phase 8 exposes deterministic scenarios, bounded "
     "route optimisation, KPIs, simulation clock control, claw relocation, robotic "
-    "barriers and road closures, reset and AI readiness."
+    "barriers and road closures, reset, and the local Qwen copilot: install, activation, "
+    "grounded chat, shift reports and human-confirmed proposals."
 )
+
+# Server-sent events must not be buffered by the proxying frontend.
+SSE_HEADERS = {
+    "cache-control": "no-cache",
+    "connection": "keep-alive",
+    "x-accel-buffering": "no",
+}
 
 
 def create_app(
@@ -53,12 +78,24 @@ def create_app(
     probe = ollama_probe or OllamaProbe(
         resolved_settings.ollama_base_url,
         resolved_settings.ollama_timeout_seconds,
+        long_timeout_seconds=max(
+            resolved_settings.ai_chat_timeout_seconds,
+            resolved_settings.ai_report_timeout_seconds,
+            resolved_settings.ai_install_timeout_seconds,
+        ),
     )
 
     app = FastAPI(title=API_TITLE, summary=API_SUMMARY, version=SERVICE_VERSION)
+    scenario_store = ScenarioStore()
     app.state.settings = resolved_settings
     app.state.ollama_probe = probe
-    app.state.scenario_store = ScenarioStore()
+    app.state.scenario_store = scenario_store
+    app.state.ai = AiCopilot.create(probe, scenario_store, resolved_settings)
+
+    @app.exception_handler(AiError)
+    async def ai_error_handler(_: Request, exc: AiError) -> JSONResponse:
+        """Answer every AI failure with the frozen ``errorResponse`` envelope."""
+        return JSONResponse(status_code=exc.status_code, content=exc.envelope())
 
     @app.get("/health", response_model=HealthResponse, tags=["infrastructure"])
     async def health() -> HealthResponse:
@@ -73,13 +110,98 @@ def create_app(
         endpoint reports state instead of failing. It never installs or loads the
         model: the model name is fixed here, not in the request.
         """
-        status = await probe.fetch_status()
-        return AiStatus(
-            serviceAvailable=status.service_available,
-            modelInstalled=status.has_installed(MODEL_NAME),
-            modelLoaded=status.has_loaded(MODEL_NAME),
-            modelName=MODEL_NAME,
-            installJob=None,
+        return await app.state.ai.status()
+
+    @app.post(
+        "/api/ai/model/install",
+        response_model=InstallJob,
+        status_code=status.HTTP_202_ACCEPTED,
+        tags=["ai"],
+    )
+    async def install_model(request: Request, response: Response) -> InstallJob:
+        """Start the one model download of the process, idempotently.
+
+        ``202`` means this request started a download. ``200`` means there was nothing to
+        start — the model is already installed, or the same download is still running — and
+        the current job is returned either way. Nothing here runs at startup.
+        """
+        validate_payload(await read_json_body(request), AiEmptyRequest)
+        record, http_status = await app.state.ai.install.start()
+        response.status_code = http_status
+        return record.job_payload()
+
+    @app.get("/api/ai/model/install/events", tags=["ai"])
+    async def install_events() -> StreamingResponse:
+        """Stream normalized install progress, then close on the terminal state.
+
+        Reconnecting replays the current state first, so a client recovers the progress
+        after a dropped connection — or after a failed download — without the backend
+        having to remember that client.
+        """
+        copilot: AiCopilot = app.state.ai
+        if copilot.install.record is None:
+            # With nothing to report, an unreachable service is the honest answer.
+            await copilot.service_status()
+        return StreamingResponse(
+            copilot.install.stream(),
+            media_type="text/event-stream",
+            headers=SSE_HEADERS,
+        )
+
+    @app.post("/api/ai/activate", response_model=AiStatus, tags=["ai"])
+    async def activate_model(request: Request) -> AiStatus:
+        """Preload the fixed model with ``keep_alive`` and report the new status."""
+        validate_payload(await read_json_body(request), AiEmptyRequest)
+        return await app.state.ai.activate()
+
+    @app.post("/api/ai/chat", response_model=AiChatResponse, tags=["ai"])
+    async def ai_chat(request: Request) -> AiChatResponse:
+        """Answer one question from the validated snapshot, and never from anywhere else."""
+        payload = await read_json_body(request)
+        parsed: AiChatRequest = validate_payload(payload, AiChatRequest)
+        return await app.state.ai.chat(parsed)
+
+    @app.post(
+        "/api/ai/reports/shift", response_model=AiReportResponse, tags=["ai"]
+    )
+    async def ai_shift_report(request: Request) -> AiReportResponse:
+        """Build the shift report: deterministic metrics, model-written narrative."""
+        payload = await read_json_body(request)
+        parsed: AiReportRequest = validate_payload(payload, AiReportRequest)
+        return await app.state.ai.shift_report(parsed)
+
+    @app.post(
+        "/api/ai/proposals/{proposal_id}/confirm",
+        response_model=ScenarioRevisionResponse,
+        tags=["ai"],
+    )
+    async def confirm_proposal(
+        proposal_id: str, request: Request
+    ) -> ScenarioRevisionResponse:
+        """Apply a proposal the human just confirmed, as one coherent revision."""
+        payload = await read_json_body(request)
+        parsed: AiProposalCommandRequest = validate_payload(
+            payload, AiProposalCommandRequest
+        )
+        return ScenarioRevisionResponse.model_validate(
+            app.state.ai.confirm_proposal(proposal_id, parsed)
+        )
+
+    @app.post(
+        "/api/ai/proposals/{proposal_id}/reject",
+        response_model=ScenarioRevisionResponse,
+        tags=["ai"],
+    )
+    async def reject_proposal(
+        proposal_id: str, request: Request
+    ) -> ScenarioRevisionResponse:
+        """Record the rejection of a proposal. No scenario action is executed."""
+        payload = await read_json_body(request)
+        parsed: AiProposalCommandRequest = validate_payload(
+            payload, AiProposalCommandRequest
+        )
+        return ScenarioRevisionResponse.model_validate(
+            app.state.ai.reject_proposal(proposal_id, parsed)
         )
 
     @app.post(
@@ -109,8 +231,14 @@ def create_app(
         tags=["scenarios"],
     )
     async def reset_scenario(scenario_id: str) -> ScenarioResetResponse:
-        """Remove the current snapshot, routes, barriers and simulation state."""
-        return app.state.scenario_store.reset(scenario_id)
+        """Remove the current snapshot, routes, barriers and simulation state.
+
+        Resetting a scenario also retires its copilot proposals: a proposal computed
+        against a scenario that no longer exists must never be confirmable.
+        """
+        result = app.state.scenario_store.reset(scenario_id)
+        app.state.ai.proposals.clear_scenario(scenario_id)
+        return result
 
     @app.post(
         "/api/scenarios/{scenario_id}/vehicles/generate",

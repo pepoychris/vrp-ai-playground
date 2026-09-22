@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { AssetReadinessPanel } from './components/AssetReadinessPanel';
+import { AiCopilotPanel } from './components/AiCopilotPanel';
 import { SceneStage } from './components/SceneStage';
 import { ScenarioControls } from './components/ScenarioControls';
 import { StatusScreen } from './components/StatusScreen';
@@ -36,6 +37,7 @@ import {
 } from './scenario/scenario';
 import { INACTIVE_READINESS, loadReadiness, type Readiness } from './state/readiness';
 import { useSceneAssets } from './state/use-scene-assets';
+import { useAiCopilot } from './state/use-ai-copilot';
 
 export function App() {
   const [readiness, setReadiness] = useState<Readiness>(INACTIVE_READINESS);
@@ -281,6 +283,19 @@ export function App() {
     return () => controller.abort();
   }, [refresh]);
 
+  const handleAiStateChanged = useCallback(() => {
+    void refresh();
+  }, [refresh]);
+
+  // The copilot reads the scenario and can only mutate it through a confirmed proposal,
+  // which travels through the same revision guard as every other command.
+  const copilot = useAiCopilot({
+    snapshot: scenario,
+    guardRef,
+    onScenarioCommand: applyCommandResponse,
+    onAiStateChanged: handleAiStateChanged,
+  });
+
   return (
     <StatusScreen
       readiness={displayReadiness}
@@ -306,6 +321,7 @@ export function App() {
             onRemoveBarrier={(barrierId) => void handleRemoveBarrier(barrierId)}
             onReset={() => void handleReset()}
           />
+          <AiCopilotPanel {...copilot} snapshot={scenario} />
           <AssetReadinessPanel readiness={assetReadiness} onReload={reload} />
           <SceneStage
             bundle={bundle}
