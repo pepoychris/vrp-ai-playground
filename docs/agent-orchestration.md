@@ -17,6 +17,10 @@ labels or phase names, and existing workflow wording should be translated whenev
 is edited.
 
 - One `phase_implementer` handles one cohesive packet of related MVP work.
+- MVP phases are strictly sequential: implementation, review/correction, focused
+  verification, and remote delivery for one numbered phase must finish before the
+  next numbered phase starts. Never combine two MVP phases in one packet, even when
+  they share files or runtime primitives.
 - The packet contains the exact scope, files, acceptance criteria, non-goals, and
   focused verification commands; unrelated project content is omitted.
 - A single `phase_reviewer` runs only after the whole phase is implemented. It reviews

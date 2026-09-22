@@ -116,7 +116,9 @@ describe('SceneStage', () => {
     });
     vi.stubGlobal('fetch', fetchStub);
 
-    const markup = renderToStaticMarkup(<SceneStage bundle={null} />);
+    const markup = renderToStaticMarkup(
+      <SceneStage bundle={null} snapshot={null} onRelocateVehicle={() => undefined} />,
+    );
 
     expect(markup).toContain('City view');
     expect(markup).toContain('stage__canvas');

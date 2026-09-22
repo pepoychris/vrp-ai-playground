@@ -32,6 +32,11 @@ export interface CityCameraOptions {
 
 export interface CityControls {
   camera: OrthographicCamera;
+  /**
+   * Navigation switch. The claw gesture turns it off so a right-button drag cannot pan
+   * or zoom the view at the same time.
+   */
+  enabled: boolean;
   /** Point on the ground the camera looks at, in local x/z. */
   readonly target: CityPoint;
   readonly zoom: number;
@@ -143,6 +148,7 @@ export function createCityControls(options: CityCameraOptions): CityControls {
 
   const controls: CityControls = {
     camera,
+    enabled: true,
     get target(): CityPoint {
       return { x: target.x, y: 0, z: target.z };
     },
@@ -153,6 +159,7 @@ export function createCityControls(options: CityCameraOptions): CityControls {
       return frustumHeight;
     },
     zoomBy(factor: number) {
+      if (!controls.enabled) return camera.zoom;
       camera.zoom = Math.min(MAX_CITY_ZOOM, Math.max(MIN_CITY_ZOOM, camera.zoom * factor));
       camera.updateProjectionMatrix();
       camera.updateMatrixWorld(true);
@@ -165,6 +172,7 @@ export function createCityControls(options: CityCameraOptions): CityControls {
       return controls.zoomBy(1 / ZOOM_STEP);
     },
     panByPixels(deltaX: number, deltaY: number) {
+      if (!controls.enabled) return controls.target;
       // World units per pixel on the ground. Zoom shrinks it, which is what makes a
       // dragged point stay under the pointer.
       camera.updateMatrixWorld(true);

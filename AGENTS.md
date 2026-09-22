@@ -31,6 +31,11 @@ per file, endpoint, test, or correction. Split a phase only when the work is
 genuinely independent and cannot safely share context, and keep the number of
 agents minimal.
 
+MVP phases are strictly sequential: complete the implementation, review/correction
+gate, focused verification, and remote-delivery gate for one phase before starting
+the next phase. Never combine two numbered MVP phases into a single implementation
+packet, even when they share files or runtime primitives.
+
 The remote repository uses `develop` as the protected integration branch and GitHub
 default branch. `main` is only the bootstrap branch that may exist before this
 workflow is configured. Before the first phase is published, the orchestrator must

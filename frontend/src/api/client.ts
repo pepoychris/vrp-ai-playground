@@ -58,7 +58,11 @@ export async function getJson<T>(path: string, signal?: AbortSignal): Promise<T>
   return (await response.json()) as T;
 }
 
-async function mutation<T>(method: 'POST' | 'DELETE', path: string, body?: unknown): Promise<T> {
+async function mutation<T>(
+  method: 'POST' | 'PATCH' | 'DELETE',
+  path: string,
+  body?: unknown,
+): Promise<T> {
   const response = await fetch(path, {
     method,
     headers: { accept: 'application/json', 'content-type': 'application/json' },
@@ -108,6 +112,11 @@ export function createCommandId(): string {
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
+/** Optional explicit command id, so the caller can track its own pending command. */
+export interface CommandOptions {
+  commandId?: string;
+}
+
 /**
  * Optimise one revision with the frozen command envelope, so a retried request is
  * replayed by the server instead of planning the scenario twice.
@@ -115,15 +124,74 @@ export function createCommandId(): string {
 export function optimizeScenario<T>(
   scenarioId: string,
   scenarioRevision: number,
-  timeLimitSeconds = 2,
+  options: CommandOptions & { timeLimitSeconds?: number } = {},
 ): Promise<T> {
   return mutation<T>('POST', `/api/scenarios/${encodeURIComponent(scenarioId)}/optimize`, {
-    commandId: createCommandId(),
+    commandId: options.commandId ?? createCommandId(),
     scenarioRevision,
-    timeLimitSeconds,
+    timeLimitSeconds: options.timeLimitSeconds ?? 2,
   });
 }
 
 export function resetScenario<T>(scenarioId: string): Promise<T> {
   return mutation<T>('DELETE', `/api/scenarios/${encodeURIComponent(scenarioId)}`);
+}
+
+/**
+ * Start or resume the simulation, optionally at a new speed.
+ *
+ * The clock lives in the snapshot and ticks never create a revision, so this command is
+ * the only place where the browser can change `simulation.running`.
+ */
+export function startSimulation<T>(
+  scenarioId: string,
+  scenarioRevision: number,
+  speedMultiplier = 1,
+  options: CommandOptions = {},
+): Promise<T> {
+  return mutation<T>(
+    'POST',
+    `/api/scenarios/${encodeURIComponent(scenarioId)}/simulation/start`,
+    {
+      commandId: options.commandId ?? createCommandId(),
+      scenarioRevision,
+      speedMultiplier,
+    },
+  );
+}
+
+export function pauseSimulation<T>(
+  scenarioId: string,
+  scenarioRevision: number,
+  options: CommandOptions = {},
+): Promise<T> {
+  return mutation<T>(
+    'POST',
+    `/api/scenarios/${encodeURIComponent(scenarioId)}/simulation/pause`,
+    { commandId: options.commandId ?? createCommandId(), scenarioRevision },
+  );
+}
+
+/**
+ * Drop one vehicle on the nearest road node.
+ *
+ * ``position`` is the raw world point under the pointer: the server snaps it, and an
+ * out-of-radius drop answers 422 without publishing a revision.
+ */
+export function relocateVehicle<T>(
+  scenarioId: string,
+  vehicleId: string,
+  position: { x: number; y: number; z: number },
+  scenarioRevision: number,
+  options: CommandOptions = {},
+): Promise<T> {
+  return mutation<T>(
+    'PATCH',
+    `/api/scenarios/${encodeURIComponent(scenarioId)}/vehicles/${encodeURIComponent(vehicleId)}/position`,
+    {
+      commandId: options.commandId ?? createCommandId(),
+      scenarioRevision,
+      position,
+    },
+  );
 }

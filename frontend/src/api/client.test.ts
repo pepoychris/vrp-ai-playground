@@ -7,6 +7,9 @@ import {
   deployFleet,
   generateOrders,
   optimizeScenario,
+  pauseSimulation,
+  relocateVehicle,
+  startSimulation,
   HttpError,
   READ_ONLY_PATHS,
   getJson,
@@ -107,10 +110,79 @@ describe('scenario mutations', () => {
     );
     vi.stubGlobal('fetch', fetchStub);
 
-    await optimizeScenario('s-1', 1, 1);
+    await optimizeScenario('s-1', 1, { timeLimitSeconds: 1 });
 
     const [, init] = fetchStub.mock.calls[0] as [unknown, RequestInit];
     expect(JSON.parse(String(init.body)).timeLimitSeconds).toBe(1);
+  });
+
+  it('accepts an explicit command id so the caller can track its own command', async () => {
+    const fetchStub = vi.fn(async (_input: unknown, _init?: RequestInit) =>
+      new Response(JSON.stringify({ scenarioId: 's-1' }), { status: 200 }),
+    );
+    vi.stubGlobal('fetch', fetchStub);
+    const commandId = createCommandId();
+
+    await optimizeScenario('s-1', 3, { commandId });
+
+    const [, init] = fetchStub.mock.calls[0] as [unknown, RequestInit];
+    expect(JSON.parse(String(init.body)).commandId).toBe(commandId);
+  });
+});
+
+describe('Phase 6 simulation and claw commands', () => {
+  it('starts, resumes and pauses the simulation with the frozen envelope', async () => {
+    const fetchStub = vi.fn(async (_input: unknown, _init?: RequestInit) =>
+      new Response(JSON.stringify({ scenarioId: 's-1' }), { status: 200 }),
+    );
+    vi.stubGlobal('fetch', fetchStub);
+
+    await startSimulation('s-1', 4, 2);
+    await pauseSimulation('s-1', 5);
+
+    expect(fetchStub).toHaveBeenCalledTimes(2);
+    const [startPath, startInit] = fetchStub.mock.calls[0] as [string, RequestInit];
+    expect(startPath).toBe('/api/scenarios/s-1/simulation/start');
+    const startBody = JSON.parse(String(startInit.body)) as Record<string, unknown>;
+    expect(startBody.scenarioRevision).toBe(4);
+    expect(startBody.speedMultiplier).toBe(2);
+    expect(startBody.commandId).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
+    );
+
+    const [pausePath, pauseInit] = fetchStub.mock.calls[1] as [string, RequestInit];
+    expect(pausePath).toBe('/api/scenarios/s-1/simulation/pause');
+    expect(JSON.parse(String(pauseInit.body)).scenarioRevision).toBe(5);
+  });
+
+  it('patches one vehicle position with the world point under the pointer', async () => {
+    const fetchStub = vi.fn(async (_input: unknown, _init?: RequestInit) =>
+      new Response(JSON.stringify({ scenarioId: 's-1' }), { status: 200 }),
+    );
+    vi.stubGlobal('fetch', fetchStub);
+
+    await relocateVehicle('s-1', 'R-01', { x: 1, y: 0, z: -2 }, 6);
+
+    const [path, init] = fetchStub.mock.calls[0] as [string, RequestInit];
+    expect(path).toBe('/api/scenarios/s-1/vehicles/R-01/position');
+    expect(init).toMatchObject({ method: 'PATCH' });
+    const body = JSON.parse(String(init.body)) as Record<string, unknown>;
+    expect(body.scenarioRevision).toBe(6);
+    expect(body.position).toEqual({ x: 1, y: 0, z: -2 });
+  });
+
+  it('surfaces the rejection detail of an out-of-radius drop', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        async () =>
+          new Response(JSON.stringify({ detail: 'SNAP_OUT_OF_RADIUS' }), { status: 422 }),
+      ),
+    );
+
+    await expect(
+      relocateVehicle('s-1', 'R-01', { x: 0, y: 0, z: 0 }, 2),
+    ).rejects.toThrow('SNAP_OUT_OF_RADIUS');
   });
 });
 
