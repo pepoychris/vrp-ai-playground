@@ -1,16 +1,26 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
+  AI_PATHS,
+  ApiRequestError,
+  activateModel,
+  askCopilot,
+  confirmProposal,
   createCommandId,
   createScenario,
   DisallowedRequestError,
   deployFleet,
   generateOrders,
+  installModel,
+  openInstallStream,
   optimizeScenario,
   pauseSimulation,
   placeBarrier,
+  proposalPath,
+  rejectProposal,
   relocateVehicle,
   removeBarrier,
+  requestShiftReport,
   startSimulation,
   HttpError,
   READ_ONLY_PATHS,
@@ -269,5 +279,143 @@ describe('command ids', () => {
     expect(first).toMatch(pattern);
     expect(second).toMatch(pattern);
     expect(first).not.toBe(second);
+  });
+});
+
+describe('Phase 8 local AI endpoints', () => {
+  it('posts an empty body to install the fixed model', async () => {
+    const fetchStub = vi.fn(async (_input: unknown, _init?: RequestInit) =>
+      new Response(JSON.stringify({ jobId: 'job-1', state: 'DOWNLOADING' }), { status: 202 }),
+    );
+    vi.stubGlobal('fetch', fetchStub);
+
+    const job = await installModel<{ state: string }>();
+
+    expect(job.state).toBe('DOWNLOADING');
+    const [path, init] = fetchStub.mock.calls[0] as [string, RequestInit];
+    expect(path).toBe(AI_PATHS.install);
+    expect(init).toMatchObject({ method: 'POST', body: '{}' });
+    // The model is not a request parameter: the browser cannot choose one.
+    expect(String(init.body)).not.toMatch(/qwen|model|null/i);
+  });
+
+  it('activates the core without sending any option', async () => {
+    const fetchStub = vi.fn(async (_input: unknown, _init?: RequestInit) =>
+      new Response(JSON.stringify({ modelLoaded: true }), { status: 200 }),
+    );
+    vi.stubGlobal('fetch', fetchStub);
+
+    await activateModel();
+
+    const [path, init] = fetchStub.mock.calls[0] as [string, RequestInit];
+    expect(path).toBe(AI_PATHS.activate);
+    expect(init).toMatchObject({ method: 'POST', body: '{}' });
+  });
+
+  it('grounds the question on the revision and carries the command envelope', async () => {
+    const fetchStub = vi.fn(async (_input: unknown, _init?: RequestInit) =>
+      new Response(JSON.stringify({ answer: 'ok', usedRevision: 5 }), { status: 200 }),
+    );
+    vi.stubGlobal('fetch', fetchStub);
+    const commandId = createCommandId();
+
+    await askCopilot('s-1', 5, [{ role: 'user', content: '¿por que cambio la ruta?' }], {
+      commandId,
+    });
+
+    const [path, init] = fetchStub.mock.calls[0] as [string, RequestInit];
+    expect(path).toBe(AI_PATHS.chat);
+    const body = JSON.parse(String(init.body)) as Record<string, unknown>;
+    expect(body).toMatchObject({ scenarioId: 's-1', scenarioRevision: 5, commandId });
+    expect(body.messages).toEqual([{ role: 'user', content: '¿por que cambio la ruta?' }]);
+    // No inference override ever leaves the browser.
+    expect(body).not.toHaveProperty('model');
+    expect(body).not.toHaveProperty('think');
+    expect(body).not.toHaveProperty('options');
+    expect(body).not.toHaveProperty('keep_alive');
+  });
+
+  it('requests the shift report with the same grounded envelope', async () => {
+    const fetchStub = vi.fn(async (_input: unknown, _init?: RequestInit) =>
+      new Response(JSON.stringify({ markdown: '# Turno' }), { status: 200 }),
+    );
+    vi.stubGlobal('fetch', fetchStub);
+
+    await requestShiftReport('s-1', 6);
+
+    const [path, init] = fetchStub.mock.calls[0] as [string, RequestInit];
+    expect(path).toBe(AI_PATHS.shiftReport);
+    const body = JSON.parse(String(init.body)) as Record<string, unknown>;
+    expect(body.scenarioRevision).toBe(6);
+    expect(body.commandId).toEqual(expect.any(String));
+  });
+
+  it('confirms and rejects one proposal through its own path', async () => {
+    const fetchStub = vi.fn(async (_input: unknown, _init?: RequestInit) =>
+      new Response(JSON.stringify({ scenarioRevision: 7 }), { status: 200 }),
+    );
+    vi.stubGlobal('fetch', fetchStub);
+
+    await confirmProposal('prop-1', 6);
+    await rejectProposal('prop-1', 6);
+
+    expect(proposalPath('prop-1')).toBe('/api/ai/proposals/prop-1');
+    expect(fetchStub.mock.calls[0][0]).toBe('/api/ai/proposals/prop-1/confirm');
+    expect(fetchStub.mock.calls[1][0]).toBe('/api/ai/proposals/prop-1/reject');
+    for (const [, init] of fetchStub.mock.calls as [string, RequestInit][]) {
+      expect(JSON.parse(String(init.body))).toMatchObject({ scenarioRevision: 6 });
+    }
+  });
+
+  it('escapes a proposal id before it reaches the path', () => {
+    expect(proposalPath('a/b c')).toBe('/api/ai/proposals/a%2Fb%20c');
+  });
+
+  it('surfaces the frozen error envelope of an AI endpoint', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        async () =>
+          new Response(
+            JSON.stringify({
+              error: { code: 'AI_MODEL_NOT_LOADED', message: 'Activate the AI core first.' },
+            }),
+            { status: 409 },
+          ),
+      ),
+    );
+
+    await expect(askCopilot('s-1', 1, [{ role: 'user', content: 'hola' }])).rejects.toMatchObject({
+      code: 'AI_MODEL_NOT_LOADED',
+      status: 409,
+    });
+    await expect(
+      askCopilot('s-1', 1, [{ role: 'user', content: 'hola' }]),
+    ).rejects.toBeInstanceOf(ApiRequestError);
+  });
+
+  it('subscribes to the install progress stream at the frozen path', () => {
+    const opened: string[] = [];
+    class FakeEventSource {
+      constructor(readonly url: string) {
+        opened.push(url);
+      }
+      addEventListener(): void {}
+      removeEventListener(): void {}
+      close(): void {}
+    }
+    vi.stubGlobal('EventSource', FakeEventSource);
+
+    const stream = openInstallStream();
+
+    expect(stream).toBeInstanceOf(FakeEventSource);
+    expect(opened).toEqual([AI_PATHS.installEvents]);
+    expect(AI_PATHS.installEvents).toBe('/api/ai/model/install/events');
+  });
+
+  it('returns no stream where the environment has no EventSource', () => {
+    vi.stubGlobal('EventSource', undefined);
+
+    expect(openInstallStream()).toBeNull();
   });
 });

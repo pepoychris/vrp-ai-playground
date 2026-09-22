@@ -60,20 +60,40 @@ Priority = Literal["LOW", "NORMAL", "URGENT"]
 # so it invalidates the tick timeline instead of inheriting it.
 SIMULATION_KINDS: Final = ("SIMULATION_START", "SIMULATION_PAUSE")
 
+# Phase 8: the only actions the copilot may suggest. Each one the user confirms becomes a
+# single ``PROPOSAL_CONFIRMED`` revision, exactly like any other mutation.
+AI_PROPOSAL_KINDS: Final = (
+    "SET_VEHICLE_UNAVAILABLE",
+    "DELAY_VEHICLE",
+    "REQUEST_REOPTIMIZATION",
+)
+# Kinds that take one robot out of the plan, and the status they leave behind.
+PROPOSAL_VEHICLE_STATUS: Final = {
+    "SET_VEHICLE_UNAVAILABLE": "BLOCKED",
+    "DELAY_VEHICLE": "DELAYED",
+}
+# A robot in one of these states is not part of the planning fleet.
+UNAVAILABLE_VEHICLE_STATUSES: Final = ("BLOCKED", "DELAYED")
 
-def _require_uuid4(value: str | None) -> str | None:
-    if value is None:
-        return value
+
+def _require_uuid4(value: str) -> str:
     try:
         parsed = UUID(value)
-    except ValueError as exc:
+    except (TypeError, ValueError) as exc:
         raise ValueError("commandId must be a UUID v4") from exc
     if parsed.version != 4:
         raise ValueError("commandId must be a UUID v4")
     return value
 
 
-CommandId = Annotated[str | None, AfterValidator(_require_uuid4)]
+def _optional_uuid4(value: str | None) -> str | None:
+    """The envelope stays optional on the endpoints that allow a reduced body."""
+    return None if value is None else _require_uuid4(value)
+
+
+CommandId = Annotated[str | None, AfterValidator(_optional_uuid4)]
+# Required form, used by the Phase 8 AI commands: a human command always carries an id.
+RequiredCommandId = Annotated[str, AfterValidator(_require_uuid4)]
 
 
 class SeededPrng:
@@ -401,6 +421,35 @@ def reset_simulation(snapshot: dict[str, Any]) -> None:
         speed_multiplier=float(previous.get("speedMultiplier", DEFAULT_SPEED_MULTIPLIER)),
         tick=0,
     )
+
+
+def _idle_route(vehicle: dict[str, Any]) -> dict[str, Any]:
+    """The route of a robot that takes no part in this revision's plan.
+
+    A vehicle pulled out of service still owns an entry in ``routePlan.vehicles``: the plan
+    is read per vehicle everywhere else, so the unavailable robot is published with an
+    empty route instead of disappearing from the plan.
+    """
+    current = vehicle.get("currentNodeId")
+    return {
+        "vehicleId": vehicle["vehicleId"],
+        "nodeSequence": [current] if current else [],
+        "edgeSequence": [],
+        "stops": [],
+        "distanceMeters": 0,
+        "driveSeconds": 0,
+        "loadUtilizationPercent": 0,
+        "endsAtSeconds": 0,
+    }
+
+
+def available_vehicle_ids(snapshot: dict[str, Any]) -> list[str]:
+    """Robots that can still take stops in the current revision."""
+    return [
+        vehicle["vehicleId"]
+        for vehicle in snapshot["vehicles"]
+        if vehicle.get("status") not in UNAVAILABLE_VEHICLE_STATUSES
+    ]
 
 
 @dataclass(slots=True)
@@ -799,6 +848,15 @@ class ScenarioStore:
         replayed["appliedCommand"] = applied
         return replayed
 
+    def replay(self, scenario_id: str, command_id: str | None) -> dict[str, Any] | None:
+        """Public read of the frozen idempotency window of one scenario.
+
+        The AI proposal endpoints consult it *before* judging the proposal, because a
+        retried confirmation must answer the revision it already produced — a resolved
+        proposal is not an error when the same human command is being replayed.
+        """
+        return self._replay(scenario_id, command_id)
+
     def _publish(
         self,
         scenario_id: str,
@@ -836,13 +894,41 @@ class ScenarioStore:
         kind: str,
         command_id: str | None,
         client_revision: int | None,
+        unavailable_vehicle_ids: frozenset[str] = frozenset(),
     ) -> None:
         """Run the planner once and stamp the plan on the next revision.
 
         Shared by the optimize command and the claw relocation so a relocation is
         exactly one recomputation, never a plan followed by a second pass.
+
+        ``unavailable_vehicle_ids`` is the Phase 8 hook the AI proposal path uses to take
+        one robot out of the plan. It defaults to the empty set, so every Phase 5-7 caller
+        plans exactly the fleet it always planned.
         """
-        route_plan, kpis = optimize_snapshot(working, time_limit_seconds)
+        if unavailable_vehicle_ids:
+            full_fleet = working["vehicles"]
+            working["vehicles"] = [
+                vehicle
+                for vehicle in full_fleet
+                if vehicle["vehicleId"] not in unavailable_vehicle_ids
+            ]
+            try:
+                route_plan, kpis = optimize_snapshot(working, time_limit_seconds)
+            finally:
+                working["vehicles"] = full_fleet
+            # Re-attach an idle route for every robot that sat this revision out, and
+            # restore the fleet order so the plan stays indexed like the vehicle list.
+            routes_by_vehicle = {
+                route["vehicleId"]: route for route in route_plan["vehicles"]
+            }
+            for vehicle in full_fleet:
+                if vehicle["vehicleId"] in unavailable_vehicle_ids:
+                    routes_by_vehicle[vehicle["vehicleId"]] = _idle_route(vehicle)
+            route_plan["vehicles"] = [
+                routes_by_vehicle[vehicle["vehicleId"]] for vehicle in full_fleet
+            ]
+        else:
+            route_plan, kpis = optimize_snapshot(working, time_limit_seconds)
         _mutate(working, kind, command_id=command_id, client_revision=client_revision)
         route_plan["scenarioRevision"] = working["scenarioRevision"]
         route_plan["generatedAt"] = working["emittedAt"]
@@ -876,6 +962,10 @@ class ScenarioStore:
                 order["assignedVehicleId"] = None
                 order["sequenceIndex"] = None
         for vehicle in working["vehicles"]:
+            if vehicle["vehicleId"] in unavailable_vehicle_ids:
+                # The robot is out of service: it keeps its own status and takes no stop.
+                vehicle["assignedOrderIds"] = []
+                continue
             route = next(route for route in route_plan["vehicles"] if route["vehicleId"] == vehicle["vehicleId"])
             vehicle["assignedOrderIds"] = [stop["orderId"] for stop in route["stops"]]
             vehicle["status"] = "EN_ROUTE" if route["stops"] else "AVAILABLE"
@@ -922,6 +1012,113 @@ class ScenarioStore:
         for key in [key for key in self.command_payloads if key.startswith(prefix)]:
             self.command_payloads.pop(key, None)
         return ScenarioResetResponse(scenarioId=scenario_id, status="RESET", scenarioRevision=snapshot["scenarioRevision"] + 1)
+
+    def apply_ai_proposal(
+        self,
+        scenario_id: str,
+        kind: str,
+        payload: dict[str, Any],
+        *,
+        command_id: str | None = None,
+        client_revision: int | None = None,
+    ) -> dict[str, Any]:
+        """Apply one human-confirmed copilot proposal as a single coherent revision.
+
+        This is the *only* place a proposal becomes an action. The HTTP layer never calls
+        it before the user confirms, and the revision it publishes carries
+        ``PROPOSAL_CONFIRMED`` plus a plan recomputed against the mutated fleet, so the
+        routes, the KPIs and the before/after comparison always describe the same revision.
+        A repeated ``commandId`` is replayed instead of mutating twice.
+        """
+        if kind not in AI_PROPOSAL_KINDS:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="VALIDATION_ERROR"
+            )
+        snapshot = self.get(scenario_id)
+        replayed = self._replay(scenario_id, command_id)
+        if replayed is not None:
+            return replayed
+
+        working = deepcopy(snapshot)
+        unavailable: set[str] = set()
+        target_status = PROPOSAL_VEHICLE_STATUS.get(kind)
+        if target_status is not None:
+            vehicle_id = payload.get("vehicleId")
+            vehicle = next(
+                (
+                    item
+                    for item in working["vehicles"]
+                    if item["vehicleId"] == vehicle_id
+                ),
+                None,
+            )
+            if vehicle is None:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND, detail="VEHICLE_NOT_FOUND"
+                )
+            # The demo always keeps one robot on the road: taking the last available robot
+            # out of service would leave a scenario nobody could plan or explain.
+            if vehicle.get("status") not in UNAVAILABLE_VEHICLE_STATUSES:
+                remaining = [
+                    item["vehicleId"]
+                    for item in working["vehicles"]
+                    if item["vehicleId"] != vehicle_id
+                    and item.get("status") not in UNAVAILABLE_VEHICLE_STATUSES
+                ]
+                if not remaining:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="VALIDATION_ERROR",
+                    )
+            vehicle["status"] = target_status
+            unavailable.add(vehicle["vehicleId"])
+
+        if working["vehicles"] and working["orders"]:
+            self._publish_routes(
+                working,
+                snapshot,
+                time_limit_seconds=DEFAULT_TIME_LIMIT_SECONDS,
+                kind="PROPOSAL_CONFIRMED",
+                command_id=command_id,
+                client_revision=client_revision,
+                unavailable_vehicle_ids=frozenset(unavailable),
+            )
+        else:
+            _mutate(
+                working,
+                "PROPOSAL_CONFIRMED",
+                command_id=command_id,
+                client_revision=client_revision,
+            )
+        self._publish(scenario_id, working, command_id=command_id)
+        return working
+
+    def reject_ai_proposal(
+        self,
+        scenario_id: str,
+        *,
+        command_id: str | None = None,
+        client_revision: int | None = None,
+    ) -> dict[str, Any]:
+        """Publish the rejection of one proposal as its own revision.
+
+        The frozen contract catalogues ``PROPOSAL_REJECTED`` as an intervention kind and
+        marks the endpoint as revision-bumping, so a rejection is a real revision *of the
+        decision*, not of the scenario: no vehicle, order, route or closure is touched.
+        """
+        snapshot = self.get(scenario_id)
+        replayed = self._replay(scenario_id, command_id)
+        if replayed is not None:
+            return replayed
+        working = deepcopy(snapshot)
+        _mutate(
+            working,
+            "PROPOSAL_REJECTED",
+            command_id=command_id,
+            client_revision=client_revision,
+        )
+        self._publish(scenario_id, working, command_id=command_id)
+        return working
 
 
 def _intervention_impact(

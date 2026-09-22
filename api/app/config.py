@@ -34,6 +34,25 @@ OLLAMA_NO_CLOUD: Final = "1"
 OLLAMA_NUM_PARALLEL: Final = "1"
 OLLAMA_MAX_LOADED_MODELS: Final = "1"
 
+# Phase 8 AI runtime. The model and the inference options stay frozen constants; only
+# the preload window, the request budgets and the streaming heartbeat are tunable,
+# because they depend on the machine that runs the demo and never on a request.
+ACTIVATE_KEEP_ALIVE: Final = "30m"
+CHAT_KEEP_ALIVE: Final = "10m"
+
+# `/api/ps` reports a model as loaded while its keep_alive window is open, so the
+# preload window is the only knob the operator may need to touch.
+DEFAULT_AI_CHAT_TIMEOUT_SECONDS: Final = 120.0
+DEFAULT_AI_INSTALL_TIMEOUT_SECONDS: Final = 1800.0
+DEFAULT_AI_REPORT_TIMEOUT_SECONDS: Final = 180.0
+DEFAULT_AI_STREAM_HEARTBEAT_SECONDS: Final = 15.0
+
+# Guard rails on the conversational surface: bounded history and bounded turns keep
+# the prompt inside the frozen 8k context window.
+AI_MAX_MESSAGES: Final = 20
+AI_MAX_MESSAGE_CHARS: Final = 2000
+AI_REPORT_SCHEMA_VERSION: Final = "1.0"
+
 DEFAULT_OLLAMA_BASE_URL: Final = "http://ollama:11434"
 DEFAULT_OLLAMA_TIMEOUT_SECONDS: Final = 2.0
 DEFAULT_DATABASE_PATH: Final = "/data/roboroute.db"
@@ -41,6 +60,10 @@ DEFAULT_DATABASE_PATH: Final = "/data/roboroute.db"
 ENV_OLLAMA_BASE_URL: Final = "ROBOROUTE_OLLAMA_BASE_URL"
 ENV_OLLAMA_TIMEOUT_SECONDS: Final = "ROBOROUTE_OLLAMA_TIMEOUT_SECONDS"
 ENV_DATABASE_PATH: Final = "ROBOROUTE_DB_PATH"
+ENV_AI_CHAT_TIMEOUT_SECONDS: Final = "ROBOROUTE_AI_CHAT_TIMEOUT_SECONDS"
+ENV_AI_INSTALL_TIMEOUT_SECONDS: Final = "ROBOROUTE_AI_INSTALL_TIMEOUT_SECONDS"
+ENV_AI_REPORT_TIMEOUT_SECONDS: Final = "ROBOROUTE_AI_REPORT_TIMEOUT_SECONDS"
+ENV_AI_STREAM_HEARTBEAT_SECONDS: Final = "ROBOROUTE_AI_STREAM_HEARTBEAT_SECONDS"
 
 
 @dataclass(frozen=True, slots=True)
@@ -54,6 +77,10 @@ class Settings:
     ollama_base_url: str = DEFAULT_OLLAMA_BASE_URL
     ollama_timeout_seconds: float = DEFAULT_OLLAMA_TIMEOUT_SECONDS
     database_path: str = DEFAULT_DATABASE_PATH
+    ai_chat_timeout_seconds: float = DEFAULT_AI_CHAT_TIMEOUT_SECONDS
+    ai_install_timeout_seconds: float = DEFAULT_AI_INSTALL_TIMEOUT_SECONDS
+    ai_report_timeout_seconds: float = DEFAULT_AI_REPORT_TIMEOUT_SECONDS
+    ai_stream_heartbeat_seconds: float = DEFAULT_AI_STREAM_HEARTBEAT_SECONDS
 
     @classmethod
     def from_env(cls, environ: Mapping[str, str] | None = None) -> "Settings":
@@ -66,6 +93,21 @@ class Settings:
                 source.get(ENV_OLLAMA_TIMEOUT_SECONDS), DEFAULT_OLLAMA_TIMEOUT_SECONDS
             ),
             database_path=database_path,
+            ai_chat_timeout_seconds=_positive_float(
+                source.get(ENV_AI_CHAT_TIMEOUT_SECONDS), DEFAULT_AI_CHAT_TIMEOUT_SECONDS
+            ),
+            ai_install_timeout_seconds=_positive_float(
+                source.get(ENV_AI_INSTALL_TIMEOUT_SECONDS),
+                DEFAULT_AI_INSTALL_TIMEOUT_SECONDS,
+            ),
+            ai_report_timeout_seconds=_positive_float(
+                source.get(ENV_AI_REPORT_TIMEOUT_SECONDS),
+                DEFAULT_AI_REPORT_TIMEOUT_SECONDS,
+            ),
+            ai_stream_heartbeat_seconds=_positive_float(
+                source.get(ENV_AI_STREAM_HEARTBEAT_SECONDS),
+                DEFAULT_AI_STREAM_HEARTBEAT_SECONDS,
+            ),
         )
 
 

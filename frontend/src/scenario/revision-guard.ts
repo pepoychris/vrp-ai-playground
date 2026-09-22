@@ -140,3 +140,14 @@ export function settleCommand(
   if (commandId === null || state.pendingCommandId !== commandId) return state;
   return { ...state, pendingCommandId: null };
 }
+
+/**
+ * Accept an AI answer only when it was grounded on the revision the user is looking at.
+ *
+ * The copilot is read-only, so an answer cannot corrupt the scenario — but an answer about
+ * an older revision would describe a plan that no longer exists. A stale answer is dropped
+ * rather than shown, exactly like a stale snapshot.
+ */
+export function acceptAiAnswer(state: RevisionGuardState, usedRevision: number): boolean {
+  return state.scenarioId !== null && usedRevision === state.scenarioRevision;
+}
