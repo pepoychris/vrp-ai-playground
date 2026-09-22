@@ -8,6 +8,14 @@ description: "How implementation, review and correction agents work in this repo
 
 This project uses a phase-based workflow to keep implementation fast and focused.
 
+## Project language
+
+English is mandatory for all project workflow and delivery artifacts: phase packets,
+agent reports, branch names, commit messages, GitHub issues, pull requests, reviews,
+comments, checklists, and status updates. New workflow text must not use Spanish
+labels or phase names, and existing workflow wording should be translated whenever it
+is edited.
+
 - One `phase_implementer` handles one cohesive packet of related MVP work.
 - The packet contains the exact scope, files, acceptance criteria, non-goals, and
   focused verification commands; unrelated project content is omitted.
@@ -46,7 +54,7 @@ The primary orchestrator owns integration. Before the first phase delivery it
 creates `develop` from the repository's bootstrap base and configures `develop` as
 the GitHub default/protected integration branch. Each phase is then worked on a
 short-lived branch created from `develop`, using the `codex/` prefix and a
-phase-specific name (for example, `codex/fase-0-contratos`). The branch is created
+English phase-specific name (for example, `codex/phase-0-contracts`). The branch is created
 before the phase commit; local tooling artifacts such as `.codegraph/`, `.codex/`
 and `.cursor/` remain untracked and are not included in phase commits.
 

@@ -4,6 +4,14 @@ These instructions govern implementation work in this repository. The MVP in
 `MVP_ROBOROUTE_ULTIMA_MILLA.md` is the source of truth for product scope,
 technical decisions, phase boundaries, and acceptance criteria.
 
+## Project language
+
+English is the project-wide working language for engineering and delivery. Context
+packets, agent reports, branch names, commit messages, issue titles/bodies, pull
+requests, reviews, comments, checklists, and status updates must be written in
+English. Do not introduce Spanish workflow labels or phase names; translate existing
+workflow wording when it is touched.
+
 ## Orchestration policy
 
 Use GPT-5.6 Luna with high reasoning for the primary orchestrator. Implementation,
@@ -70,7 +78,7 @@ reported as complete:
 1. Create or verify the GitHub issues that represent the phase scope and acceptance
    criteria. Keep them grouped by cohesive behavior, not one issue per file or test.
 2. Create a short-lived branch from `develop` using the `codex/` prefix and a
-   phase-specific name.
+   English phase-specific name.
 3. Commit only the phase changes with a Conventional Commit message and push the
    branch to the configured `origin` remote.
 4. Open one pull request from that branch into `develop`, listing the phase issues
