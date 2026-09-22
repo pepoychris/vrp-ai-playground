@@ -1,0 +1,106 @@
+# RoboRoute Nexus local stack (MVP Phase 1).
+#
+# - Base images are pinned in docs/contracts/versions.md; "latest" is never used.
+# - Only the frontend and the API publish host ports. Ollama is reachable through
+#   the internal `backend` network only, so the browser can never talk to it.
+# - The `backend` network is intentionally NOT marked `internal: true`: Phase 8
+#   needs outbound Internet access to download the model once, on user request.
+name: roboroute-nexus
+
+services:
+  ollama:
+    image: ollama/ollama:0.34.2
+    environment:
+      # Approved inference runtime settings (docs/contracts/versions.md).
+      OLLAMA_NO_CLOUD: "1"
+      OLLAMA_NUM_PARALLEL: "1"
+      OLLAMA_MAX_LOADED_MODELS: "1"
+      OLLAMA_HOST: "0.0.0.0:11434"
+    volumes:
+      - ollama-models:/root/.ollama
+    networks:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    # No published ports on purpose: the API is the only component allowed to
+    # reach this service, and no model is downloaded or preloaded on startup.
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    environment:
+      ROBOROUTE_OLLAMA_BASE_URL: http://ollama:11434
+      ROBOROUTE_OLLAMA_TIMEOUT_SECONDS: "${ROBOROUTE_OLLAMA_TIMEOUT_SECONDS:-2.0}"
+      ROBOROUTE_DB_PATH: "${ROBOROUTE_DB_PATH:-/data/roboroute.db}"
+    ports:
+      - "${API_PORT:-8000}:8000"
+    volumes:
+      - sqlite-data:/data
+    networks:
+      - backend
+      - edge
+    # The API reports Ollama as unavailable instead of failing to boot, so it does
+    # not wait for the Ollama healthcheck.
+    depends_on:
+      ollama:
+        condition: service_started
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3).read()",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      PORT: "8080"
+      # Same-origin proxy target: the browser only ever talks to the frontend.
+      API_UPSTREAM: http://api:8000
+    ports:
+      - "${FRONTEND_PORT:-8080}:8080"
+    networks:
+      - edge
+    depends_on:
+      api:
+        condition: service_started
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:8080/').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  ollama-models:
+    name: roboroute-ollama-models
+  sqlite-data:
+    name: roboroute-sqlite-data
+
+networks:
+  edge:
+    name: roboroute-edge
+  backend:
+    name: roboroute-backend

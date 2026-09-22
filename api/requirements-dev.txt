@@ -1,0 +1,4 @@
+# Extra dependencies used by the local Phase 1 test suite only.
+# Not installed in the runtime image; see api/Dockerfile.
+-r requirements.txt
+jsonschema==4.26.0
