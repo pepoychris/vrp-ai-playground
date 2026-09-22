@@ -232,7 +232,11 @@ describe('scene placements', () => {
   it('publishes one route surface per vehicle that drives', () => {
     const surfaces = routeSurfaces(snapshotWithPlan([straightRoute()]));
     expect(surfaces).toEqual([
-      { vehicleId: 'R-01', edgeIds: ['E-N001-N002', 'E-N002-N003'] },
+      {
+        vehicleId: 'R-01',
+        startNodeId: 'N-001',
+        edgeIds: ['E-N001-N002', 'E-N002-N003'],
+      },
     ]);
   });
 });

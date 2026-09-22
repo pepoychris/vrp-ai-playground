@@ -251,6 +251,13 @@ describe('routePolyline', () => {
     expect(next.x).toBeLessThan(segment.x);
   });
 
+  it('uses the route start node to orient the first bidirectional edge', () => {
+    const edgeIds = ['E-N023-N032', 'E-N014-N023'];
+    const polyline = routePolyline(network, edgeIds, { startNodeId: 'N-032' });
+
+    expect(polyline.nodeIds).toEqual(['N-032', 'N-023', 'N-014']);
+  });
+
   it('refuses a sequence that is not connected instead of inventing a shortcut', () => {
     expect(() => routePolyline(network, ['E-N032-N033', 'E-N001-N002'])).toThrowError(
       /not connected/,
