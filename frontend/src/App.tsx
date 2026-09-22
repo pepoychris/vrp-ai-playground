@@ -321,18 +321,28 @@ export function App() {
             onRemoveBarrier={(barrierId) => void handleRemoveBarrier(barrierId)}
             onReset={() => void handleReset()}
           />
-          <AiCopilotPanel {...copilot} snapshot={scenario} />
-          <AssetReadinessPanel readiness={assetReadiness} onReload={reload} />
-          <SceneStage
-            bundle={bundle}
-            snapshot={scenario}
-            onRelocateVehicle={(vehicleId, position) => void handleRelocateVehicle(vehicleId, position)}
-            barrierToolArmed={barrierToolArmed}
-            selectedBarrierId={selectedBarrierId}
-            onPlaceBarrier={(position) => void handlePlaceBarrier(position)}
-            onRemoveBarrier={(barrierId) => void handleRemoveBarrier(barrierId)}
-            onSelectBarrier={setSelectedBarrierId}
-          />
+          {/* The city is the primary surface of the control tower: it spans the page and the
+              panels that act on it sit beside it on a desktop viewport. */}
+          <div className="scene-layout">
+            <div className="scene-layout__main">
+              <SceneStage
+                bundle={bundle}
+                snapshot={scenario}
+                onRelocateVehicle={(vehicleId, position) =>
+                  void handleRelocateVehicle(vehicleId, position)
+                }
+                barrierToolArmed={barrierToolArmed}
+                selectedBarrierId={selectedBarrierId}
+                onPlaceBarrier={(position) => void handlePlaceBarrier(position)}
+                onRemoveBarrier={(barrierId) => void handleRemoveBarrier(barrierId)}
+                onSelectBarrier={setSelectedBarrierId}
+              />
+            </div>
+            <div className="scene-layout__side">
+              <AiCopilotPanel {...copilot} snapshot={scenario} />
+              <AssetReadinessPanel readiness={assetReadiness} onReload={reload} />
+            </div>
+          </div>
         </>
       }
     />

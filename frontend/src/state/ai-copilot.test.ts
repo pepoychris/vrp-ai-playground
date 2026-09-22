@@ -3,13 +3,17 @@ import { describe, expect, it } from 'vitest';
 import {
   INITIAL_INSTALL_PROGRESS,
   aiReadinessCopy,
+  canActivateCore,
+  describeAnswerTimings,
   describeAiError,
   describeProposalKind,
   installProgressDetail,
   installProgressLabel,
+  installProgressFromStatus,
   installProgressRatio,
   isInstallTerminal,
   isInstalling,
+  mergeAiStatus,
   parseAiProposal,
   parseChatResponse,
   parseInstallEvent,
@@ -20,7 +24,7 @@ import {
   reportFileName,
   type InstallProgress,
 } from './ai-copilot';
-import { INACTIVE_AI_STATUS } from './readiness';
+import { FIXED_MODEL_NAME, INACTIVE_AI_STATUS, type AiStatus } from './readiness';
 
 function frame(payload: unknown, eventSeq = 1): unknown {
   return { type: 'ai.install', eventSeq, payload };
@@ -28,6 +32,20 @@ function frame(payload: unknown, eventSeq = 1): unknown {
 
 function progress(overrides: Partial<InstallProgress> = {}): InstallProgress {
   return { ...INITIAL_INSTALL_PROGRESS, ...overrides };
+}
+
+function aiStatus(overrides: Partial<AiStatus> = {}): AiStatus {
+  return { ...INACTIVE_AI_STATUS, ...overrides };
+}
+
+function completedJob() {
+  return {
+    jobId: 'job-1',
+    state: 'COMPLETED',
+    modelName: FIXED_MODEL_NAME,
+    startedAt: '2026-09-22T09:00:00.000Z',
+    finishedAt: '2026-09-22T09:05:00.000Z',
+  };
 }
 
 describe('install progress', () => {
@@ -222,5 +240,118 @@ describe('error copy', () => {
 
     expect(copy).toEqual({ service: 'Available', installed: 'Installed', loaded: 'Not loaded' });
     expect(Object.values(copy).join(' ')).not.toMatch(/qwen|ollama|11434/i);
+  });
+});
+
+describe('authoritative status synchronization', () => {
+  it('adopts the model the backend reports as installed', () => {
+    const merged = mergeAiStatus(
+      INACTIVE_AI_STATUS,
+      aiStatus({ serviceAvailable: true, modelInstalled: true }),
+    );
+
+    expect(merged).toMatchObject({
+      serviceAvailable: true,
+      modelInstalled: true,
+      modelLoaded: false,
+    });
+    // The reported bug: Available + Installed + Not loaded must activate.
+    expect(canActivateCore(merged)).toBe(true);
+  });
+
+  it('never lets a delayed frame un-install or un-load a confirmed model', () => {
+    const confirmed = aiStatus({
+      serviceAvailable: true,
+      modelInstalled: true,
+      modelLoaded: true,
+    });
+
+    const stale = mergeAiStatus(confirmed, aiStatus({ serviceAvailable: true }));
+
+    expect(stale.modelInstalled).toBe(true);
+    expect(stale.modelLoaded).toBe(true);
+    expect(canActivateCore(stale)).toBe(false);
+  });
+
+  it('keeps the last known model state when the service stops answering', () => {
+    const confirmed = mergeAiStatus(
+      INACTIVE_AI_STATUS,
+      aiStatus({ serviceAvailable: true, modelInstalled: true }),
+    );
+
+    const offline = mergeAiStatus(confirmed, aiStatus());
+
+    expect(offline.serviceAvailable).toBe(false);
+    // An unreachable service says nothing about what is on disk.
+    expect(offline.modelInstalled).toBe(true);
+    expect(offline.modelName).toBe(FIXED_MODEL_NAME);
+  });
+
+  it('seeds the terminal install state a reloaded page never streamed', () => {
+    const seeded = installProgressFromStatus(
+      aiStatus({ serviceAvailable: true, modelInstalled: true, installJob: completedJob() }),
+      progress(),
+    );
+
+    expect(seeded.state).toBe('COMPLETED');
+    expect(seeded.percent).toBe(100);
+    expect(installProgressLabel(seeded)).toBe('Installed');
+    expect(installProgressRatio(seeded)).toBe(1);
+  });
+
+  it('never replaces progress the stream already owns', () => {
+    const live = progress({ state: 'DOWNLOADING', percent: 42.5, eventSeq: 7 });
+    const seeded = installProgressFromStatus(
+      aiStatus({ serviceAvailable: true, installJob: completedJob() }),
+      live,
+    );
+
+    expect(seeded).toBe(live);
+  });
+
+  it('seeds a running job and a failed job from the status summary', () => {
+    const running = installProgressFromStatus(
+      aiStatus({
+        serviceAvailable: true,
+        installJob: { ...completedJob(), state: 'DOWNLOADING', finishedAt: null },
+      }),
+      progress(),
+    );
+    expect(running.state).toBe('DOWNLOADING');
+
+    const failed = installProgressFromStatus(
+      aiStatus({
+        serviceAvailable: true,
+        installJob: { ...completedJob(), state: 'FAILED', finishedAt: null },
+      }),
+      progress(),
+    );
+    expect(failed.state).toBe('FAILED');
+    expect(installProgressDetail(failed)).toMatch(/start it again/);
+  });
+
+  it('ignores an absent or unknown job without disturbing the panel', () => {
+    const idle = progress();
+
+    expect(installProgressFromStatus(aiStatus(), idle)).toBe(idle);
+    expect(
+      installProgressFromStatus(
+        aiStatus({ installJob: { ...completedJob(), state: 'SOMETHING_ELSE' } }),
+        idle,
+      ),
+    ).toBe(idle);
+  });
+
+  it('reports the measured answer latency, and nothing when it is unusable', () => {
+    expect(describeAnswerTimings({ total: 2841 })).toBe('2.8 s');
+    expect(describeAnswerTimings({})).toBeNull();
+    expect(describeAnswerTimings({ total: 0 })).toBeNull();
+    expect(describeAnswerTimings({ total: Number.NaN })).toBeNull();
+  });
+
+  it('requires an installed model before the core can be activated', () => {
+    expect(canActivateCore(aiStatus())).toBe(false);
+    expect(canActivateCore(aiStatus({ modelInstalled: true }))).toBe(true);
+    expect(canActivateCore(aiStatus({ modelInstalled: true, modelLoaded: true }))).toBe(false);
   });
 });

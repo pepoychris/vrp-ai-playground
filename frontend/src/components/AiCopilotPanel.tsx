@@ -12,6 +12,8 @@ import { useState } from 'react';
 
 import {
   aiReadinessCopy,
+  canActivateCore,
+  describeAnswerTimings,
   describeProposalKind,
   installProgressDetail,
   installProgressLabel,
@@ -27,6 +29,10 @@ import type { ScenarioSnapshot } from '../scenario/scenario';
 export interface AiCopilotPanelProps {
   snapshot: ScenarioSnapshot | null;
   status: AiStatus;
+  /** True while the authoritative status read is in flight. */
+  statusChecking: boolean;
+  /** Recoverable read failure of `GET /api/ai/status`; `null` once it answers. */
+  statusError: string | null;
   install: InstallProgress;
   installing: boolean;
   installBusy: boolean;
@@ -39,6 +45,7 @@ export interface AiCopilotPanelProps {
   answer: AiChatAnswer | null;
   answerStale: boolean;
   report: AiReport | null;
+  onRetryStatus: () => void;
   onInstall: () => void;
   onActivate: () => void;
   onAsk: (question: string) => void;
@@ -56,6 +63,8 @@ const EXAMPLE_QUESTIONS = [
 export function AiCopilotPanel({
   snapshot,
   status,
+  statusChecking,
+  statusError,
   install,
   installing,
   installBusy,
@@ -68,6 +77,7 @@ export function AiCopilotPanel({
   answer,
   answerStale,
   report,
+  onRetryStatus,
   onInstall,
   onActivate,
   onAsk,
@@ -81,6 +91,16 @@ export function AiCopilotPanel({
   const ratio = installProgressRatio(install);
   const proposal = answer?.proposal ?? null;
   const canAsk = Boolean(snapshot) && !chatBusy;
+  const activatable = canActivateCore(status);
+  const answerLatency = answer ? describeAnswerTimings(answer.timingsMs) : null;
+  const installTitle = status.modelInstalled
+    ? 'The fixed model is already installed in the local volume.'
+    : 'Download the fixed model from the local AI service. Nothing is downloaded until you ask.';
+  const activateTitle = status.modelLoaded
+    ? 'The AI core is already loaded.'
+    : activatable
+      ? 'Preload the installed model. This never downloads anything.'
+      : 'Install the model first.';
 
   return (
     <section className="panel ai-copilot" aria-labelledby="ai-copilot-heading">
@@ -98,20 +118,44 @@ export function AiCopilotPanel({
         </span>
       </div>
 
+      {statusError ? (
+        <div className="ai-recoverable" role="alert">
+          <p className="panel__error">{statusError}</p>
+          <button
+            type="button"
+            className="refresh"
+            onClick={onRetryStatus}
+            disabled={statusChecking}
+            title="Read GET /api/ai/status again"
+          >
+            {statusChecking ? 'Checking the AI service' : 'Retry AI status'}
+          </button>
+        </div>
+      ) : null}
+
+      {!statusError && !status.serviceAvailable ? (
+        <p className="panel__note">
+          The local AI service is not answering through the internal network. The scenario
+          stays fully usable; retry the status check once it is back.
+        </p>
+      ) : null}
+
       <div className="button-row">
         <button
           type="button"
           className="refresh"
           disabled={installBusy || installing || status.modelInstalled}
           onClick={onInstall}
+          title={installTitle}
         >
           {install.state === 'FAILED' ? 'Retry Qwen Core install' : 'Install Qwen Core'}
         </button>
         <button
           type="button"
           className="refresh"
-          disabled={activating || !status.modelInstalled || status.modelLoaded}
+          disabled={activating || !activatable}
           onClick={onActivate}
+          title={activateTitle}
         >
           {activating ? 'Activating' : 'Activate AI core'}
         </button>
@@ -173,7 +217,10 @@ export function AiCopilotPanel({
 
       {answer ? (
         <section className="ai-answer" aria-label="Copilot answer">
-          <h3 className="ai-heading">Answer · revision {answer.usedRevision}</h3>
+          <h3 className="ai-heading">
+            Answer · revision {answer.usedRevision}
+            {answerLatency ? ` · ${answerLatency}` : ''}
+          </h3>
           <p className="ai-answer__text">{answer.answer}</p>
           {answer.references.length > 0 ? (
             <ul className="ai-references" aria-label="Grounded fields">

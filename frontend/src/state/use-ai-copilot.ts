@@ -7,7 +7,7 @@
  * same revision guard as every other command.
  */
 
-import { useCallback, useEffect, useState, type MutableRefObject } from 'react';
+import { useCallback, useEffect, useRef, useState, type MutableRefObject } from 'react';
 
 import {
   ApiRequestError,
@@ -26,7 +26,9 @@ import type { ScenarioSnapshot } from '../scenario/scenario';
 import {
   describeAiError,
   INITIAL_INSTALL_PROGRESS,
+  installProgressFromStatus,
   isInstalling,
+  mergeAiStatus,
   parseChatResponse,
   parseInstallEvent,
   parseShiftReport,
@@ -36,7 +38,16 @@ import {
   type AiReport,
   type InstallProgress,
 } from './ai-copilot';
-import { INACTIVE_AI_STATUS, toAiStatus, type AiStatus } from './readiness';
+import { INACTIVE_AI_STATUS, loadAiStatus, toAiStatus, type AiStatus } from './readiness';
+
+/**
+ * Fallback cadence for the status poll that runs only while a download is in flight.
+ *
+ * The event stream is the primary progress source. This poll is the safety net for a
+ * browser without `EventSource` and for a proxy hiccup mid-download; it is slow enough to
+ * stay out of the way of the stream and it can never overwrite a stream frame.
+ */
+const INSTALL_STATUS_POLL_MS = 2000;
 
 export interface UseAiCopilotOptions {
   snapshot: ScenarioSnapshot | null;
@@ -49,6 +60,10 @@ export interface UseAiCopilotOptions {
 
 export interface AiCopilotController {
   status: AiStatus;
+  /** True while an authoritative `GET /api/ai/status` read is in flight. */
+  statusChecking: boolean;
+  /** Why the last status read failed, when it did. Recoverable: the panel offers a retry. */
+  statusError: string | null;
   install: InstallProgress;
   installing: boolean;
   installBusy: boolean;
@@ -61,6 +76,7 @@ export interface AiCopilotController {
   answer: AiChatAnswer | null;
   answerStale: boolean;
   report: AiReport | null;
+  onRetryStatus: () => void;
   onInstall: () => void;
   onActivate: () => void;
   onAsk: (question: string) => void;
@@ -77,6 +93,8 @@ export function useAiCopilot({
   onAiStateChanged,
 }: UseAiCopilotOptions): AiCopilotController {
   const [status, setStatus] = useState<AiStatus>(INACTIVE_AI_STATUS);
+  const [statusChecking, setStatusChecking] = useState(false);
+  const [statusError, setStatusError] = useState<string | null>(null);
   const [install, setInstall] = useState<InstallProgress>(INITIAL_INSTALL_PROGRESS);
   const [installBusy, setInstallBusy] = useState(false);
   const [activating, setActivating] = useState(false);
@@ -88,6 +106,53 @@ export function useAiCopilot({
   const [answer, setAnswer] = useState<AiChatAnswer | null>(null);
   const [report, setReport] = useState<AiReport | null>(null);
   const [streamKey, setStreamKey] = useState(0);
+  // Only the newest in-flight status read may write state, so a slow probe cannot undo a
+  // faster one that started after it.
+  const statusProbeRef = useRef(0);
+
+  /**
+   * Read `GET /api/ai/status` and merge it into the panel.
+   *
+   * This is the authoritative path: the panel mirrors the backend on mount, after an
+   * install and after an activation. A delayed, reordered or lost stream frame can then
+   * never leave the panel describing a state the backend is not in.
+   */
+  const probeStatus = useCallback(async (signal?: AbortSignal) => {
+    const ticket = statusProbeRef.current + 1;
+    statusProbeRef.current = ticket;
+    setStatusChecking(true);
+    try {
+      const probe = await loadAiStatus(signal);
+      if (signal?.aborted || ticket !== statusProbeRef.current) return;
+      if (!probe.reachable) {
+        setStatusError(probe.error);
+        return;
+      }
+      setStatusError(null);
+      setStatus((current) => mergeAiStatus(current, probe.status));
+      setInstall((current) => installProgressFromStatus(probe.status, current));
+    } finally {
+      if (ticket === statusProbeRef.current) setStatusChecking(false);
+    }
+  }, []);
+
+  // The panel starts from the backend's own answer instead of a default that would claim
+  // the service is down until the first stream frame happens to arrive.
+  useEffect(() => {
+    const controller = new AbortController();
+    void probeStatus(controller.signal);
+    return () => controller.abort();
+  }, [probeStatus]);
+
+  const installing = isInstalling(install);
+
+  useEffect(() => {
+    if (!installing) return undefined;
+    const timer = setInterval(() => {
+      void probeStatus();
+    }, INSTALL_STATUS_POLL_MS);
+    return () => clearInterval(timer);
+  }, [installing, probeStatus]);
 
   // The stream is re-opened on demand: the backend closes it on the terminal state, and a
   // reconnecting EventSource would otherwise loop against an already finished download.
@@ -110,12 +175,17 @@ export function useAiCopilot({
           closed = true;
           source.close();
         }
+        // The terminal frame is the trigger to re-read the authoritative status: the
+        // install just changed it, and the panel must not depend on the last frame it saw.
+        void probeStatus();
         onAiStateChanged();
       }
     };
     const handleStatus = (event: MessageEvent<string>) => {
       try {
-        setStatus(toAiStatus(JSON.parse(event.data)?.payload));
+        setStatus((current) =>
+          mergeAiStatus(current, toAiStatus(JSON.parse(event.data)?.payload)),
+        );
       } catch {
         // A malformed status frame must not disturb the panel.
       }
@@ -128,7 +198,7 @@ export function useAiCopilot({
       source.removeEventListener('ai.status', handleStatus as EventListener);
       source.close();
     };
-  }, [streamKey, onAiStateChanged]);
+  }, [streamKey, onAiStateChanged, probeStatus]);
 
   const onInstall = useCallback(() => {
     setInstallBusy(true);
@@ -137,6 +207,9 @@ export function useAiCopilot({
     void (async () => {
       try {
         await installModel();
+        // Seed the download state right away: the stream may take a moment to open, and a
+        // job that is already running must not look like it never started.
+        void probeStatus();
         onAiStateChanged();
       } catch (failure) {
         setError(errorMessage(failure));
@@ -147,7 +220,7 @@ export function useAiCopilot({
         setInstallBusy(false);
       }
     })();
-  }, [onAiStateChanged]);
+  }, [onAiStateChanged, probeStatus]);
 
   const onActivate = useCallback(() => {
     setActivating(true);
@@ -155,15 +228,17 @@ export function useAiCopilot({
     setNotice(null);
     void (async () => {
       try {
-        setStatus(toAiStatus(await activateModel()));
+        const activated = toAiStatus(await activateModel());
+        setStatus((current) => mergeAiStatus(current, activated));
       } catch (failure) {
         setError(errorMessage(failure));
       } finally {
         setActivating(false);
+        void probeStatus();
         onAiStateChanged();
       }
     })();
-  }, [onAiStateChanged]);
+  }, [onAiStateChanged, probeStatus]);
 
   const onAsk = useCallback(
     (question: string) => {
@@ -295,10 +370,16 @@ export function useAiCopilot({
     [resolveProposal],
   );
 
+  const onRetryStatus = useCallback(() => {
+    void probeStatus();
+  }, [probeStatus]);
+
   return {
     status,
+    statusChecking,
+    statusError,
     install,
-    installing: isInstalling(install),
+    installing,
     installBusy,
     activating,
     chatBusy,
@@ -309,6 +390,7 @@ export function useAiCopilot({
     answer,
     answerStale: answer !== null && answer.usedRevision !== snapshot?.scenarioRevision,
     report,
+    onRetryStatus,
     onInstall,
     onActivate,
     onAsk,

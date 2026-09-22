@@ -13,6 +13,17 @@ import { AiCopilotPanel } from './AiCopilotPanel';
 
 const noop = () => undefined;
 
+/**
+ * Static markup check for one button's disabled state.
+ *
+ * The panel adds `title` tooltips, so the rendered attribute order is not fixed: matching
+ * the label alone would be brittle.
+ */
+function isButtonDisabled(markup: string, label: string): boolean {
+  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`<button[^>]*\\bdisabled=""[^>]*>${escaped}</button>`).test(markup);
+}
+
 function snapshot(scenarioRevision = 5): ScenarioSnapshot {
   return {
     scenarioId: 's-1',
@@ -36,6 +47,8 @@ function snapshot(scenarioRevision = 5): ScenarioSnapshot {
 interface Overrides {
   snapshot?: ScenarioSnapshot | null;
   status?: AiStatus;
+  statusChecking?: boolean;
+  statusError?: string | null;
   install?: InstallProgress;
   installing?: boolean;
   installBusy?: boolean;
@@ -52,6 +65,8 @@ function render(overrides: Overrides = {}): string {
     <AiCopilotPanel
       snapshot={overrides.snapshot === undefined ? snapshot() : overrides.snapshot}
       status={overrides.status ?? INACTIVE_AI_STATUS}
+      statusChecking={overrides.statusChecking ?? false}
+      statusError={overrides.statusError ?? null}
       install={overrides.install ?? INITIAL_INSTALL_PROGRESS}
       installing={overrides.installing ?? false}
       installBusy={overrides.installBusy ?? false}
@@ -64,6 +79,7 @@ function render(overrides: Overrides = {}): string {
       answer={overrides.answer ?? null}
       answerStale={overrides.answerStale ?? false}
       report={overrides.report ?? null}
+      onRetryStatus={noop}
       onInstall={noop}
       onActivate={noop}
       onAsk={noop}
@@ -94,12 +110,55 @@ describe('AiCopilotPanel', () => {
   it('offers the install button only while the model is missing', () => {
     const missing = render({ status: INACTIVE_AI_STATUS });
     expect(missing).toContain('>Install Qwen Core</button>');
-    expect(missing).not.toContain('disabled="">Install Qwen Core</button>');
+    expect(isButtonDisabled(missing, 'Install Qwen Core')).toBe(false);
 
     const installed = render({
       status: { ...INACTIVE_AI_STATUS, serviceAvailable: true, modelInstalled: true },
     });
-    expect(installed).toContain('disabled="">Install Qwen Core</button>');
+    expect(isButtonDisabled(installed, 'Install Qwen Core')).toBe(true);
+  });
+
+  it('enables the activation as soon as the model is installed but not loaded', () => {
+    const markup = render({
+      status: { ...INACTIVE_AI_STATUS, serviceAvailable: true, modelInstalled: true },
+    });
+
+    expect(markup).toContain('Service Available');
+    expect(markup).toContain('Model Installed');
+    expect(markup).toContain('Core Not loaded');
+    // The reported bug: the button stayed dead while the API said the model was installed.
+    expect(isButtonDisabled(markup, 'Activate AI core')).toBe(false);
+  });
+
+  it('disables the activation once the core is loaded', () => {
+    const markup = render({
+      status: {
+        ...INACTIVE_AI_STATUS,
+        serviceAvailable: true,
+        modelInstalled: true,
+        modelLoaded: true,
+      },
+    });
+
+    expect(isButtonDisabled(markup, 'Activate AI core')).toBe(true);
+  });
+
+  it('explains a recoverable status read failure and offers a retry', () => {
+    const markup = render({ statusError: 'The AI status could not be read: Failed to fetch' });
+
+    expect(markup).toContain('role="alert"');
+    expect(markup).toContain('The AI status could not be read: Failed to fetch');
+    expect(markup).toContain('Retry AI status');
+  });
+
+  it('explains an unreachable AI service without claiming the scenario is broken', () => {
+    const markup = render({ status: INACTIVE_AI_STATUS });
+
+    expect(markup).toContain('Service Unavailable');
+    expect(markup).toContain('The local AI service is not answering');
+    expect(markup).toContain('stays fully usable');
+    // A failed service probe is a state, not the recoverable read error.
+    expect(markup).not.toContain('Retry AI status');
   });
 
   it('renders the install progress the stream reported', () => {
@@ -167,6 +226,8 @@ describe('AiCopilotPanel', () => {
     });
 
     expect(markup).toContain('Answer · revision 5');
+    // The measured latency the backend reported, never an estimate made by the browser.
+    expect(markup).toContain('· 2.8 s');
     expect(markup).toContain('La ruta de R-01 se recalculo');
     expect(markup).toContain('kpis.economicCostCents');
     expect(markup).toContain('Take one robot out of service');

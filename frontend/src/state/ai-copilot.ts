@@ -144,6 +144,78 @@ export function installProgressDetail(progress: InstallProgress): string {
 }
 
 // --------------------------------------------------------------------------------------
+// Status synchronization
+// --------------------------------------------------------------------------------------
+
+/**
+ * Merge one AI status observation into the panel state.
+ *
+ * Two observations can describe the same backend at different moments — the mount probe
+ * and an event-stream frame, for instance — and they can land out of order. Two facts are
+ * monotonic while the backend is up: an installed model stays installed and an activated
+ * core stays loaded. A probe that could not reach the service carries no information
+ * about the model at all, so it only clears `serviceAvailable`.
+ */
+export function mergeAiStatus(previous: AiStatus, incoming: AiStatus): AiStatus {
+  if (!incoming.serviceAvailable) {
+    return { ...previous, serviceAvailable: false };
+  }
+  const sameModel = incoming.modelName === previous.modelName;
+  return {
+    serviceAvailable: true,
+    modelInstalled: incoming.modelInstalled || (sameModel && previous.modelInstalled),
+    modelLoaded: incoming.modelLoaded || (sameModel && previous.modelLoaded),
+    modelName: incoming.modelName,
+    installJob: incoming.installJob ?? previous.installJob,
+  };
+}
+
+/**
+ * Seed the install progress from the authoritative status.
+ *
+ * A reloaded page never saw the live stream, so `installJob` is the only place a terminal
+ * state survives. A progress the stream already owns is left alone: it carries a
+ * percentage and Ollama's own status text, which the job summary does not.
+ */
+export function installProgressFromStatus(
+  status: AiStatus,
+  current: InstallProgress,
+): InstallProgress {
+  const job = status.installJob;
+  if (job === null || current.eventSeq >= 0) return current;
+  const state = asInstallState(job.state);
+  if (state === null || state === 'IDLE') return current;
+  if (state === 'COMPLETED') {
+    return {
+      ...current,
+      state,
+      modelName: job.modelName,
+      percent: 100,
+      statusText: 'installed',
+      error: null,
+    };
+  }
+  if (state === 'FAILED') {
+    // `installJob` carries the state, not the transport error: the detail text explains
+    // that the download can simply be started again.
+    return {
+      ...current,
+      state,
+      modelName: job.modelName,
+      percent: null,
+      statusText: '',
+      error: null,
+    };
+  }
+  return { ...current, state, modelName: job.modelName };
+}
+
+/** The activation button is live as soon as the model is installed and not yet loaded. */
+export function canActivateCore(status: AiStatus): boolean {
+  return status.modelInstalled && !status.modelLoaded;
+}
+
+// --------------------------------------------------------------------------------------
 // Chat and reports
 // --------------------------------------------------------------------------------------
 
@@ -279,6 +351,18 @@ export function describeProposalKind(kind: ProposalKind): string {
     default:
       return kind;
   }
+}
+
+/**
+ * The measured total latency of one copilot answer, for the answer heading.
+ *
+ * The number comes from the backend's own `timingsMs`; nothing here is estimated. An
+ * answer without a usable total simply shows no latency.
+ */
+export function describeAnswerTimings(timingsMs: Record<string, number>): string | null {
+  const total = timingsMs.total;
+  if (typeof total !== 'number' || !Number.isFinite(total) || total <= 0) return null;
+  return `${(total / 1000).toFixed(1)} s`;
 }
 
 // --------------------------------------------------------------------------------------

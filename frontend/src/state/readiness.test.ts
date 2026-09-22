@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   FIXED_MODEL_NAME,
   INACTIVE_READINESS,
+  loadAiStatus,
   loadReadiness,
   toAiStatus,
 } from './readiness';
@@ -114,5 +115,63 @@ describe('toAiStatus', () => {
 
   it('keeps the model name reported by the backend', () => {
     expect(toAiStatus({ ...AI_READY, modelName: 'qwen3:4b' }).modelName).toBe('qwen3:4b');
+  });
+});
+
+describe('loadAiStatus', () => {
+  it('adopts the authoritative status the backend answered', async () => {
+    const calls = stubFetch(() =>
+      jsonResponse({
+        serviceAvailable: true,
+        modelInstalled: true,
+        modelLoaded: false,
+        modelName: FIXED_MODEL_NAME,
+        installJob: {
+          jobId: 'job-1',
+          state: 'COMPLETED',
+          modelName: FIXED_MODEL_NAME,
+          startedAt: '2026-09-22T09:00:00.000Z',
+          finishedAt: '2026-09-22T09:05:00.000Z',
+        },
+      }),
+    );
+
+    const probe = await loadAiStatus();
+
+    expect(calls).toEqual([{ url: '/api/ai/status', method: 'GET' }]);
+    expect(probe.reachable).toBe(true);
+    expect(probe.error).toBeNull();
+    expect(probe.status).toMatchObject({
+      serviceAvailable: true,
+      modelInstalled: true,
+      modelLoaded: false,
+    });
+    expect(probe.status.installJob?.state).toBe('COMPLETED');
+  });
+
+  it('reports the read failure instead of a status that claims the service is down', async () => {
+    stubFetch(() => {
+      throw new Error('Failed to fetch');
+    });
+
+    const probe = await loadAiStatus();
+
+    expect(probe.reachable).toBe(false);
+    expect(probe.status.serviceAvailable).toBe(false);
+    expect(probe.error).toContain('Failed to fetch');
+  });
+
+  it('names the HTTP status when the backend rejects the read', async () => {
+    stubFetch(() => jsonResponse({ detail: 'boom' }, 503));
+
+    const probe = await loadAiStatus();
+
+    expect(probe.reachable).toBe(false);
+    expect(probe.error).toContain('HTTP 503');
+  });
+
+  it('drops an install job that does not carry an identity', () => {
+    expect(toAiStatus({ ...AI_READY, installJob: { state: 'COMPLETED' } }).installJob).toBeNull();
+    expect(toAiStatus({ ...AI_READY, installJob: 'job-1' }).installJob).toBeNull();
   });
 });

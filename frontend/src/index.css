@@ -459,6 +459,125 @@ body {
   transition: width var(--rr-motion-base, 220ms) var(--rr-easing-standard, ease-out);
 }
 
+/* A recoverable AI read failure: explained, never a dead end. */
+.ai-recoverable {
+  margin-top: 14px;
+  border: 1px solid var(--degraded);
+  border-radius: 6px;
+  padding: 10px 12px 12px;
+}
+
+.ai-recoverable .panel__error {
+  margin-top: 0;
+}
+
+.ai-recoverable .refresh {
+  margin-top: 10px;
+}
+
+/* Integration layout: the city is the primary surface, the acting panels sit beside it. */
+.scene-layout {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 20px;
+  align-items: start;
+}
+
+.scene-layout__main,
+.scene-layout__side {
+  display: grid;
+  gap: 20px;
+  align-content: start;
+  min-width: 0;
+}
+
+@media (min-width: 1180px) {
+  .scene-layout {
+    grid-template-columns: minmax(0, 1.8fr) minmax(320px, 1fr);
+  }
+}
+
+.scene-stage__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.scene-stage__head h2 {
+  margin: 0;
+}
+
+.stage__stats {
+  margin: 0;
+  color: var(--text-muted);
+  font-family: var(--rr-font-family-mono, 'Cascadia Mono', 'Consolas', monospace);
+  font-size: 12px;
+}
+
+.stage__tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  margin: 10px 0 12px;
+  padding: 0;
+  list-style: none;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.stage__tools li::before {
+  content: '·';
+  margin-right: 7px;
+  color: var(--accent);
+}
+
+/* A usable desktop viewport for the city instead of an incidental 16:9 thumbnail. */
+.scene-stage .stage {
+  margin-top: 0;
+  aspect-ratio: auto;
+  height: clamp(280px, 46vh, 620px);
+  min-height: 280px;
+}
+
+@media (min-width: 1180px) {
+  .scene-stage .stage {
+    height: clamp(420px, 62vh, 860px);
+  }
+}
+
+/* Without a WebGL context the fallback takes the space instead of a blank canvas. */
+.scene-stage .stage--degraded {
+  height: auto;
+  min-height: 0;
+}
+
+.stage__fallback {
+  display: grid;
+  gap: 6px;
+  padding: 18px 20px;
+}
+
+.stage__fallback-title {
+  margin: 0;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.stage__fallback-note,
+.stage__fallback-detail {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.stage__fallback-detail {
+  font-family: var(--rr-font-family-mono, 'Cascadia Mono', 'Consolas', monospace);
+  overflow-wrap: anywhere;
+}
+
 .stage {
   position: relative;
   overflow: hidden;
