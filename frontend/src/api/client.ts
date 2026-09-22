@@ -195,3 +195,42 @@ export function relocateVehicle<T>(
     },
   );
 }
+
+/**
+ * Place one robotic barrier.
+ *
+ * The body carries either the raw world point under the pointer, which the server snaps
+ * to the nearest road edge (skipping the roads that are already closed), or an explicit
+ * `edgeId`. Either way the barrier blocks one stable road edge and never a pixel.
+ */
+export function placeBarrier<T>(
+  scenarioId: string,
+  target: { position: { x: number; y: number; z: number } } | { edgeId: string },
+  scenarioRevision: number,
+  options: CommandOptions = {},
+): Promise<T> {
+  return mutation<T>('POST', `/api/scenarios/${encodeURIComponent(scenarioId)}/barriers`, {
+    commandId: options.commandId ?? createCommandId(),
+    scenarioRevision,
+    ...target,
+  });
+}
+
+/**
+ * Remove one barrier, restoring its road edge.
+ *
+ * `DELETE` is a resource operation, so the frozen envelope stays optional; sending it
+ * makes a retried removal idempotent instead of a second command.
+ */
+export function removeBarrier<T>(
+  scenarioId: string,
+  barrierId: string,
+  scenarioRevision: number,
+  options: CommandOptions = {},
+): Promise<T> {
+  return mutation<T>(
+    'DELETE',
+    `/api/scenarios/${encodeURIComponent(scenarioId)}/barriers/${encodeURIComponent(barrierId)}`,
+    { commandId: options.commandId ?? createCommandId(), scenarioRevision },
+  );
+}

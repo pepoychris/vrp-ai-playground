@@ -8,7 +8,9 @@ import {
   generateOrders,
   optimizeScenario,
   pauseSimulation,
+  placeBarrier,
   relocateVehicle,
+  removeBarrier,
   startSimulation,
   HttpError,
   READ_ONLY_PATHS,
@@ -183,6 +185,79 @@ describe('Phase 6 simulation and claw commands', () => {
     await expect(
       relocateVehicle('s-1', 'R-01', { x: 0, y: 0, z: 0 }, 2),
     ).rejects.toThrow('SNAP_OUT_OF_RADIUS');
+  });
+});
+
+describe('Phase 7 barrier commands', () => {
+  it('posts one barrier with the world point and the frozen envelope', async () => {
+    const fetchStub = vi.fn(async (_input: unknown, _init?: RequestInit) =>
+      new Response(JSON.stringify({ scenarioId: 's-1' }), { status: 200 }),
+    );
+    vi.stubGlobal('fetch', fetchStub);
+    const commandId = createCommandId();
+
+    await placeBarrier(
+      's-1',
+      { position: { x: 3, y: 0, z: -4 } },
+      9,
+      { commandId },
+    );
+
+    const [path, init] = fetchStub.mock.calls[0] as [string, RequestInit];
+    expect(path).toBe('/api/scenarios/s-1/barriers');
+    expect(init).toMatchObject({ method: 'POST' });
+    const body = JSON.parse(String(init.body)) as Record<string, unknown>;
+    expect(body.scenarioRevision).toBe(9);
+    expect(body.commandId).toBe(commandId);
+    expect(body.position).toEqual({ x: 3, y: 0, z: -4 });
+    expect(body).not.toHaveProperty('edgeId');
+  });
+
+  it('posts an explicit edge id without any pixel position', async () => {
+    const fetchStub = vi.fn(async (_input: unknown, _init?: RequestInit) =>
+      new Response(JSON.stringify({ scenarioId: 's-1' }), { status: 200 }),
+    );
+    vi.stubGlobal('fetch', fetchStub);
+
+    await placeBarrier('s-1', { edgeId: 'E-N001-N002' }, 3);
+
+    const body = JSON.parse(
+      String((fetchStub.mock.calls[0] as [string, RequestInit])[1].body),
+    ) as Record<string, unknown>;
+    expect(body.edgeId).toBe('E-N001-N002');
+    expect(body).not.toHaveProperty('position');
+  });
+
+  it('deletes one barrier by id with the same command envelope', async () => {
+    const fetchStub = vi.fn(async (_input: unknown, _init?: RequestInit) =>
+      new Response(JSON.stringify({ scenarioId: 's-1' }), { status: 200 }),
+    );
+    vi.stubGlobal('fetch', fetchStub);
+    const commandId = createCommandId();
+
+    await removeBarrier('s-1', 'B-2', 4, { commandId });
+
+    const [path, init] = fetchStub.mock.calls[0] as [string, RequestInit];
+    expect(path).toBe('/api/scenarios/s-1/barriers/B-2');
+    expect(init).toMatchObject({ method: 'DELETE' });
+    expect(JSON.parse(String(init.body))).toMatchObject({
+      commandId,
+      scenarioRevision: 4,
+    });
+  });
+
+  it('surfaces the rejection detail of a drop with no road in range', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        async () =>
+          new Response(JSON.stringify({ detail: 'SNAP_NO_VALID_EDGE' }), { status: 422 }),
+      ),
+    );
+
+    await expect(
+      placeBarrier('s-1', { position: { x: 0, y: 0, z: 0 } }, 2),
+    ).rejects.toThrow('SNAP_NO_VALID_EDGE');
   });
 });
 

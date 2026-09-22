@@ -4,6 +4,8 @@ export const MIN_VEHICLES = 1;
 export const MAX_VEHICLES = 6;
 export const MIN_ORDERS = 6;
 export const MAX_ORDERS = 24;
+/** The frozen MVP limit: three simultaneous active barriers. */
+export const MAX_BARRIERS = 3;
 export const DEFAULT_SEED = 20260922;
 
 export type VehicleStatus = 'AVAILABLE' | 'EN_ROUTE' | 'DELAYED' | 'BLOCKED' | 'FINISHED';
@@ -60,6 +62,45 @@ export interface Order {
   sequenceIndex: number | null;
 }
 
+export type UnassignedReason =
+  | 'NO_CAPACITY'
+  | 'TIME_WINDOW'
+  | 'UNREACHABLE'
+  | 'DROPPED_BY_PENALTY';
+
+/**
+ * One robotic barrier placed on a real road edge.
+ *
+ * `blockedEdgeId` is the stable road edge identifier the barrier closes, never a pixel
+ * position: the barrier blocks that edge in both directions for the planner, the
+ * distance matrices and the published plan.
+ */
+export interface Barrier {
+  barrierId: string;
+  blockedEdgeId: string;
+  position: { x: number; y: number; z: number };
+  placedAtRevision: number;
+}
+
+/** The frozen `result` of a barrier placement command. */
+export interface BarrierPlacementResult {
+  barrierId: string;
+  blockedEdgeId: string;
+  projectedPoint: { x: number; y: number; z: number };
+  distanceMeters: number;
+  accepted: boolean;
+  rejectionCode: 'SNAP_NO_VALID_EDGE' | null;
+}
+
+/**
+ * A scenario revision plus the endpoint-specific result of the command that produced it.
+ *
+ * Mutations return the whole snapshot; only the barrier commands publish a `result`.
+ */
+export interface ScenarioCommandResponse extends ScenarioSnapshot {
+  result?: BarrierPlacementResult | null;
+}
+
 export interface RouteStop {
   orderId: string;
   nodeId: string;
@@ -95,7 +136,7 @@ export interface RoutePlan {
     unassignedOrderCount: number;
   };
   vehicles: VehicleRoute[];
-  unassignedOrders: { orderId: string; reason: 'NO_CAPACITY' | 'TIME_WINDOW' | 'UNREACHABLE' | 'DROPPED_BY_PENALTY' }[];
+  unassignedOrders: { orderId: string; reason: UnassignedReason }[];
 }
 
 export interface KpiSnapshot {
@@ -129,13 +170,21 @@ export interface ScenarioSnapshot {
   graph: { cityId: string; graphVersion: number; nodes: unknown[]; edges: unknown[] };
   vehicles: Vehicle[];
   orders: Order[];
-  barriers: unknown[];
+  barriers: Barrier[];
   blockedEdgeIds: string[];
   routePlan: RoutePlan | null;
   kpis: KpiSnapshot | null;
   simulation: SimulationState;
   appliedCommand: AppliedCommand | null;
   emittedAt: string;
+}
+
+export function barrierById(
+  snapshot: ScenarioSnapshot | null,
+  barrierId: string | null,
+): Barrier | null {
+  if (!snapshot || !barrierId) return null;
+  return snapshot.barriers.find((barrier) => barrier.barrierId === barrierId) ?? null;
 }
 
 export interface RoutePlanSummary {

@@ -283,6 +283,89 @@ body {
   margin-top: 16px;
 }
 
+.closure-tools {
+  border-top: 1px solid var(--border);
+  margin-top: 18px;
+  padding-top: 6px;
+}
+
+.closure-tools__heading {
+  margin: 12px 0 0;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* An armed closure tool reads as active: it changes what the left button does. */
+.refresh--armed {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.closure-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.closure-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  background: var(--surface);
+  padding: 10px 11px;
+}
+
+.closure-card--selected {
+  border-color: var(--accent);
+  background: var(--surface-raised);
+}
+
+.closure-card__select {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  padding: 0;
+  text-align: left;
+}
+
+.closure-card__select strong {
+  color: var(--text);
+  font-size: 15px;
+}
+
+.closure-card__remove {
+  min-width: 0;
+}
+
+.closure-impact {
+  border: 1px solid var(--degraded);
+  border-radius: 6px;
+  margin-top: 12px;
+  padding: 4px 11px 11px;
+}
+
+.closure-impact .panel__note {
+  margin-top: 7px;
+}
+
 .progress {
   overflow: hidden;
   height: 6px;

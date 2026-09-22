@@ -1,8 +1,9 @@
-"""FastAPI application for the RoboRoute Nexus backend (MVP Phase 6).
+"""FastAPI application for the RoboRoute Nexus backend (MVP Phase 7).
 
-Phase 6 adds the simulation clock (start, pause, speed) and the claw relocation
-command on top of the Phase 4/5 scenario, fleet, order, route-plan and KPI surface. No
-scenario is generated during startup.
+Phase 6 added the simulation clock (start, pause, speed) and the claw relocation
+command; Phase 7 adds the robotic barrier: a road closure bound to one stable edge id
+that blocks both directions and recomputes the plan once. No scenario is generated
+during startup.
 
 Starting this application performs no network call, no database write and no model
 download. There is no startup hook: scenario generation only happens after an
@@ -17,6 +18,8 @@ from .config import MODEL_NAME, SERVICE_NAME, SERVICE_VERSION, Settings
 from .contracts import AiStatus, HealthResponse
 from .ollama_client import OllamaProbe
 from .scenario import (
+    BarrierPlaceRequest,
+    BarrierRemoveRequest,
     FleetGenerateRequest,
     OptimizeRequest,
     OrdersGenerateRequest,
@@ -31,9 +34,9 @@ from .scenario import (
 
 API_TITLE = "RoboRoute Nexus API"
 API_SUMMARY = (
-    "Last-mile control tower backend. Phase 6 exposes deterministic scenarios, bounded "
-    "route optimisation, KPIs, simulation clock control, claw relocation, reset and AI "
-    "readiness."
+    "Last-mile control tower backend. Phase 7 exposes deterministic scenarios, bounded "
+    "route optimisation, KPIs, simulation clock control, claw relocation, robotic "
+    "barriers and road closures, reset and AI readiness."
 )
 
 
@@ -223,6 +226,54 @@ def create_app(
                 client_revision=request.scenarioRevision,
             )
         )
+
+    @app.post(
+        "/api/scenarios/{scenario_id}/barriers",
+        response_model=ScenarioRevisionResponse,
+        tags=["scenarios"],
+    )
+    async def place_barrier(
+        scenario_id: str, request: BarrierPlaceRequest
+    ) -> ScenarioRevisionResponse:
+        """Place one robotic barrier on a road edge and publish the closed revision.
+
+        ``position`` is snapped to the nearest road edge, skipping the roads that are
+        already blocked; ``edgeId`` places the barrier on a named edge instead. Either way
+        the barrier blocks the edge in both directions and the plan is recomputed once in
+        the same revision, which also carries the before/after KPI comparison.
+        """
+        snapshot, result = app.state.scenario_store.place_barrier(
+            scenario_id,
+            position=request.position.model_dump() if request.position else None,
+            edge_id=request.edgeId,
+            command_id=request.commandId,
+            client_revision=request.scenarioRevision,
+        )
+        return ScenarioRevisionResponse.model_validate({**snapshot, "result": result})
+
+    @app.delete(
+        "/api/scenarios/{scenario_id}/barriers/{barrier_id}",
+        response_model=ScenarioRevisionResponse,
+        tags=["scenarios"],
+    )
+    async def remove_barrier(
+        scenario_id: str,
+        barrier_id: str,
+        request: BarrierRemoveRequest | None = None,
+    ) -> ScenarioRevisionResponse:
+        """Remove one barrier, restore its road edge and recompute the plan once.
+
+        ``DELETE`` is a resource operation, so the body stays optional; when the client
+        sends the frozen envelope the command is idempotent like every other mutation.
+        """
+        resolved_request = request or BarrierRemoveRequest()
+        snapshot, result = app.state.scenario_store.remove_barrier(
+            scenario_id,
+            barrier_id,
+            command_id=resolved_request.commandId,
+            client_revision=resolved_request.scenarioRevision,
+        )
+        return ScenarioRevisionResponse.model_validate({**snapshot, "result": result})
 
     return app
 

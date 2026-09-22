@@ -53,6 +53,17 @@ import {
   type VehicleLayer,
   type VehiclePlacement,
 } from './vehicle-layer';
+import {
+  BARRIER_PICK_RADIUS_PIXELS,
+  applyBarrierPlacements,
+  createBarrierLayer,
+  nearestBarrierInScreenSpace,
+  pickBarrierId,
+  setBarrierPreview,
+  type BarrierLayer,
+  type BarrierPlacement,
+  type BarrierPreview,
+} from './barrier-layer';
 
 /**
  * Fog distances are derived from the city size: the Phase 2 token values are tuned for
@@ -79,12 +90,13 @@ export interface CityShellOptions {
 }
 
 /**
- * Everything the Phase 6 scenario contributes to the scene: one route surface per
- * vehicle with stops, and the vehicles themselves.
+ * Everything the scenario contributes to the scene: one route surface per vehicle with
+ * stops, the vehicles themselves and the active barriers of a road closure.
  */
-export interface VehicleSceneState {
+export interface ScenarioSceneState {
   routes: readonly { vehicleId: string; edgeIds: readonly string[] }[];
   vehicles: readonly VehiclePlacement[];
+  barriers?: readonly BarrierPlacement[];
 }
 
 export interface CityShell {
@@ -92,6 +104,7 @@ export interface CityShell {
   readonly camera: OrthographicCamera;
   readonly cityRoot: Group;
   readonly vehicleRoot: Group;
+  readonly barrierRoot: Group;
   readonly registry: ResourceRegistry;
   readonly network: RoadNetwork;
   readonly controls: CityControls;
@@ -100,9 +113,13 @@ export interface CityShell {
   readonly lastBuild: CityStageReport | null;
   readonly cameraEnabled: boolean;
   buildCity(bundle?: SceneAssetBundle | null): CityStageReport;
-  syncScenario(state: VehicleSceneState, bundle?: SceneAssetBundle | null): void;
+  syncScenario(state: ScenarioSceneState, bundle?: SceneAssetBundle | null): void;
   updateVehiclePlacements(placements: readonly VehiclePlacement[]): void;
+  /** Refresh only the placed barriers, for a selection change that alters no plan. */
+  updateBarriers(placements: readonly BarrierPlacement[]): void;
   pickVehicleAtPixel(offsetX: number, offsetY: number): string | null;
+  pickBarrierAtPixel(offsetX: number, offsetY: number): string | null;
+  setBarrierPreview(preview: BarrierPreview | null): void;
   groundPointAtPixel(offsetX: number, offsetY: number): CityPoint | null;
   setCameraEnabled(enabled: boolean): void;
   setClawLift(vehicleId: string, lifted: boolean): boolean;
@@ -156,6 +173,8 @@ export function createCityShell(options: CityShellOptions): CityShell {
   scene.add(routeRoot);
   const vehicles: VehicleLayer = createVehicleLayer();
   scene.add(vehicles.root);
+  const barriers: BarrierLayer = createBarrierLayer();
+  scene.add(barriers.root);
   const raycaster = new Raycaster();
 
   let renderer: RendererLike | null = null;
@@ -195,6 +214,7 @@ export function createCityShell(options: CityShellOptions): CityShell {
     camera,
     cityRoot,
     vehicleRoot: vehicles.root,
+    barrierRoot: barriers.root,
     registry,
     network,
     controls,
@@ -233,9 +253,13 @@ export function createCityShell(options: CityShellOptions): CityShell {
         routeRoot.add(surface);
       });
       applyVehiclePlacements(vehicles, state.vehicles, bundle);
+      applyBarrierPlacements(barriers, state.barriers ?? [], bundle);
     },
     updateVehiclePlacements(placements) {
       applyVehiclePlacements(vehicles, placements);
+    },
+    updateBarriers(placements) {
+      applyBarrierPlacements(barriers, placements);
     },
     pickVehicleAtPixel(offsetX, offsetY) {
       const ndc = pixelToNdc(offsetX, offsetY, width, height);
@@ -255,6 +279,28 @@ export function createCityShell(options: CityShellOptions): CityShell {
         height,
         PICK_RADIUS_PIXELS,
       );
+    },
+    pickBarrierAtPixel(offsetX, offsetY) {
+      const ndc = pixelToNdc(offsetX, offsetY, width, height);
+      camera.updateMatrixWorld(true);
+      raycaster.setFromCamera(new Vector2(ndc.x, ndc.y), camera);
+      const exact = pickBarrierId(raycaster, barriers.root);
+      if (exact) return exact;
+      const candidates = [...barriers.objects.values()].map((object) => ({
+        barrierId: object.userData.barrierId as string,
+        position: { x: object.position.x, y: object.position.y, z: object.position.z },
+      }));
+      return nearestBarrierInScreenSpace(
+        camera,
+        candidates,
+        { x: offsetX, y: offsetY },
+        width,
+        height,
+        BARRIER_PICK_RADIUS_PIXELS,
+      );
+    },
+    setBarrierPreview(preview) {
+      setBarrierPreview(barriers, preview);
     },
     groundPointAtPixel(offsetX, offsetY) {
       return groundPointFromNdc(camera, pixelToNdc(offsetX, offsetY, width, height));
@@ -300,6 +346,16 @@ export function createCityShell(options: CityShellOptions): CityShell {
       vehicles.fallbackBody.dispose();
       vehicles.fallbackClaw.dispose();
       vehicles.objects.clear();
+      vehicles.highlightGeometry.dispose();
+      vehicles.highlightMaterial.dispose();
+      barriers.objects.clear();
+      barriers.fallbackBody.dispose();
+      barriers.fallbackArm.dispose();
+      barriers.markerGeometry.dispose();
+      barriers.previewMaterial.dispose();
+      barriers.bodyMaterial.dispose();
+      barriers.markerMaterial.dispose();
+      barriers.selectionMaterial.dispose();
       const report = registry.dispose();
       scene.clear();
       renderer?.dispose();

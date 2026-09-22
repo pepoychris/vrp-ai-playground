@@ -16,6 +16,7 @@ import {
   Group,
   Mesh,
   MeshStandardMaterial,
+  PlaneGeometry,
   type Object3D,
   type OrthographicCamera,
   type Raycaster,
@@ -23,7 +24,7 @@ import {
 } from 'three';
 
 import type { SceneAssetBundle } from '../scene/load-assets';
-import { CITY_TOKENS } from '../scene/design-tokens';
+import { CITY_TOKENS, STATUS_COLORS } from '../scene/design-tokens';
 import { instantiateShared } from '../scene/resources';
 
 import type { CityPoint } from './dataset';
@@ -42,6 +43,8 @@ export interface VehiclePlacement {
   headingDegrees: number;
   colorHex?: string;
   lifted?: boolean;
+  /** True for a vehicle a road closure affects: highlighted in the city view. */
+  highlighted?: boolean;
 }
 
 export interface VehicleLayer {
@@ -51,6 +54,9 @@ export interface VehicleLayer {
   materials: Map<number, MeshStandardMaterial>;
   fallbackBody: BoxGeometry;
   fallbackClaw: BoxGeometry;
+  /** Footprint geometry and material for the affected-vehicle highlight. */
+  highlightGeometry: PlaneGeometry;
+  highlightMaterial: MeshStandardMaterial;
 }
 
 export function fallbackVehicleGeometry(): BoxGeometry {
@@ -66,6 +72,17 @@ export function createVehicleLayer(): VehicleLayer {
     materials: new Map(),
     fallbackBody: fallbackVehicleGeometry(),
     fallbackClaw: new BoxGeometry(0.6, 0.4, 0.6),
+    highlightGeometry: new PlaneGeometry(2.6, 2.6).rotateX(-Math.PI / 2),
+    highlightMaterial: new MeshStandardMaterial({
+      color: new Color(STATUS_COLORS.degraded),
+      emissive: new Color(STATUS_COLORS.degraded),
+      emissiveIntensity: 0.35,
+      roughness: 0.7,
+      metalness: 0.0,
+      transparent: true,
+      opacity: 0.75,
+      depthWrite: false,
+    }),
   };
 }
 
@@ -122,6 +139,8 @@ export function applyVehiclePlacements(
     object.userData.roadNodeId = placement.nodeId;
     const claw = object.getObjectByName('VehicleClaw') ?? object.getObjectByName('VehicleClawFallback');
     if (claw) claw.visible = Boolean(placement.lifted);
+    const highlight = object.getObjectByName('VehicleHighlight');
+    if (highlight) highlight.visible = Boolean(placement.highlighted);
   });
   for (const [vehicleId, object] of [...layer.objects.entries()]) {
     if (seen.has(vehicleId)) continue;
@@ -151,7 +170,11 @@ function createVehicleObject(
   const body = new Mesh(fixtureMesh?.geometry ?? layer.fallbackBody, material);
   body.name = 'VehicleBody';
   body.userData.vehicleId = placement.vehicleId;
-  root.add(body, clawObject(layer, bundle));
+  const highlight = new Mesh(layer.highlightGeometry, layer.highlightMaterial);
+  highlight.name = 'VehicleHighlight';
+  highlight.position.y = 0.05;
+  highlight.visible = Boolean(placement.highlighted);
+  root.add(body, clawObject(layer, bundle), highlight);
   return root;
 }
 

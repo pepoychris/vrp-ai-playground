@@ -10,9 +10,22 @@ import {
   resolveClawDrop,
   updateClawGesture,
   type ClawGesture,
+  type GesturePlacement,
 } from '../city/vehicle-gesture';
 import type { SceneAssetBundle } from '../scene/load-assets';
-import type { ScenarioSnapshot, SimulationState } from '../scenario/scenario';
+import {
+  barrierById,
+  type ScenarioSnapshot,
+  type SimulationState,
+} from '../scenario/scenario';
+import {
+  affectedVehicleIds,
+  barrierPlacements,
+  describeBarrierPlacement,
+  describeBarrierPreview,
+  resolveBarrierPreview,
+  type BarrierPreview,
+} from '../scenario/barriers';
 import {
   advanceSimulationClock,
   boundedTickDelta,
@@ -27,10 +40,17 @@ export interface SceneStageProps {
   snapshot: ScenarioSnapshot | null;
   /** Called once, on release, when the claw drops a vehicle on a different node. */
   onRelocateVehicle: (vehicleId: string, position: CityPoint) => void;
+  /** True while the barrier tool is armed: a left drag closes the nearest road edge. */
+  barrierToolArmed: boolean;
+  selectedBarrierId: string | null;
+  /** Called once, on release, with the world point that should receive a barrier. */
+  onPlaceBarrier: (position: CityPoint) => void;
+  onRemoveBarrier: (barrierId: string) => void;
+  onSelectBarrier: (barrierId: string | null) => void;
 }
 
 type StageStatus = 'waiting' | 'ready' | 'unavailable' | 'failed';
-type PointerMode = 'pan' | 'claw';
+type PointerMode = 'pan' | 'claw' | 'barrier';
 
 const KEYBOARD_PAN_PIXELS = 28;
 const CLICK_SLOP_PIXELS = 3;
@@ -78,12 +98,62 @@ function describeVehicleSelection(
   );
 }
 
-export function SceneStage({ bundle, snapshot, onRelocateVehicle }: SceneStageProps) {
+function describeBarrierSelection(
+  snapshot: ScenarioSnapshot,
+  barrierId: string,
+): string {
+  const barrier = barrierById(snapshot, barrierId);
+  return barrier
+    ? `Selected closure ${barrierId} · edge ${barrier.blockedEdgeId}`
+    : `Selected closure ${barrierId}`;
+}
+
+/**
+ * Mark the vehicles a road closure affects, so the scene can highlight them.
+ *
+ * The placement type is forwarded instead of widened: the gesture overlay below requires
+ * a `lifted` flag, and a widened `VehiclePlacement` would erase that guarantee.
+ */
+function withClosureHighlight<T extends GesturePlacement>(
+  snapshot: ScenarioSnapshot,
+  placements: readonly T[],
+): (T & { highlighted: boolean })[] {
+  const affected = affectedVehicleIds(snapshot);
+  return placements.map((placement) =>
+    Object.assign({}, placement, { highlighted: affected.has(placement.vehicleId) }),
+  );
+}
+
+export function SceneStage({
+  bundle,
+  snapshot,
+  onRelocateVehicle,
+  barrierToolArmed,
+  selectedBarrierId,
+  onPlaceBarrier,
+  onRemoveBarrier,
+  onSelectBarrier,
+}: SceneStageProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const shellRef = useRef<CityShell | null>(null);
   const snapshotRef = useRef<ScenarioSnapshot | null>(snapshot);
   const relocateRef = useRef(onRelocateVehicle);
+  const placeBarrierRef = useRef(onPlaceBarrier);
+  const removeBarrierRef = useRef(onRemoveBarrier);
+  const selectBarrierRef = useRef(onSelectBarrier);
+  const barrierToolRef = useRef(barrierToolArmed);
+  const selectedBarrierRef = useRef(selectedBarrierId);
   const gestureRef = useRef<ClawGesture | null>(null);
+  const barrierGestureRef = useRef<{
+    pointerId: number;
+    pointer: CityPoint;
+    preview: BarrierPreview;
+  } | null>(null);
+  /**
+   * Cancels a barrier drag from outside the scene effect: disarming the tool, or an
+   * unmount, has to drop the capture and give the camera back.
+   */
+  const cancelBarrierGestureRef = useRef<(() => void) | null>(null);
   const clockRef = useRef<SimulationState>(simulationState({ running: false }));
   const [status, setStatus] = useState<StageStatus>('waiting');
   const [summary, setSummary] = useState<string | null>(null);
@@ -94,6 +164,25 @@ export function SceneStage({ bundle, snapshot, onRelocateVehicle }: SceneStagePr
   useEffect(() => {
     relocateRef.current = onRelocateVehicle;
   }, [onRelocateVehicle]);
+
+  useEffect(() => {
+    placeBarrierRef.current = onPlaceBarrier;
+    removeBarrierRef.current = onRemoveBarrier;
+    selectBarrierRef.current = onSelectBarrier;
+  }, [onPlaceBarrier, onRemoveBarrier, onSelectBarrier]);
+
+  useEffect(() => {
+    barrierToolRef.current = barrierToolArmed;
+    if (!barrierToolArmed) {
+      // Disarming the tool never leaves a preview floating over the city, and it never
+      // leaves a drag holding the pointer capture.
+      cancelBarrierGestureRef.current?.();
+    }
+  }, [barrierToolArmed]);
+
+  useEffect(() => {
+    selectedBarrierRef.current = selectedBarrierId;
+  }, [selectedBarrierId]);
 
   // The authoritative clock is the one published in the snapshot; a new revision always
   // reseeds it, so a local tick can never be replayed onto a newer revision.
@@ -128,7 +217,10 @@ export function SceneStage({ bundle, snapshot, onRelocateVehicle }: SceneStagePr
       if (!active || !activeShell) return;
       const placements = vehiclePlacements(active, clockRef.current.elapsedSeconds, null);
       activeShell.updateVehiclePlacements(
-        applyGestureToPlacements(placements, gestureRef.current),
+        applyGestureToPlacements(
+          withClosureHighlight(active, placements),
+          gestureRef.current,
+        ),
       );
     };
 
@@ -189,8 +281,8 @@ export function SceneStage({ bundle, snapshot, onRelocateVehicle }: SceneStagePr
         canvas.addEventListener('contextmenu', onContextMenu);
         cleanups.push(() => canvas.removeEventListener('contextmenu', onContextMenu));
 
-        const releasePointer = (pointerId: number) => {
-          if (canvas.hasPointerCapture(pointerId)) {
+        const releasePointer = (pointerId: number | null) => {
+          if (pointerId !== null && canvas.hasPointerCapture(pointerId)) {
             canvas.releasePointerCapture(pointerId);
           }
           active.setCameraEnabled(true);
@@ -219,6 +311,46 @@ export function SceneStage({ bundle, snapshot, onRelocateVehicle }: SceneStagePr
           drawPlacements();
           active.render();
         };
+
+        /**
+         * Finish a barrier drag. This is the single exit for every ending: release,
+         * cancel, Escape and disarming the tool all come through here, so the pointer
+         * capture and the camera can never be left in a grabbed state.
+         *
+         * A cancelled drag commits nothing and never falls through to selection: the
+         * caller stops as soon as this returns.
+         */
+        const endBarrierGesture = (pointerId: number | null, commit: boolean) => {
+          const gesture = barrierGestureRef.current;
+          pointerMode = null;
+          barrierGestureRef.current = null;
+          releasePointer(pointerId);
+          active.setBarrierPreview(null);
+          if (!gesture) {
+            active.render();
+            return false;
+          }
+          if (!commit) {
+            // Cancelling is silent: the road is untouched and no command is sent.
+            setGestureNote(null);
+            active.render();
+            return true;
+          }
+          setGestureNote(
+            describeBarrierPlacement(gesture.preview.accepted, gesture.preview.edgeId, null),
+          );
+          if (gesture.preview.accepted) {
+            // The server snaps again from the raw world point and answers with the
+            // authoritative barrier id, edge id and before/after comparison.
+            placeBarrierRef.current(gesture.preview.pointer);
+          }
+          active.render();
+          return true;
+        };
+        // Outside the scene effect the only thing a disarm or an unmount needs is the
+        // cancel path, so it is published through a ref.
+        cancelBarrierGestureRef.current = () =>
+          void endBarrierGesture(barrierGestureRef.current?.pointerId ?? null, false);
 
         const onPointerDown = (event: PointerEvent) => {
           const activeSnapshot = snapshotRef.current;
@@ -254,6 +386,30 @@ export function SceneStage({ bundle, snapshot, onRelocateVehicle }: SceneStagePr
             return;
           }
           if (event.button !== 0) return;
+          if (barrierToolRef.current) {
+            // The barrier tool borrows the left button: the drag closes one road edge
+            // instead of panning, and the camera steps aside for the duration.
+            if (!activeSnapshot) return;
+            if (barrierGestureRef.current) return;
+            const pointer = active.groundPointAtPixel(event.offsetX, event.offsetY);
+            if (!pointer) return;
+            event.preventDefault();
+            const preview = resolveBarrierPreview(
+              active.network,
+              pointer,
+              activeSnapshot.blockedEdgeIds,
+            );
+            barrierGestureRef.current = { pointerId: event.pointerId, pointer, preview };
+            pointerMode = 'barrier';
+            travelled = 0;
+            canvas.setPointerCapture(event.pointerId);
+            canvas.classList.add('stage__canvas--grabbing');
+            active.setCameraEnabled(false);
+            active.setBarrierPreview(preview);
+            setGestureNote(describeBarrierPreview(preview));
+            active.render();
+            return;
+          }
           dragging = true;
           pointerMode = 'pan';
           lastX = event.offsetX;
@@ -277,6 +433,24 @@ export function SceneStage({ bundle, snapshot, onRelocateVehicle }: SceneStagePr
             active.render();
             return;
           }
+          if (pointerMode === 'barrier') {
+            // A pointer move only re-resolves the nearest road edge: no command, no plan.
+            const gesture = barrierGestureRef.current;
+            const activeSnapshot = snapshotRef.current;
+            if (!gesture || !activeSnapshot) return;
+            const pointer = active.groundPointAtPixel(event.offsetX, event.offsetY);
+            if (!pointer) return;
+            const preview = resolveBarrierPreview(
+              active.network,
+              pointer,
+              activeSnapshot.blockedEdgeIds,
+            );
+            barrierGestureRef.current = { pointerId: gesture.pointerId, pointer, preview };
+            active.setBarrierPreview(preview);
+            setGestureNote(describeBarrierPreview(preview));
+            active.render();
+            return;
+          }
           if (!dragging) return;
           const deltaX = event.offsetX - lastX;
           const deltaY = event.offsetY - lastY;
@@ -292,6 +466,10 @@ export function SceneStage({ bundle, snapshot, onRelocateVehicle }: SceneStagePr
             finishClawGesture(event.pointerId, true);
             return;
           }
+          if (pointerMode === 'barrier') {
+            endBarrierGesture(event.pointerId, true);
+            return;
+          }
           if (!dragging) return;
           dragging = false;
           pointerMode = null;
@@ -301,10 +479,19 @@ export function SceneStage({ bundle, snapshot, onRelocateVehicle }: SceneStagePr
           canvas.classList.remove('stage__canvas--dragging');
           if (travelled > CLICK_SLOP_PIXELS) return;
           const activeSnapshot = snapshotRef.current;
+          const barrierId = activeSnapshot
+            ? active.pickBarrierAtPixel(event.offsetX, event.offsetY)
+            : null;
+          if (barrierId && activeSnapshot) {
+            selectBarrierRef.current(barrierId);
+            setSelection(describeBarrierSelection(activeSnapshot, barrierId));
+            return;
+          }
           const vehicleId = activeSnapshot
             ? active.pickVehicleAtPixel(event.offsetX, event.offsetY)
             : null;
           if (vehicleId && activeSnapshot) {
+            selectBarrierRef.current(null);
             const placement = vehiclePlacements(
               activeSnapshot,
               clockRef.current.elapsedSeconds,
@@ -322,6 +509,7 @@ export function SceneStage({ bundle, snapshot, onRelocateVehicle }: SceneStagePr
             );
             return;
           }
+          selectBarrierRef.current(null);
           const result = active.selectAtPixel(event.offsetX, event.offsetY);
           setSelection(result ? describeSelection(result) : null);
         };
@@ -329,6 +517,12 @@ export function SceneStage({ bundle, snapshot, onRelocateVehicle }: SceneStagePr
         const onPointerCancel = (event: PointerEvent) => {
           if (pointerMode === 'claw') {
             finishClawGesture(event.pointerId, false);
+            return;
+          }
+          if (pointerMode === 'barrier') {
+            // A cancelled drag is a cancelled drag: it never counts as a click, so it
+            // cannot select a barrier or a vehicle by accident.
+            endBarrierGesture(event.pointerId, false);
             return;
           }
           dragging = false;
@@ -339,6 +533,21 @@ export function SceneStage({ bundle, snapshot, onRelocateVehicle }: SceneStagePr
         const onKeyDown = (event: KeyboardEvent) => {
           if (event.key === 'Escape' && gestureRef.current) {
             finishClawGesture(gestureRef.current.pointerId, false);
+            event.preventDefault();
+            return;
+          }
+          if (event.key === 'Escape' && barrierGestureRef.current) {
+            // Cancelling a drag in flight must restore the camera and drop the capture,
+            // exactly like the pointercancel path, so the canvas never stays grabbed.
+            endBarrierGesture(barrierGestureRef.current.pointerId, false);
+            event.preventDefault();
+            return;
+          }
+          if (
+            (event.key === 'Delete' || event.key === 'Backspace') &&
+            selectedBarrierRef.current
+          ) {
+            removeBarrierRef.current(selectedBarrierRef.current);
             event.preventDefault();
             return;
           }
@@ -375,6 +584,12 @@ export function SceneStage({ bundle, snapshot, onRelocateVehicle }: SceneStagePr
       cancelled = true;
       observer?.disconnect();
       for (const cleanup of cleanups) cleanup();
+      // Unmounting mid-drag gives the camera back and leaves no preview behind; the
+      // cancel path is not reused here because it would set state on a dead component.
+      cancelBarrierGestureRef.current = null;
+      barrierGestureRef.current = null;
+      shell?.setBarrierPreview(null);
+      shell?.setCameraEnabled(true);
       shellRef.current = null;
       gestureRef.current = null;
       shell?.dispose();
@@ -390,9 +605,19 @@ export function SceneStage({ bundle, snapshot, onRelocateVehicle }: SceneStagePr
     active.syncScenario({
       routes: routeSurfaces(snapshot),
       vehicles: vehiclePlacements(snapshot, clockRef.current.elapsedSeconds, null),
+      barriers: barrierPlacements(snapshot, active.network, selectedBarrierRef.current),
     });
     active.render();
   }, [snapshot, status]);
+
+  // Barrier selection is a view-only change: it repaints the barrier layer and never
+  // recomputes a plan, so it stays out of the snapshot sync above.
+  useEffect(() => {
+    const active = shellRef.current;
+    if (!active || status !== 'ready' || !snapshot) return;
+    active.updateBarriers(barrierPlacements(snapshot, active.network, selectedBarrierId));
+    active.render();
+  }, [snapshot, status, selectedBarrierId]);
 
   // The animation loop runs only while the simulation is running, and it advances the
   // clock in bounded ticks with the same rule the backend publishes.
