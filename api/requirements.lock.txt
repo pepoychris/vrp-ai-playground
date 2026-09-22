@@ -1,0 +1,25 @@
+# Resolved transitive dependency set of api/requirements.txt (Phase 1).
+#
+# Generated with the command documented in README.md:
+#   python -m pip install --dry-run --ignore-installed \
+#     --report "$env:TEMP/roboroute-lock.json" -r api/requirements.txt
+#
+# Exact pins only: no ranges, no "latest". pydantic-core is published as a
+# per-platform wheel, so the version is pinned here and pip picks the matching
+# wheel for the interpreter and platform of the build.
+annotated-doc==0.0.5
+annotated-types==0.8.0
+anyio==4.15.1
+certifi==2026.7.22
+click==8.5.0
+fastapi==0.141.1
+h11==0.16.0
+httpcore==1.0.9
+httpx==0.28.1
+idna==3.20
+pydantic==2.13.5
+pydantic-core==2.46.5
+starlette==1.6.0
+typing-extensions==4.16.0
+typing-inspection==0.4.4
+uvicorn==0.53.0

@@ -1,0 +1,9 @@
+# Direct runtime dependencies of the RoboRoute Nexus API.
+#
+# Versions and artifact hashes are frozen in docs/contracts/versions.md (Phase 0).
+# The resolved transitive set used by the container build lives in
+# requirements.lock.txt; see README.md for how it is generated.
+fastapi==0.141.1
+httpx==0.28.1
+pydantic==2.13.5
+uvicorn==0.53.0
