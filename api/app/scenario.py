@@ -1,10 +1,11 @@
 """Seeded scenario generation, command handling and revision publication.
 
 Phase 4 added the seeded generator; Phase 5 added the bounded optimisation command and
-the route/KPI revision it publishes; Phase 6 adds the simulation clock and the claw
-relocation command. The store deliberately keeps the scenario in memory: starting the
-service still has no business side effects, while reset can remove the current
-scenario atomically.
+the route/KPI revision it publishes; Phase 6 added the simulation clock and the claw
+relocation command; Phase 7 adds the robotic barrier, its road-edge block and the
+before/after comparison of the cut. The store deliberately keeps the scenario in
+memory: starting the service still has no business side effects, while reset can remove
+the current scenario atomically.
 """
 
 from __future__ import annotations
@@ -16,8 +17,15 @@ from typing import Annotated, Any, Final, Literal
 from uuid import NAMESPACE_URL, UUID, uuid5
 
 from fastapi import HTTPException, status
-from pydantic import AfterValidator, BaseModel, ConfigDict, Field
+from pydantic import AfterValidator, BaseModel, ConfigDict, Field, model_validator
 
+from .barriers import (
+    MAX_BARRIERS,
+    barrier_id_for,
+    blocked_edge_ids,
+    edge_snap,
+    nearest_edge,
+)
 from .routing import (
     DEFAULT_TIME_LIMIT_SECONDS,
     MAX_TIME_LIMIT_SECONDS,
@@ -41,6 +49,8 @@ MIN_ORDERS: Final = 6
 MAX_ORDERS: Final = 24
 DEFAULT_SEED: Final = 20260922
 MAX_SEED: Final = 2**32 - 1
+
+EDGE_ID_PATTERN: Final = r"^E-N[0-9]{3}-N[0-9]{3}$"
 
 VehicleStatus = Literal["AVAILABLE", "EN_ROUTE", "DELAYED", "BLOCKED", "FINISHED"]
 OrderStatus = Literal["PENDING", "ASSIGNED", "DELIVERED", "DELAYED", "UNASSIGNED"]
@@ -171,6 +181,33 @@ class VehiclePositionRequest(ScenarioCommandRequest):
     position: Point3D
 
 
+class BarrierPlaceRequest(ScenarioCommandRequest):
+    """Place one barrier on a road edge.
+
+    The frozen contract accepts either a world point, which the server snaps to the
+    nearest road edge, or an explicit ``edgeId``, which is validated against the graph.
+    Sending both is not ambiguous: the explicit identifier wins and no snap is done.
+    """
+
+    position: Point3D | None = None
+    edgeId: str | None = Field(default=None, pattern=EDGE_ID_PATTERN)
+
+    @model_validator(mode="after")
+    def _require_a_target(self) -> "BarrierPlaceRequest":
+        if self.position is None and self.edgeId is None:
+            raise ValueError("a barrier needs either a position or an edgeId")
+        return self
+
+
+class BarrierRemoveRequest(ScenarioCommandRequest):
+    """Optional command envelope for removing one barrier.
+
+    ``DELETE`` is a resource operation, so the frozen contract does not demand a body.
+    When the client does send ``commandId`` and ``scenarioRevision`` the extra fields are
+    rejected and the idempotent replay semantics of every other command apply.
+    """
+
+
 class ScenarioRevisionResponse(BaseModel):
     model_config = ConfigDict(extra="allow")
 
@@ -189,6 +226,10 @@ class ScenarioRevisionResponse(BaseModel):
     simulation: dict[str, Any]
     appliedCommand: dict[str, Any] | None
     emittedAt: str
+    # Endpoint-specific result of the command that produced this revision, when the
+    # frozen contract declares one (``result.barrierPlacement``). It is never stored in
+    # the scenario itself, so ``GET`` keeps returning a plain ``ScenarioRevision``.
+    result: dict[str, Any] | None = None
 
 
 class ScenarioResetResponse(BaseModel):
@@ -366,12 +407,20 @@ def reset_simulation(snapshot: dict[str, Any]) -> None:
 class ScenarioStore:
     scenarios: dict[str, dict[str, Any]]
     command_results: dict[str, dict[str, Any]]
+    command_payloads: dict[str, dict[str, Any]]
+    barrier_sequences: dict[str, int]
 
     def __init__(self) -> None:
         self.scenarios = {}
         # Frozen contract semantics: repeating a commandId returns the stored result
         # instead of mutating the scenario again. The window is the scenario lifetime.
         self.command_results = {}
+        # The endpoint-specific ``result`` payload of a stored command, kept beside the
+        # stored snapshot so a replay can answer exactly what the original response did.
+        self.command_payloads = {}
+        # Barrier ids are never reused inside a scenario, so the placement sequence is
+        # kept next to the scenario instead of being derived from the active barriers.
+        self.barrier_sequences = {}
 
     def create(self, seed: int) -> dict[str, Any]:
         scenario_id = str(uuid5(NAMESPACE_URL, f"roboroute-nexus:{seed}"))
@@ -581,6 +630,131 @@ class ScenarioStore:
         self._publish(scenario_id, working, command_id=command_id)
         return working
 
+    def place_barrier(
+        self,
+        scenario_id: str,
+        *,
+        position: dict[str, float] | None = None,
+        edge_id: str | None = None,
+        command_id: str | None = None,
+        client_revision: int | None = None,
+    ) -> tuple[dict[str, Any], dict[str, Any]]:
+        """Place exactly one barrier on one road edge and publish it atomically.
+
+        The frozen contract accepts a world point (snapped to the nearest road edge, with
+        already blocked edges excluded from the candidates) or an explicit ``edgeId`` that
+        must exist in the immutable graph. A drop without a candidate edge answers
+        ``422 SNAP_NO_VALID_EDGE`` and a fourth barrier answers ``409 BARRIER_LIMIT_REACHED``;
+        neither failure consumes a revision.
+
+        A successful placement recomputes routes and KPIs in the *same* revision, so the
+        cut, the plan and the before/after delta are always published together.
+        """
+        snapshot = self.get(scenario_id)
+        replayed = self._replay(scenario_id, command_id)
+        if replayed is not None:
+            # A replayed command answers with the placement it produced the first time, so
+            # a retried drop is indistinguishable from the original response.
+            return replayed, self._replayed_payload(scenario_id, command_id)
+        if len(snapshot["barriers"]) >= MAX_BARRIERS:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT, detail="BARRIER_LIMIT_REACHED"
+            )
+
+        if edge_id is not None:
+            # An already blocked edge is not a valid candidate either: one barrier owns
+            # one road, and the block is a set, not a counter.
+            snap = (
+                None
+                if edge_id in set(snapshot.get("blockedEdgeIds") or [])
+                else edge_snap(snapshot["graph"], edge_id)
+            )
+        else:
+            snap = nearest_edge(
+                snapshot["graph"],
+                position or {"x": 0.0, "y": 0.0, "z": 0.0},
+                excluded_edge_ids=snapshot.get("blockedEdgeIds") or [],
+            )
+        if snap is None:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="SNAP_NO_VALID_EDGE",
+            )
+
+        sequence = self.barrier_sequences.get(scenario_id, 0) + 1
+        barrier = {
+            "barrierId": barrier_id_for(sequence),
+            "blockedEdgeId": snap.edge_id,
+            "position": snap.projected_point,
+            # The revision this placement was applied against, which is what the frozen
+            # barrier example publishes: the barrier appears in the next revision.
+            "placedAtRevision": snapshot["scenarioRevision"],
+        }
+
+        working = deepcopy(snapshot)
+        working["barriers"] = [*working["barriers"], barrier]
+        working["blockedEdgeIds"] = blocked_edge_ids(working["barriers"])
+        self.barrier_sequences[scenario_id] = sequence
+        result = {
+            "barrierId": barrier["barrierId"],
+            "blockedEdgeId": snap.edge_id,
+            "projectedPoint": snap.projected_point,
+            "distanceMeters": round(snap.distance_meters, 6),
+            "accepted": True,
+            "rejectionCode": None,
+        }
+        self._recompute_or_mutate(
+            working,
+            snapshot,
+            kind="BARRIER_PLACED",
+            command_id=command_id,
+            client_revision=client_revision,
+        )
+        self._publish(scenario_id, working, command_id=command_id, payload=result)
+        return working, result
+
+    def remove_barrier(
+        self,
+        scenario_id: str,
+        barrier_id: str,
+        *,
+        command_id: str | None = None,
+        client_revision: int | None = None,
+    ) -> tuple[dict[str, Any], dict[str, Any] | None]:
+        """Remove one barrier, restore its edge and recompute the plan once.
+
+        The removed road edge disappears from ``blockedEdgeIds`` in the same revision, so
+        the next plan is computed against the restored graph. An unknown ``barrierId``
+        answers ``404 BARRIER_NOT_FOUND`` and publishes nothing.
+        """
+        snapshot = self.get(scenario_id)
+        replayed = self._replay(scenario_id, command_id)
+        if replayed is not None:
+            return replayed, None
+        barrier = next(
+            (item for item in snapshot["barriers"] if item["barrierId"] == barrier_id),
+            None,
+        )
+        if barrier is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="BARRIER_NOT_FOUND"
+            )
+
+        working = deepcopy(snapshot)
+        working["barriers"] = [
+            item for item in working["barriers"] if item["barrierId"] != barrier_id
+        ]
+        working["blockedEdgeIds"] = blocked_edge_ids(working["barriers"])
+        self._recompute_or_mutate(
+            working,
+            snapshot,
+            kind="BARRIER_REMOVED",
+            command_id=command_id,
+            client_revision=client_revision,
+        )
+        self._publish(scenario_id, working, command_id=command_id)
+        return working, None
+
     def advance_simulation(
         self,
         scenario_id: str,
@@ -625,10 +799,33 @@ class ScenarioStore:
         replayed["appliedCommand"] = applied
         return replayed
 
-    def _publish(self, scenario_id: str, working: dict[str, Any], *, command_id: str | None) -> None:
+    def _publish(
+        self,
+        scenario_id: str,
+        working: dict[str, Any],
+        *,
+        command_id: str | None,
+        payload: dict[str, Any] | None = None,
+    ) -> None:
         self.scenarios[scenario_id] = working
         if command_id is not None:
-            self.command_results[f"{scenario_id}:{command_id}"] = deepcopy(working)
+            key = f"{scenario_id}:{command_id}"
+            self.command_results[key] = deepcopy(working)
+            if payload is not None:
+                self.command_payloads[key] = deepcopy(payload)
+
+    def _replayed_payload(
+        self, scenario_id: str, command_id: str | None
+    ) -> dict[str, Any] | None:
+        """The stored endpoint ``result`` of a replayed command, or ``None``.
+
+        Commands whose frozen response carries no ``result`` (removal, simulation, claw)
+        answer ``None``, which is exactly what a fresh call would have answered.
+        """
+        if command_id is None:
+            return None
+        stored = self.command_payloads.get(f"{scenario_id}:{command_id}")
+        return deepcopy(stored) if stored is not None else None
 
     def _publish_routes(
         self,
@@ -683,11 +880,47 @@ class ScenarioStore:
             vehicle["assignedOrderIds"] = [stop["orderId"] for stop in route["stops"]]
             vehicle["status"] = "EN_ROUTE" if route["stops"] else "AVAILABLE"
 
+    def _recompute_or_mutate(
+        self,
+        working: dict[str, Any],
+        previous: dict[str, Any],
+        *,
+        kind: str,
+        command_id: str | None,
+        client_revision: int | None,
+    ) -> None:
+        """Publish the plan of a barrier command in the same revision, when there is one.
+
+        A barrier placed before a fleet or orders exist cannot change a plan, so it only
+        advances the revision. As soon as both exist the cut recomputes the routes and the
+        KPIs exactly once, which is the single recomputation the phase requires.
+        """
+        if working["vehicles"] and working["orders"]:
+            self._publish_routes(
+                working,
+                previous,
+                time_limit_seconds=DEFAULT_TIME_LIMIT_SECONDS,
+                kind=kind,
+                command_id=command_id,
+                client_revision=client_revision,
+            )
+        else:
+            _mutate(
+                working,
+                kind,
+                command_id=command_id,
+                client_revision=client_revision,
+            )
+
     def reset(self, scenario_id: str) -> ScenarioResetResponse:
         snapshot = self.get(scenario_id)
         self.scenarios.pop(scenario_id, None)
-        for key in [key for key in self.command_results if key.startswith(f"{scenario_id}:")]:
+        self.barrier_sequences.pop(scenario_id, None)
+        prefix = f"{scenario_id}:"
+        for key in [key for key in self.command_results if key.startswith(prefix)]:
             self.command_results.pop(key, None)
+        for key in [key for key in self.command_payloads if key.startswith(prefix)]:
+            self.command_payloads.pop(key, None)
         return ScenarioResetResponse(scenarioId=scenario_id, status="RESET", scenarioRevision=snapshot["scenarioRevision"] + 1)
 
 

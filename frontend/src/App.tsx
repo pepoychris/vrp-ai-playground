@@ -11,7 +11,9 @@ import {
   generateOrders,
   optimizeScenario,
   pauseSimulation,
+  placeBarrier,
   relocateVehicle,
+  removeBarrier,
   resetScenario,
   startSimulation,
 } from './api/client';
@@ -24,6 +26,7 @@ import {
   settleCommand,
 } from './scenario/revision-guard';
 import {
+  MAX_BARRIERS,
   persistScenario,
   readPersistedScenario,
   validateOrderCount,
@@ -40,6 +43,10 @@ export function App() {
   const [scenario, setScenario] = useState<ScenarioSnapshot | null>(() => readPersistedScenario());
   const [scenarioBusy, setScenarioBusy] = useState(false);
   const [scenarioError, setScenarioError] = useState<string | null>(null);
+  // The closure tool is an explicit mode: while it is armed the left button closes the
+  // nearest road edge instead of panning, and a selected closure can be removed.
+  const [barrierToolArmed, setBarrierToolArmed] = useState(false);
+  const [selectedBarrierId, setSelectedBarrierId] = useState<string | null>(null);
   const { readiness: assetReadiness, bundle, reload } = useSceneAssets();
   // One guard per session: it keeps the highest applied revision and drops stale
   // payloads without ever showing them to the user as an error.
@@ -142,6 +149,8 @@ export function App() {
     try {
       await resetScenario(scenario.scenarioId);
       guardRef.current = createRevisionGuard();
+      setBarrierToolArmed(false);
+      setSelectedBarrierId(null);
       setScenario(null);
     } catch (error) {
       setScenarioError(error instanceof Error ? error.message : 'Reset failed.');
@@ -209,6 +218,52 @@ export function App() {
     [runCommand, scenario],
   );
 
+  /**
+   * One barrier drop, called once per accepted release.
+   *
+   * The client refuses a drop that the preview already rejected and a fourth closure, so
+   * the server only ever sees a command the local view can explain. The server snaps the
+   * point again, blocks the edge in both directions and answers with the single
+   * recomputed revision plus the before/after delta.
+   */
+  const handlePlaceBarrier = useCallback(
+    async (position: CityPoint) => {
+      if (!scenario) return;
+      if (scenario.barriers.length >= MAX_BARRIERS) {
+        setScenarioError(`The MVP supports ${MAX_BARRIERS} simultaneous closures.`);
+        return;
+      }
+      const commandId = createCommandId();
+      await runCommand(commandId, () =>
+        placeBarrier<ScenarioSnapshot>(
+          scenario.scenarioId,
+          { position: { x: position.x, y: position.y, z: position.z } },
+          scenario.scenarioRevision,
+          { commandId },
+        ),
+      );
+    },
+    [runCommand, scenario],
+  );
+
+  /** Remove one closure, restoring its road edge in a single recomputed revision. */
+  const handleRemoveBarrier = useCallback(
+    async (barrierId: string) => {
+      if (!scenario) return;
+      const commandId = createCommandId();
+      setSelectedBarrierId((current) => (current === barrierId ? null : current));
+      await runCommand(commandId, () =>
+        removeBarrier<ScenarioSnapshot>(
+          scenario.scenarioId,
+          barrierId,
+          scenario.scenarioRevision,
+          { commandId },
+        ),
+      );
+    },
+    [runCommand, scenario],
+  );
+
   const displayReadiness = scenario
     ? {
         ...readiness,
@@ -239,11 +294,16 @@ export function App() {
             snapshot={scenario}
             busy={scenarioBusy}
             error={scenarioError}
+            barrierToolArmed={barrierToolArmed}
+            selectedBarrierId={selectedBarrierId}
             onDeployFleet={(count, seed) => void applyScenarioCommand('fleet', count, seed)}
             onGenerateOrders={(count, seed) => void applyScenarioCommand('orders', count, seed)}
             onOptimize={() => void handleOptimize()}
             onStartSimulation={(speedMultiplier) => void handleStartSimulation(speedMultiplier)}
             onPauseSimulation={() => void handlePauseSimulation()}
+            onToggleBarrierTool={() => setBarrierToolArmed((armed) => !armed)}
+            onSelectBarrier={setSelectedBarrierId}
+            onRemoveBarrier={(barrierId) => void handleRemoveBarrier(barrierId)}
             onReset={() => void handleReset()}
           />
           <AssetReadinessPanel readiness={assetReadiness} onReload={reload} />
@@ -251,6 +311,11 @@ export function App() {
             bundle={bundle}
             snapshot={scenario}
             onRelocateVehicle={(vehicleId, position) => void handleRelocateVehicle(vehicleId, position)}
+            barrierToolArmed={barrierToolArmed}
+            selectedBarrierId={selectedBarrierId}
+            onPlaceBarrier={(position) => void handlePlaceBarrier(position)}
+            onRemoveBarrier={(barrierId) => void handleRemoveBarrier(barrierId)}
+            onSelectBarrier={setSelectedBarrierId}
           />
         </>
       }

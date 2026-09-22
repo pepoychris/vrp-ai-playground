@@ -117,7 +117,16 @@ describe('SceneStage', () => {
     vi.stubGlobal('fetch', fetchStub);
 
     const markup = renderToStaticMarkup(
-      <SceneStage bundle={null} snapshot={null} onRelocateVehicle={() => undefined} />,
+      <SceneStage
+        bundle={null}
+        snapshot={null}
+        onRelocateVehicle={() => undefined}
+        barrierToolArmed={false}
+        selectedBarrierId={null}
+        onPlaceBarrier={() => undefined}
+        onRemoveBarrier={() => undefined}
+        onSelectBarrier={() => undefined}
+      />,
     );
 
     expect(markup).toContain('City view');
