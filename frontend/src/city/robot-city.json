@@ -1,0 +1,4848 @@
+{
+  "cityId": "robot-city",
+  "graphVersion": 1,
+  "capturedAt": "2026-09-22",
+  "generator": "roboroute-nexus-phase3-city-generator",
+  "seed": 20260922,
+  "units": "meters",
+  "coordinateSystem": "local-xz-up-y",
+  "bounds": {
+    "minX": -200,
+    "maxX": 200,
+    "minZ": -168,
+    "maxZ": 168
+  },
+  "presentation": {
+    "groundMarginMeters": 40,
+    "routeWidthMeters": 2.2,
+    "roadWidthMetersBySpeedKph": {
+      "30": 7,
+      "40": 8.5,
+      "50": 10
+    },
+    "blockPadHeightMeters": 0.06,
+    "roadSurfaceHeightMeters": 0.02,
+    "routeSurfaceHeightMeters": 0.08,
+    "buildingAssetId": "buildingFixture"
+  },
+  "nodes": [
+    {
+      "nodeId": "N-001",
+      "kind": "DELIVERY",
+      "position": {
+        "x": -200,
+        "y": 0,
+        "z": -168
+      }
+    },
+    {
+      "nodeId": "N-002",
+      "kind": "JUNCTION",
+      "position": {
+        "x": -144,
+        "y": 0,
+        "z": -168
+      }
+    },
+    {
+      "nodeId": "N-003",
+      "kind": "DELIVERY",
+      "position": {
+        "x": -96,
+        "y": 0,
+        "z": -168
+      }
+    },
+    {
+      "nodeId": "N-004",
+      "kind": "JUNCTION",
+      "position": {
+        "x": -48,
+        "y": 0,
+        "z": -168
+      }
+    },
+    {
+      "nodeId": "N-005",
+      "kind": "DELIVERY",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": -168
+      }
+    },
+    {
+      "nodeId": "N-006",
+      "kind": "JUNCTION",
+      "position": {
+        "x": 48,
+        "y": 0,
+        "z": -168
+      }
+    },
+    {
+      "nodeId": "N-007",
+      "kind": "DELIVERY",
+      "position": {
+        "x": 96,
+        "y": 0,
+        "z": -168
+      }
+    },
+    {
+      "nodeId": "N-008",
+      "kind": "JUNCTION",
+      "position": {
+        "x": 144,
+        "y": 0,
+        "z": -168
+      }
+    },
+    {
+      "nodeId": "N-009",
+      "kind": "DELIVERY",
+      "position": {
+        "x": 200,
+        "y": 0,
+        "z": -168
+      }
+    },
+    {
+      "nodeId": "N-010",
+      "kind": "JUNCTION",
+      "position": {
+        "x": -200,
+        "y": 0,
+        "z": -112
+      }
+    },
+    {
+      "nodeId": "N-011",
+      "kind": "JUNCTION",
+      "position": {
+        "x": -144,
+        "y": 0,
+        "z": -112
+      }
+    },
+    {
+      "nodeId": "N-012",
+      "kind": "JUNCTION",
+      "position": {
+        "x": -96,
+        "y": 0,
+        "z": -112
+      }
+    },
+    {
+      "nodeId": "N-013",
+      "kind": "JUNCTION",
+      "position": {
+        "x": -48,
+        "y": 0,
+        "z": -112
+      }
+    },
+    {
+      "nodeId": "N-014",
+      "kind": "JUNCTION",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": -112
+      }
+    },
+    {
+      "nodeId": "N-015",
+      "kind": "JUNCTION",
+      "position": {
+        "x": 48,
+        "y": 0,
+        "z": -112
+      }
+    },
+    {
+      "nodeId": "N-016",
+      "kind": "JUNCTION",
+      "position": {
+        "x": 96,
+        "y": 0,
+        "z": -112
+      }
+    },
+    {
+      "nodeId": "N-017",
+      "kind": "JUNCTION",
+      "position": {
+        "x": 144,
+        "y": 0,
+        "z": -112
+      }
+    },
+    {
+      "nodeId": "N-018",
+      "kind": "JUNCTION",
+      "position": {
+        "x": 200,
+        "y": 0,
+        "z": -112
+      }
+    },
+    {
+      "nodeId": "N-019",
+      "kind": "DELIVERY",
+      "position": {
+        "x": -200,
+        "y": 0,
+        "z": -58
+      }
+    },
+    {
+      "nodeId": "N-020",
+      "kind": "JUNCTION",
+      "position": {
+        "x": -144,
+        "y": 0,
+        "z": -58
+      }
+    },
+    {
+      "nodeId": "N-021",
+      "kind": "DELIVERY",
+      "position": {
+        "x": -96,
+        "y": 0,
+        "z": -58
+      }
+    },
+    {
+      "nodeId": "N-022",
+      "kind": "JUNCTION",
+      "position": {
+        "x": -48,
+        "y": 0,
+        "z": -58
+      }
+    },
+    {
+      "nodeId": "N-023",
+      "kind": "JUNCTION",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": -58
+      }
+    },
+    {
+      "nodeId": "N-024",
+      "kind": "JUNCTION",
+      "position": {
+        "x": 48,
+        "y": 0,
+        "z": -58
+      }
+    },
+    {
+      "nodeId": "N-025",
+      "kind": "DELIVERY",
+      "position": {
+        "x": 96,
+        "y": 0,
+        "z": -58
+      }
+    },
+    {
+      "nodeId": "N-026",
+      "kind": "JUNCTION",
+      "position": {
+        "x": 144,
+        "y": 0,
+        "z": -58
+      }
+    },
+    {
+      "nodeId": "N-027",
+      "kind": "DELIVERY",
+      "position": {
+        "x": 200,
+        "y": 0,
+        "z": -58
+      }
+    },
+    {
+      "nodeId": "N-028",
+      "kind": "JUNCTION",
+      "position": {
+        "x": -200,
+        "y": 0,
+        "z": 0
+      }
+    },
+    {
+      "nodeId": "N-029",
+      "kind": "JUNCTION",
+      "position": {
+        "x": -144,
+        "y": 0,
+        "z": 0
+      }
+    },
+    {
+      "nodeId": "N-030",
+      "kind": "JUNCTION",
+      "position": {
+        "x": -96,
+        "y": 0,
+        "z": 0
+      }
+    },
+    {
+      "nodeId": "N-031",
+      "kind": "JUNCTION",
+      "position": {
+        "x": -48,
+        "y": 0,
+        "z": 0
+      }
+    },
+    {
+      "nodeId": "N-032",
+      "kind": "DEPOT",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "label": "Central depot"
+    },
+    {
+      "nodeId": "N-033",
+      "kind": "JUNCTION",
+      "position": {
+        "x": 48,
+        "y": 0,
+        "z": 0
+      }
+    },
+    {
+      "nodeId": "N-034",
+      "kind": "JUNCTION",
+      "position": {
+        "x": 96,
+        "y": 0,
+        "z": 0
+      }
+    },
+    {
+      "nodeId": "N-035",
+      "kind": "JUNCTION",
+      "position": {
+        "x": 144,
+        "y": 0,
+        "z": 0
+      }
+    },
+    {
+      "nodeId": "N-036",
+      "kind": "JUNCTION",
+      "position": {
+        "x": 200,
+        "y": 0,
+        "z": 0
+      }
+    },
+    {
+      "nodeId": "N-037",
+      "kind": "DELIVERY",
+      "position": {
+        "x": -200,
+        "y": 0,
+        "z": 58
+      }
+    },
+    {
+      "nodeId": "N-038",
+      "kind": "JUNCTION",
+      "position": {
+        "x": -144,
+        "y": 0,
+        "z": 58
+      }
+    },
+    {
+      "nodeId": "N-039",
+      "kind": "DELIVERY",
+      "position": {
+        "x": -96,
+        "y": 0,
+        "z": 58
+      }
+    },
+    {
+      "nodeId": "N-040",
+      "kind": "JUNCTION",
+      "position": {
+        "x": -48,
+        "y": 0,
+        "z": 58
+      }
+    },
+    {
+      "nodeId": "N-041",
+      "kind": "JUNCTION",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 58
+      }
+    },
+    {
+      "nodeId": "N-042",
+      "kind": "JUNCTION",
+      "position": {
+        "x": 48,
+        "y": 0,
+        "z": 58
+      }
+    },
+    {
+      "nodeId": "N-043",
+      "kind": "DELIVERY",
+      "position": {
+        "x": 96,
+        "y": 0,
+        "z": 58
+      }
+    },
+    {
+      "nodeId": "N-044",
+      "kind": "JUNCTION",
+      "position": {
+        "x": 144,
+        "y": 0,
+        "z": 58
+      }
+    },
+    {
+      "nodeId": "N-045",
+      "kind": "DELIVERY",
+      "position": {
+        "x": 200,
+        "y": 0,
+        "z": 58
+      }
+    },
+    {
+      "nodeId": "N-046",
+      "kind": "JUNCTION",
+      "position": {
+        "x": -200,
+        "y": 0,
+        "z": 112
+      }
+    },
+    {
+      "nodeId": "N-047",
+      "kind": "JUNCTION",
+      "position": {
+        "x": -144,
+        "y": 0,
+        "z": 112
+      }
+    },
+    {
+      "nodeId": "N-048",
+      "kind": "JUNCTION",
+      "position": {
+        "x": -96,
+        "y": 0,
+        "z": 112
+      }
+    },
+    {
+      "nodeId": "N-049",
+      "kind": "JUNCTION",
+      "position": {
+        "x": -48,
+        "y": 0,
+        "z": 112
+      }
+    },
+    {
+      "nodeId": "N-050",
+      "kind": "JUNCTION",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 112
+      }
+    },
+    {
+      "nodeId": "N-051",
+      "kind": "JUNCTION",
+      "position": {
+        "x": 48,
+        "y": 0,
+        "z": 112
+      }
+    },
+    {
+      "nodeId": "N-052",
+      "kind": "JUNCTION",
+      "position": {
+        "x": 96,
+        "y": 0,
+        "z": 112
+      }
+    },
+    {
+      "nodeId": "N-053",
+      "kind": "JUNCTION",
+      "position": {
+        "x": 144,
+        "y": 0,
+        "z": 112
+      }
+    },
+    {
+      "nodeId": "N-054",
+      "kind": "JUNCTION",
+      "position": {
+        "x": 200,
+        "y": 0,
+        "z": 112
+      }
+    },
+    {
+      "nodeId": "N-055",
+      "kind": "DELIVERY",
+      "position": {
+        "x": -200,
+        "y": 0,
+        "z": 168
+      }
+    },
+    {
+      "nodeId": "N-056",
+      "kind": "JUNCTION",
+      "position": {
+        "x": -144,
+        "y": 0,
+        "z": 168
+      }
+    },
+    {
+      "nodeId": "N-057",
+      "kind": "DELIVERY",
+      "position": {
+        "x": -96,
+        "y": 0,
+        "z": 168
+      }
+    },
+    {
+      "nodeId": "N-058",
+      "kind": "JUNCTION",
+      "position": {
+        "x": -48,
+        "y": 0,
+        "z": 168
+      }
+    },
+    {
+      "nodeId": "N-059",
+      "kind": "DELIVERY",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 168
+      }
+    },
+    {
+      "nodeId": "N-060",
+      "kind": "JUNCTION",
+      "position": {
+        "x": 48,
+        "y": 0,
+        "z": 168
+      }
+    },
+    {
+      "nodeId": "N-061",
+      "kind": "DELIVERY",
+      "position": {
+        "x": 96,
+        "y": 0,
+        "z": 168
+      }
+    },
+    {
+      "nodeId": "N-062",
+      "kind": "JUNCTION",
+      "position": {
+        "x": 144,
+        "y": 0,
+        "z": 168
+      }
+    },
+    {
+      "nodeId": "N-063",
+      "kind": "DELIVERY",
+      "position": {
+        "x": 200,
+        "y": 0,
+        "z": 168
+      }
+    }
+  ],
+  "edges": [
+    {
+      "edgeId": "E-N001-N002",
+      "fromNodeId": "N-001",
+      "toNodeId": "N-002",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": -200,
+          "y": 0,
+          "z": -168
+        },
+        {
+          "x": -172,
+          "y": 0,
+          "z": -167.148
+        },
+        {
+          "x": -144,
+          "y": 0,
+          "z": -168
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N002-N003",
+      "fromNodeId": "N-002",
+      "toNodeId": "N-003",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": -144,
+          "y": 0,
+          "z": -168
+        },
+        {
+          "x": -120,
+          "y": 0,
+          "z": -167.874
+        },
+        {
+          "x": -96,
+          "y": 0,
+          "z": -168
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N003-N004",
+      "fromNodeId": "N-003",
+      "toNodeId": "N-004",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": -96,
+          "y": 0,
+          "z": -168
+        },
+        {
+          "x": -72,
+          "y": 0,
+          "z": -167.187
+        },
+        {
+          "x": -48,
+          "y": 0,
+          "z": -168
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N004-N005",
+      "fromNodeId": "N-004",
+      "toNodeId": "N-005",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": -48,
+          "y": 0,
+          "z": -168
+        },
+        {
+          "x": -24,
+          "y": 0,
+          "z": -168.239
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "z": -168
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N005-N006",
+      "fromNodeId": "N-005",
+      "toNodeId": "N-006",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": -168
+        },
+        {
+          "x": 24,
+          "y": 0,
+          "z": -167.726
+        },
+        {
+          "x": 48,
+          "y": 0,
+          "z": -168
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N006-N007",
+      "fromNodeId": "N-006",
+      "toNodeId": "N-007",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": 48,
+          "y": 0,
+          "z": -168
+        },
+        {
+          "x": 72,
+          "y": 0,
+          "z": -167.641
+        },
+        {
+          "x": 96,
+          "y": 0,
+          "z": -168
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N007-N008",
+      "fromNodeId": "N-007",
+      "toNodeId": "N-008",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": 96,
+          "y": 0,
+          "z": -168
+        },
+        {
+          "x": 120,
+          "y": 0,
+          "z": -167.668
+        },
+        {
+          "x": 144,
+          "y": 0,
+          "z": -168
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N008-N009",
+      "fromNodeId": "N-008",
+      "toNodeId": "N-009",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": 144,
+          "y": 0,
+          "z": -168
+        },
+        {
+          "x": 172,
+          "y": 0,
+          "z": -168.454
+        },
+        {
+          "x": 200,
+          "y": 0,
+          "z": -168
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N010-N011",
+      "fromNodeId": "N-010",
+      "toNodeId": "N-011",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -200,
+          "y": 0,
+          "z": -112
+        },
+        {
+          "x": -172,
+          "y": 0,
+          "z": -112.311
+        },
+        {
+          "x": -144,
+          "y": 0,
+          "z": -112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N011-N012",
+      "fromNodeId": "N-011",
+      "toNodeId": "N-012",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -144,
+          "y": 0,
+          "z": -112
+        },
+        {
+          "x": -120,
+          "y": 0,
+          "z": -112.424
+        },
+        {
+          "x": -96,
+          "y": 0,
+          "z": -112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N012-N013",
+      "fromNodeId": "N-012",
+      "toNodeId": "N-013",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -96,
+          "y": 0,
+          "z": -112
+        },
+        {
+          "x": -72,
+          "y": 0,
+          "z": -111.783
+        },
+        {
+          "x": -48,
+          "y": 0,
+          "z": -112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N013-N014",
+      "fromNodeId": "N-013",
+      "toNodeId": "N-014",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -48,
+          "y": 0,
+          "z": -112
+        },
+        {
+          "x": -24,
+          "y": 0,
+          "z": -111.82
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "z": -112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N014-N015",
+      "fromNodeId": "N-014",
+      "toNodeId": "N-015",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": -112
+        },
+        {
+          "x": 24,
+          "y": 0,
+          "z": -111.154
+        },
+        {
+          "x": 48,
+          "y": 0,
+          "z": -112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N015-N016",
+      "fromNodeId": "N-015",
+      "toNodeId": "N-016",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 48,
+          "y": 0,
+          "z": -112
+        },
+        {
+          "x": 72,
+          "y": 0,
+          "z": -111.424
+        },
+        {
+          "x": 96,
+          "y": 0,
+          "z": -112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N016-N017",
+      "fromNodeId": "N-016",
+      "toNodeId": "N-017",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 96,
+          "y": 0,
+          "z": -112
+        },
+        {
+          "x": 120,
+          "y": 0,
+          "z": -112.146
+        },
+        {
+          "x": 144,
+          "y": 0,
+          "z": -112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N017-N018",
+      "fromNodeId": "N-017",
+      "toNodeId": "N-018",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 144,
+          "y": 0,
+          "z": -112
+        },
+        {
+          "x": 172,
+          "y": 0,
+          "z": -110.938
+        },
+        {
+          "x": 200,
+          "y": 0,
+          "z": -112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N019-N020",
+      "fromNodeId": "N-019",
+      "toNodeId": "N-020",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -200,
+          "y": 0,
+          "z": -58
+        },
+        {
+          "x": -172,
+          "y": 0,
+          "z": -58.745
+        },
+        {
+          "x": -144,
+          "y": 0,
+          "z": -58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N020-N021",
+      "fromNodeId": "N-020",
+      "toNodeId": "N-021",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -144,
+          "y": 0,
+          "z": -58
+        },
+        {
+          "x": -120,
+          "y": 0,
+          "z": -57.176
+        },
+        {
+          "x": -96,
+          "y": 0,
+          "z": -58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N021-N022",
+      "fromNodeId": "N-021",
+      "toNodeId": "N-022",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -96,
+          "y": 0,
+          "z": -58
+        },
+        {
+          "x": -72,
+          "y": 0,
+          "z": -58.854
+        },
+        {
+          "x": -48,
+          "y": 0,
+          "z": -58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N022-N023",
+      "fromNodeId": "N-022",
+      "toNodeId": "N-023",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -48,
+          "y": 0,
+          "z": -58
+        },
+        {
+          "x": -24,
+          "y": 0,
+          "z": -57.818
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "z": -58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N023-N024",
+      "fromNodeId": "N-023",
+      "toNodeId": "N-024",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": -58
+        },
+        {
+          "x": 24,
+          "y": 0,
+          "z": -57.397
+        },
+        {
+          "x": 48,
+          "y": 0,
+          "z": -58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N024-N025",
+      "fromNodeId": "N-024",
+      "toNodeId": "N-025",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 48,
+          "y": 0,
+          "z": -58
+        },
+        {
+          "x": 72,
+          "y": 0,
+          "z": -57.23
+        },
+        {
+          "x": 96,
+          "y": 0,
+          "z": -58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N025-N026",
+      "fromNodeId": "N-025",
+      "toNodeId": "N-026",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 96,
+          "y": 0,
+          "z": -58
+        },
+        {
+          "x": 120,
+          "y": 0,
+          "z": -58.842
+        },
+        {
+          "x": 144,
+          "y": 0,
+          "z": -58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N026-N027",
+      "fromNodeId": "N-026",
+      "toNodeId": "N-027",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 144,
+          "y": 0,
+          "z": -58
+        },
+        {
+          "x": 172,
+          "y": 0,
+          "z": -58.615
+        },
+        {
+          "x": 200,
+          "y": 0,
+          "z": -58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N028-N029",
+      "fromNodeId": "N-028",
+      "toNodeId": "N-029",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 50,
+      "visualSplineControlPoints": [
+        {
+          "x": -200,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": -172,
+          "y": 0,
+          "z": 0.584
+        },
+        {
+          "x": -144,
+          "y": 0,
+          "z": 0
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N029-N030",
+      "fromNodeId": "N-029",
+      "toNodeId": "N-030",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 50,
+      "visualSplineControlPoints": [
+        {
+          "x": -144,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": -120,
+          "y": 0,
+          "z": 0.081
+        },
+        {
+          "x": -96,
+          "y": 0,
+          "z": 0
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N030-N031",
+      "fromNodeId": "N-030",
+      "toNodeId": "N-031",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 50,
+      "visualSplineControlPoints": [
+        {
+          "x": -96,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": -72,
+          "y": 0,
+          "z": 0.058
+        },
+        {
+          "x": -48,
+          "y": 0,
+          "z": 0
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N031-N032",
+      "fromNodeId": "N-031",
+      "toNodeId": "N-032",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 50,
+      "visualSplineControlPoints": [
+        {
+          "x": -48,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": -24,
+          "y": 0,
+          "z": -0.187
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N032-N033",
+      "fromNodeId": "N-032",
+      "toNodeId": "N-033",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 50,
+      "visualSplineControlPoints": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 24,
+          "y": 0,
+          "z": 0.804
+        },
+        {
+          "x": 48,
+          "y": 0,
+          "z": 0
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N033-N034",
+      "fromNodeId": "N-033",
+      "toNodeId": "N-034",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 50,
+      "visualSplineControlPoints": [
+        {
+          "x": 48,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 72,
+          "y": 0,
+          "z": -0.595
+        },
+        {
+          "x": 96,
+          "y": 0,
+          "z": 0
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N034-N035",
+      "fromNodeId": "N-034",
+      "toNodeId": "N-035",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 50,
+      "visualSplineControlPoints": [
+        {
+          "x": 96,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 120,
+          "y": 0,
+          "z": 0.572
+        },
+        {
+          "x": 144,
+          "y": 0,
+          "z": 0
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N035-N036",
+      "fromNodeId": "N-035",
+      "toNodeId": "N-036",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 50,
+      "visualSplineControlPoints": [
+        {
+          "x": 144,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 172,
+          "y": 0,
+          "z": 0.914
+        },
+        {
+          "x": 200,
+          "y": 0,
+          "z": 0
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N037-N038",
+      "fromNodeId": "N-037",
+      "toNodeId": "N-038",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -200,
+          "y": 0,
+          "z": 58
+        },
+        {
+          "x": -172,
+          "y": 0,
+          "z": 58.152
+        },
+        {
+          "x": -144,
+          "y": 0,
+          "z": 58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N038-N039",
+      "fromNodeId": "N-038",
+      "toNodeId": "N-039",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -144,
+          "y": 0,
+          "z": 58
+        },
+        {
+          "x": -120,
+          "y": 0,
+          "z": 57.703
+        },
+        {
+          "x": -96,
+          "y": 0,
+          "z": 58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N039-N040",
+      "fromNodeId": "N-039",
+      "toNodeId": "N-040",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -96,
+          "y": 0,
+          "z": 58
+        },
+        {
+          "x": -72,
+          "y": 0,
+          "z": 58.115
+        },
+        {
+          "x": -48,
+          "y": 0,
+          "z": 58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N040-N041",
+      "fromNodeId": "N-040",
+      "toNodeId": "N-041",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -48,
+          "y": 0,
+          "z": 58
+        },
+        {
+          "x": -24,
+          "y": 0,
+          "z": 57.195
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "z": 58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N041-N042",
+      "fromNodeId": "N-041",
+      "toNodeId": "N-042",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 58
+        },
+        {
+          "x": 24,
+          "y": 0,
+          "z": 57.901
+        },
+        {
+          "x": 48,
+          "y": 0,
+          "z": 58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N042-N043",
+      "fromNodeId": "N-042",
+      "toNodeId": "N-043",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 48,
+          "y": 0,
+          "z": 58
+        },
+        {
+          "x": 72,
+          "y": 0,
+          "z": 57.539
+        },
+        {
+          "x": 96,
+          "y": 0,
+          "z": 58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N043-N044",
+      "fromNodeId": "N-043",
+      "toNodeId": "N-044",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 96,
+          "y": 0,
+          "z": 58
+        },
+        {
+          "x": 120,
+          "y": 0,
+          "z": 58.551
+        },
+        {
+          "x": 144,
+          "y": 0,
+          "z": 58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N044-N045",
+      "fromNodeId": "N-044",
+      "toNodeId": "N-045",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 144,
+          "y": 0,
+          "z": 58
+        },
+        {
+          "x": 172,
+          "y": 0,
+          "z": 57.052
+        },
+        {
+          "x": 200,
+          "y": 0,
+          "z": 58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N046-N047",
+      "fromNodeId": "N-046",
+      "toNodeId": "N-047",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -200,
+          "y": 0,
+          "z": 112
+        },
+        {
+          "x": -172,
+          "y": 0,
+          "z": 112.406
+        },
+        {
+          "x": -144,
+          "y": 0,
+          "z": 112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N047-N048",
+      "fromNodeId": "N-047",
+      "toNodeId": "N-048",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -144,
+          "y": 0,
+          "z": 112
+        },
+        {
+          "x": -120,
+          "y": 0,
+          "z": 112.154
+        },
+        {
+          "x": -96,
+          "y": 0,
+          "z": 112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N048-N049",
+      "fromNodeId": "N-048",
+      "toNodeId": "N-049",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -96,
+          "y": 0,
+          "z": 112
+        },
+        {
+          "x": -72,
+          "y": 0,
+          "z": 112.586
+        },
+        {
+          "x": -48,
+          "y": 0,
+          "z": 112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N049-N050",
+      "fromNodeId": "N-049",
+      "toNodeId": "N-050",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -48,
+          "y": 0,
+          "z": 112
+        },
+        {
+          "x": -24,
+          "y": 0,
+          "z": 111.131
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "z": 112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N050-N051",
+      "fromNodeId": "N-050",
+      "toNodeId": "N-051",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 112
+        },
+        {
+          "x": 24,
+          "y": 0,
+          "z": 112.588
+        },
+        {
+          "x": 48,
+          "y": 0,
+          "z": 112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N051-N052",
+      "fromNodeId": "N-051",
+      "toNodeId": "N-052",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 48,
+          "y": 0,
+          "z": 112
+        },
+        {
+          "x": 72,
+          "y": 0,
+          "z": 112.014
+        },
+        {
+          "x": 96,
+          "y": 0,
+          "z": 112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N052-N053",
+      "fromNodeId": "N-052",
+      "toNodeId": "N-053",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 96,
+          "y": 0,
+          "z": 112
+        },
+        {
+          "x": 120,
+          "y": 0,
+          "z": 112.559
+        },
+        {
+          "x": 144,
+          "y": 0,
+          "z": 112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N053-N054",
+      "fromNodeId": "N-053",
+      "toNodeId": "N-054",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 144,
+          "y": 0,
+          "z": 112
+        },
+        {
+          "x": 172,
+          "y": 0,
+          "z": 112.618
+        },
+        {
+          "x": 200,
+          "y": 0,
+          "z": 112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N055-N056",
+      "fromNodeId": "N-055",
+      "toNodeId": "N-056",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": -200,
+          "y": 0,
+          "z": 168
+        },
+        {
+          "x": -172,
+          "y": 0,
+          "z": 166.815
+        },
+        {
+          "x": -144,
+          "y": 0,
+          "z": 168
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N056-N057",
+      "fromNodeId": "N-056",
+      "toNodeId": "N-057",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": -144,
+          "y": 0,
+          "z": 168
+        },
+        {
+          "x": -120,
+          "y": 0,
+          "z": 168.581
+        },
+        {
+          "x": -96,
+          "y": 0,
+          "z": 168
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N057-N058",
+      "fromNodeId": "N-057",
+      "toNodeId": "N-058",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": -96,
+          "y": 0,
+          "z": 168
+        },
+        {
+          "x": -72,
+          "y": 0,
+          "z": 168.899
+        },
+        {
+          "x": -48,
+          "y": 0,
+          "z": 168
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N058-N059",
+      "fromNodeId": "N-058",
+      "toNodeId": "N-059",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": -48,
+          "y": 0,
+          "z": 168
+        },
+        {
+          "x": -24,
+          "y": 0,
+          "z": 167.494
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "z": 168
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N059-N060",
+      "fromNodeId": "N-059",
+      "toNodeId": "N-060",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 168
+        },
+        {
+          "x": 24,
+          "y": 0,
+          "z": 167.232
+        },
+        {
+          "x": 48,
+          "y": 0,
+          "z": 168
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N060-N061",
+      "fromNodeId": "N-060",
+      "toNodeId": "N-061",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": 48,
+          "y": 0,
+          "z": 168
+        },
+        {
+          "x": 72,
+          "y": 0,
+          "z": 167.814
+        },
+        {
+          "x": 96,
+          "y": 0,
+          "z": 168
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N061-N062",
+      "fromNodeId": "N-061",
+      "toNodeId": "N-062",
+      "bidirectional": true,
+      "lengthMeters": 48,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": 96,
+          "y": 0,
+          "z": 168
+        },
+        {
+          "x": 120,
+          "y": 0,
+          "z": 168.428
+        },
+        {
+          "x": 144,
+          "y": 0,
+          "z": 168
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N062-N063",
+      "fromNodeId": "N-062",
+      "toNodeId": "N-063",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": 144,
+          "y": 0,
+          "z": 168
+        },
+        {
+          "x": 172,
+          "y": 0,
+          "z": 167.217
+        },
+        {
+          "x": 200,
+          "y": 0,
+          "z": 168
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N001-N010",
+      "fromNodeId": "N-001",
+      "toNodeId": "N-010",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": -200,
+          "y": 0,
+          "z": -168
+        },
+        {
+          "x": -201.076,
+          "y": 0,
+          "z": -140
+        },
+        {
+          "x": -200,
+          "y": 0,
+          "z": -112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N010-N019",
+      "fromNodeId": "N-010",
+      "toNodeId": "N-019",
+      "bidirectional": true,
+      "lengthMeters": 54,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": -200,
+          "y": 0,
+          "z": -112
+        },
+        {
+          "x": -199.898,
+          "y": 0,
+          "z": -85
+        },
+        {
+          "x": -200,
+          "y": 0,
+          "z": -58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N019-N028",
+      "fromNodeId": "N-019",
+      "toNodeId": "N-028",
+      "bidirectional": true,
+      "lengthMeters": 58,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": -200,
+          "y": 0,
+          "z": -58
+        },
+        {
+          "x": -199.054,
+          "y": 0,
+          "z": -29
+        },
+        {
+          "x": -200,
+          "y": 0,
+          "z": 0
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N028-N037",
+      "fromNodeId": "N-028",
+      "toNodeId": "N-037",
+      "bidirectional": true,
+      "lengthMeters": 58,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": -200,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": -200.105,
+          "y": 0,
+          "z": 29
+        },
+        {
+          "x": -200,
+          "y": 0,
+          "z": 58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N037-N046",
+      "fromNodeId": "N-037",
+      "toNodeId": "N-046",
+      "bidirectional": true,
+      "lengthMeters": 54,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": -200,
+          "y": 0,
+          "z": 58
+        },
+        {
+          "x": -200.731,
+          "y": 0,
+          "z": 85
+        },
+        {
+          "x": -200,
+          "y": 0,
+          "z": 112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N046-N055",
+      "fromNodeId": "N-046",
+      "toNodeId": "N-055",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": -200,
+          "y": 0,
+          "z": 112
+        },
+        {
+          "x": -199.19,
+          "y": 0,
+          "z": 140
+        },
+        {
+          "x": -200,
+          "y": 0,
+          "z": 168
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N002-N011",
+      "fromNodeId": "N-002",
+      "toNodeId": "N-011",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -144,
+          "y": 0,
+          "z": -168
+        },
+        {
+          "x": -144.996,
+          "y": 0,
+          "z": -140
+        },
+        {
+          "x": -144,
+          "y": 0,
+          "z": -112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N011-N020",
+      "fromNodeId": "N-011",
+      "toNodeId": "N-020",
+      "bidirectional": true,
+      "lengthMeters": 54,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -144,
+          "y": 0,
+          "z": -112
+        },
+        {
+          "x": -143.213,
+          "y": 0,
+          "z": -85
+        },
+        {
+          "x": -144,
+          "y": 0,
+          "z": -58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N020-N029",
+      "fromNodeId": "N-020",
+      "toNodeId": "N-029",
+      "bidirectional": true,
+      "lengthMeters": 58,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -144,
+          "y": 0,
+          "z": -58
+        },
+        {
+          "x": -144.008,
+          "y": 0,
+          "z": -29
+        },
+        {
+          "x": -144,
+          "y": 0,
+          "z": 0
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N029-N038",
+      "fromNodeId": "N-029",
+      "toNodeId": "N-038",
+      "bidirectional": true,
+      "lengthMeters": 58,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -144,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": -143.979,
+          "y": 0,
+          "z": 29
+        },
+        {
+          "x": -144,
+          "y": 0,
+          "z": 58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N038-N047",
+      "fromNodeId": "N-038",
+      "toNodeId": "N-047",
+      "bidirectional": true,
+      "lengthMeters": 54,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -144,
+          "y": 0,
+          "z": 58
+        },
+        {
+          "x": -142.976,
+          "y": 0,
+          "z": 85
+        },
+        {
+          "x": -144,
+          "y": 0,
+          "z": 112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N047-N056",
+      "fromNodeId": "N-047",
+      "toNodeId": "N-056",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -144,
+          "y": 0,
+          "z": 112
+        },
+        {
+          "x": -145.1,
+          "y": 0,
+          "z": 140
+        },
+        {
+          "x": -144,
+          "y": 0,
+          "z": 168
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N003-N012",
+      "fromNodeId": "N-003",
+      "toNodeId": "N-012",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -96,
+          "y": 0,
+          "z": -168
+        },
+        {
+          "x": -95.588,
+          "y": 0,
+          "z": -140
+        },
+        {
+          "x": -96,
+          "y": 0,
+          "z": -112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N012-N021",
+      "fromNodeId": "N-012",
+      "toNodeId": "N-021",
+      "bidirectional": true,
+      "lengthMeters": 54,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -96,
+          "y": 0,
+          "z": -112
+        },
+        {
+          "x": -96.228,
+          "y": 0,
+          "z": -85
+        },
+        {
+          "x": -96,
+          "y": 0,
+          "z": -58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N021-N030",
+      "fromNodeId": "N-021",
+      "toNodeId": "N-030",
+      "bidirectional": true,
+      "lengthMeters": 58,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -96,
+          "y": 0,
+          "z": -58
+        },
+        {
+          "x": -95.328,
+          "y": 0,
+          "z": -29
+        },
+        {
+          "x": -96,
+          "y": 0,
+          "z": 0
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N030-N039",
+      "fromNodeId": "N-030",
+      "toNodeId": "N-039",
+      "bidirectional": true,
+      "lengthMeters": 58,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -96,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": -96.326,
+          "y": 0,
+          "z": 29
+        },
+        {
+          "x": -96,
+          "y": 0,
+          "z": 58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N039-N048",
+      "fromNodeId": "N-039",
+      "toNodeId": "N-048",
+      "bidirectional": true,
+      "lengthMeters": 54,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -96,
+          "y": 0,
+          "z": 58
+        },
+        {
+          "x": -96.116,
+          "y": 0,
+          "z": 85
+        },
+        {
+          "x": -96,
+          "y": 0,
+          "z": 112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N048-N057",
+      "fromNodeId": "N-048",
+      "toNodeId": "N-057",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -96,
+          "y": 0,
+          "z": 112
+        },
+        {
+          "x": -95.604,
+          "y": 0,
+          "z": 140
+        },
+        {
+          "x": -96,
+          "y": 0,
+          "z": 168
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N004-N013",
+      "fromNodeId": "N-004",
+      "toNodeId": "N-013",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -48,
+          "y": 0,
+          "z": -168
+        },
+        {
+          "x": -47.705,
+          "y": 0,
+          "z": -140
+        },
+        {
+          "x": -48,
+          "y": 0,
+          "z": -112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N013-N022",
+      "fromNodeId": "N-013",
+      "toNodeId": "N-022",
+      "bidirectional": true,
+      "lengthMeters": 54,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -48,
+          "y": 0,
+          "z": -112
+        },
+        {
+          "x": -47.077,
+          "y": 0,
+          "z": -85
+        },
+        {
+          "x": -48,
+          "y": 0,
+          "z": -58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N022-N031",
+      "fromNodeId": "N-022",
+      "toNodeId": "N-031",
+      "bidirectional": true,
+      "lengthMeters": 58,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -48,
+          "y": 0,
+          "z": -58
+        },
+        {
+          "x": -49.083,
+          "y": 0,
+          "z": -29
+        },
+        {
+          "x": -48,
+          "y": 0,
+          "z": 0
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N031-N040",
+      "fromNodeId": "N-031",
+      "toNodeId": "N-040",
+      "bidirectional": true,
+      "lengthMeters": 58,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -48,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": -48.584,
+          "y": 0,
+          "z": 29
+        },
+        {
+          "x": -48,
+          "y": 0,
+          "z": 58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N040-N049",
+      "fromNodeId": "N-040",
+      "toNodeId": "N-049",
+      "bidirectional": true,
+      "lengthMeters": 54,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -48,
+          "y": 0,
+          "z": 58
+        },
+        {
+          "x": -47.294,
+          "y": 0,
+          "z": 85
+        },
+        {
+          "x": -48,
+          "y": 0,
+          "z": 112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N049-N058",
+      "fromNodeId": "N-049",
+      "toNodeId": "N-058",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": -48,
+          "y": 0,
+          "z": 112
+        },
+        {
+          "x": -47.296,
+          "y": 0,
+          "z": 140
+        },
+        {
+          "x": -48,
+          "y": 0,
+          "z": 168
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N005-N014",
+      "fromNodeId": "N-005",
+      "toNodeId": "N-014",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 50,
+      "visualSplineControlPoints": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": -168
+        },
+        {
+          "x": -0.193,
+          "y": 0,
+          "z": -140
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "z": -112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N014-N023",
+      "fromNodeId": "N-014",
+      "toNodeId": "N-023",
+      "bidirectional": true,
+      "lengthMeters": 54,
+      "speedLimitKph": 50,
+      "visualSplineControlPoints": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": -112
+        },
+        {
+          "x": -1.075,
+          "y": 0,
+          "z": -85
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "z": -58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N023-N032",
+      "fromNodeId": "N-023",
+      "toNodeId": "N-032",
+      "bidirectional": true,
+      "lengthMeters": 58,
+      "speedLimitKph": 50,
+      "visualSplineControlPoints": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": -58
+        },
+        {
+          "x": 0.569,
+          "y": 0,
+          "z": -29
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N032-N041",
+      "fromNodeId": "N-032",
+      "toNodeId": "N-041",
+      "bidirectional": true,
+      "lengthMeters": 58,
+      "speedLimitKph": 50,
+      "visualSplineControlPoints": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": -0.664,
+          "y": 0,
+          "z": 29
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "z": 58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N041-N050",
+      "fromNodeId": "N-041",
+      "toNodeId": "N-050",
+      "bidirectional": true,
+      "lengthMeters": 54,
+      "speedLimitKph": 50,
+      "visualSplineControlPoints": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 58
+        },
+        {
+          "x": 0.517,
+          "y": 0,
+          "z": 85
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "z": 112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N050-N059",
+      "fromNodeId": "N-050",
+      "toNodeId": "N-059",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 50,
+      "visualSplineControlPoints": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 112
+        },
+        {
+          "x": 0.805,
+          "y": 0,
+          "z": 140
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "z": 168
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N006-N015",
+      "fromNodeId": "N-006",
+      "toNodeId": "N-015",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 48,
+          "y": 0,
+          "z": -168
+        },
+        {
+          "x": 48.214,
+          "y": 0,
+          "z": -140
+        },
+        {
+          "x": 48,
+          "y": 0,
+          "z": -112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N015-N024",
+      "fromNodeId": "N-015",
+      "toNodeId": "N-024",
+      "bidirectional": true,
+      "lengthMeters": 54,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 48,
+          "y": 0,
+          "z": -112
+        },
+        {
+          "x": 47.728,
+          "y": 0,
+          "z": -85
+        },
+        {
+          "x": 48,
+          "y": 0,
+          "z": -58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N024-N033",
+      "fromNodeId": "N-024",
+      "toNodeId": "N-033",
+      "bidirectional": true,
+      "lengthMeters": 58,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 48,
+          "y": 0,
+          "z": -58
+        },
+        {
+          "x": 47.482,
+          "y": 0,
+          "z": -29
+        },
+        {
+          "x": 48,
+          "y": 0,
+          "z": 0
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N033-N042",
+      "fromNodeId": "N-033",
+      "toNodeId": "N-042",
+      "bidirectional": true,
+      "lengthMeters": 58,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 48,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 47.94,
+          "y": 0,
+          "z": 29
+        },
+        {
+          "x": 48,
+          "y": 0,
+          "z": 58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N042-N051",
+      "fromNodeId": "N-042",
+      "toNodeId": "N-051",
+      "bidirectional": true,
+      "lengthMeters": 54,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 48,
+          "y": 0,
+          "z": 58
+        },
+        {
+          "x": 47.696,
+          "y": 0,
+          "z": 85
+        },
+        {
+          "x": 48,
+          "y": 0,
+          "z": 112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N051-N060",
+      "fromNodeId": "N-051",
+      "toNodeId": "N-060",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 48,
+          "y": 0,
+          "z": 112
+        },
+        {
+          "x": 47.47,
+          "y": 0,
+          "z": 140
+        },
+        {
+          "x": 48,
+          "y": 0,
+          "z": 168
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N007-N016",
+      "fromNodeId": "N-007",
+      "toNodeId": "N-016",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 96,
+          "y": 0,
+          "z": -168
+        },
+        {
+          "x": 95.247,
+          "y": 0,
+          "z": -140
+        },
+        {
+          "x": 96,
+          "y": 0,
+          "z": -112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N016-N025",
+      "fromNodeId": "N-016",
+      "toNodeId": "N-025",
+      "bidirectional": true,
+      "lengthMeters": 54,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 96,
+          "y": 0,
+          "z": -112
+        },
+        {
+          "x": 96.538,
+          "y": 0,
+          "z": -85
+        },
+        {
+          "x": 96,
+          "y": 0,
+          "z": -58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N025-N034",
+      "fromNodeId": "N-025",
+      "toNodeId": "N-034",
+      "bidirectional": true,
+      "lengthMeters": 58,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 96,
+          "y": 0,
+          "z": -58
+        },
+        {
+          "x": 94.949,
+          "y": 0,
+          "z": -29
+        },
+        {
+          "x": 96,
+          "y": 0,
+          "z": 0
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N034-N043",
+      "fromNodeId": "N-034",
+      "toNodeId": "N-043",
+      "bidirectional": true,
+      "lengthMeters": 58,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 96,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 96.999,
+          "y": 0,
+          "z": 29
+        },
+        {
+          "x": 96,
+          "y": 0,
+          "z": 58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N043-N052",
+      "fromNodeId": "N-043",
+      "toNodeId": "N-052",
+      "bidirectional": true,
+      "lengthMeters": 54,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 96,
+          "y": 0,
+          "z": 58
+        },
+        {
+          "x": 95.951,
+          "y": 0,
+          "z": 85
+        },
+        {
+          "x": 96,
+          "y": 0,
+          "z": 112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N052-N061",
+      "fromNodeId": "N-052",
+      "toNodeId": "N-061",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 96,
+          "y": 0,
+          "z": 112
+        },
+        {
+          "x": 96.161,
+          "y": 0,
+          "z": 140
+        },
+        {
+          "x": 96,
+          "y": 0,
+          "z": 168
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N008-N017",
+      "fromNodeId": "N-008",
+      "toNodeId": "N-017",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 144,
+          "y": 0,
+          "z": -168
+        },
+        {
+          "x": 144.42,
+          "y": 0,
+          "z": -140
+        },
+        {
+          "x": 144,
+          "y": 0,
+          "z": -112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N017-N026",
+      "fromNodeId": "N-017",
+      "toNodeId": "N-026",
+      "bidirectional": true,
+      "lengthMeters": 54,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 144,
+          "y": 0,
+          "z": -112
+        },
+        {
+          "x": 144.92,
+          "y": 0,
+          "z": -85
+        },
+        {
+          "x": 144,
+          "y": 0,
+          "z": -58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N026-N035",
+      "fromNodeId": "N-026",
+      "toNodeId": "N-035",
+      "bidirectional": true,
+      "lengthMeters": 58,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 144,
+          "y": 0,
+          "z": -58
+        },
+        {
+          "x": 143.306,
+          "y": 0,
+          "z": -29
+        },
+        {
+          "x": 144,
+          "y": 0,
+          "z": 0
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N035-N044",
+      "fromNodeId": "N-035",
+      "toNodeId": "N-044",
+      "bidirectional": true,
+      "lengthMeters": 58,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 144,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 143.432,
+          "y": 0,
+          "z": 29
+        },
+        {
+          "x": 144,
+          "y": 0,
+          "z": 58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N044-N053",
+      "fromNodeId": "N-044",
+      "toNodeId": "N-053",
+      "bidirectional": true,
+      "lengthMeters": 54,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 144,
+          "y": 0,
+          "z": 58
+        },
+        {
+          "x": 145.158,
+          "y": 0,
+          "z": 85
+        },
+        {
+          "x": 144,
+          "y": 0,
+          "z": 112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N053-N062",
+      "fromNodeId": "N-053",
+      "toNodeId": "N-062",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 30,
+      "visualSplineControlPoints": [
+        {
+          "x": 144,
+          "y": 0,
+          "z": 112
+        },
+        {
+          "x": 143.424,
+          "y": 0,
+          "z": 140
+        },
+        {
+          "x": 144,
+          "y": 0,
+          "z": 168
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N009-N018",
+      "fromNodeId": "N-009",
+      "toNodeId": "N-018",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": 200,
+          "y": 0,
+          "z": -168
+        },
+        {
+          "x": 199.03,
+          "y": 0,
+          "z": -140
+        },
+        {
+          "x": 200,
+          "y": 0,
+          "z": -112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N018-N027",
+      "fromNodeId": "N-018",
+      "toNodeId": "N-027",
+      "bidirectional": true,
+      "lengthMeters": 54,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": 200,
+          "y": 0,
+          "z": -112
+        },
+        {
+          "x": 199.319,
+          "y": 0,
+          "z": -85
+        },
+        {
+          "x": 200,
+          "y": 0,
+          "z": -58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N027-N036",
+      "fromNodeId": "N-027",
+      "toNodeId": "N-036",
+      "bidirectional": true,
+      "lengthMeters": 58,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": 200,
+          "y": 0,
+          "z": -58
+        },
+        {
+          "x": 199.772,
+          "y": 0,
+          "z": -29
+        },
+        {
+          "x": 200,
+          "y": 0,
+          "z": 0
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N036-N045",
+      "fromNodeId": "N-036",
+      "toNodeId": "N-045",
+      "bidirectional": true,
+      "lengthMeters": 58,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": 200,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 200.971,
+          "y": 0,
+          "z": 29
+        },
+        {
+          "x": 200,
+          "y": 0,
+          "z": 58
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N045-N054",
+      "fromNodeId": "N-045",
+      "toNodeId": "N-054",
+      "bidirectional": true,
+      "lengthMeters": 54,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": 200,
+          "y": 0,
+          "z": 58
+        },
+        {
+          "x": 199.456,
+          "y": 0,
+          "z": 85
+        },
+        {
+          "x": 200,
+          "y": 0,
+          "z": 112
+        }
+      ]
+    },
+    {
+      "edgeId": "E-N054-N063",
+      "fromNodeId": "N-054",
+      "toNodeId": "N-063",
+      "bidirectional": true,
+      "lengthMeters": 56,
+      "speedLimitKph": 40,
+      "visualSplineControlPoints": [
+        {
+          "x": 200,
+          "y": 0,
+          "z": 112
+        },
+        {
+          "x": 199.674,
+          "y": 0,
+          "z": 140
+        },
+        {
+          "x": 200,
+          "y": 0,
+          "z": 168
+        }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "BLK-01-01",
+      "kind": "BUILT",
+      "center": {
+        "x": -171.625,
+        "z": -139.625
+      },
+      "size": {
+        "x": 47.05,
+        "z": 47.05
+      },
+      "buildings": [
+        {
+          "x": -182.456,
+          "z": -150.129,
+          "rotationYDegrees": 2,
+          "scale": 2.56
+        },
+        {
+          "x": -159.863,
+          "z": -152.699,
+          "rotationYDegrees": 1.7,
+          "scale": 3.22
+        },
+        {
+          "x": -182.739,
+          "z": -128.553,
+          "rotationYDegrees": 3.5,
+          "scale": 4.37
+        },
+        {
+          "x": -159.905,
+          "z": -127.665,
+          "rotationYDegrees": -1.8,
+          "scale": 3.16
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-01-02",
+      "kind": "BUILT",
+      "center": {
+        "x": -171.625,
+        "z": -85
+      },
+      "size": {
+        "x": 47.05,
+        "z": 45.8
+      },
+      "buildings": [
+        {
+          "x": -184.421,
+          "z": -97.663,
+          "rotationYDegrees": 92.6,
+          "scale": 3.13
+        },
+        {
+          "x": -159.134,
+          "z": -96.545,
+          "rotationYDegrees": -0.5,
+          "scale": 3.35
+        },
+        {
+          "x": -184.05,
+          "z": -74.127,
+          "rotationYDegrees": 3.5,
+          "scale": 3.83
+        },
+        {
+          "x": -160.982,
+          "z": -72.617,
+          "rotationYDegrees": 90.6,
+          "scale": 3.15
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-01-03",
+      "kind": "BUILT",
+      "center": {
+        "x": -171.625,
+        "z": -29.75
+      },
+      "size": {
+        "x": 47.05,
+        "z": 48.3
+      },
+      "buildings": [
+        {
+          "x": -184.03,
+          "z": -43.141,
+          "rotationYDegrees": 88.1,
+          "scale": 4.1
+        },
+        {
+          "x": -159.866,
+          "z": -41.208,
+          "rotationYDegrees": -1.2,
+          "scale": 4.13
+        },
+        {
+          "x": -160.084,
+          "z": -16.419,
+          "rotationYDegrees": -2.2,
+          "scale": 4.2
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-01-04",
+      "kind": "BUILT",
+      "center": {
+        "x": -171.625,
+        "z": 29.75
+      },
+      "size": {
+        "x": 47.05,
+        "z": 48.3
+      },
+      "buildings": [
+        {
+          "x": -182.211,
+          "z": 17.744,
+          "rotationYDegrees": -2.4,
+          "scale": 2.97
+        },
+        {
+          "x": -160.4,
+          "z": 16.59,
+          "rotationYDegrees": 89.5,
+          "scale": 4.07
+        },
+        {
+          "x": -183.074,
+          "z": 42.86,
+          "rotationYDegrees": 91.9,
+          "scale": 3.09
+        },
+        {
+          "x": -160.683,
+          "z": 41.461,
+          "rotationYDegrees": -2.5,
+          "scale": 2.56
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-01-05",
+      "kind": "BUILT",
+      "center": {
+        "x": -171.625,
+        "z": 85
+      },
+      "size": {
+        "x": 47.05,
+        "z": 45.8
+      },
+      "buildings": [
+        {
+          "x": -182.772,
+          "z": 72.983,
+          "rotationYDegrees": 89.7,
+          "scale": 4.14
+        },
+        {
+          "x": -160.844,
+          "z": 72.94,
+          "rotationYDegrees": -2.1,
+          "scale": 3.52
+        },
+        {
+          "x": -183.905,
+          "z": 96.331,
+          "rotationYDegrees": -0.6,
+          "scale": 2.46
+        },
+        {
+          "x": -159.496,
+          "z": 96.622,
+          "rotationYDegrees": 94,
+          "scale": 2.56
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-01-06",
+      "kind": "PARK",
+      "center": {
+        "x": -171.625,
+        "z": 139.625
+      },
+      "size": {
+        "x": 47.05,
+        "z": 47.05
+      },
+      "buildings": []
+    },
+    {
+      "blockId": "BLK-02-01",
+      "kind": "BUILT",
+      "center": {
+        "x": -120,
+        "z": -139.625
+      },
+      "size": {
+        "x": 39.8,
+        "z": 47.05
+      },
+      "buildings": [
+        {
+          "x": -130.261,
+          "z": -152.123,
+          "rotationYDegrees": 2.4,
+          "scale": 2.88
+        },
+        {
+          "x": -129.193,
+          "z": -127.558,
+          "rotationYDegrees": -0.1,
+          "scale": 2.99
+        },
+        {
+          "x": -109.816,
+          "z": -127.288,
+          "rotationYDegrees": 88.1,
+          "scale": 2.47
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-02-02",
+      "kind": "PARK",
+      "center": {
+        "x": -120,
+        "z": -85
+      },
+      "size": {
+        "x": 39.8,
+        "z": 45.8
+      },
+      "buildings": []
+    },
+    {
+      "blockId": "BLK-02-03",
+      "kind": "BUILT",
+      "center": {
+        "x": -120,
+        "z": -29.75
+      },
+      "size": {
+        "x": 39.8,
+        "z": 48.3
+      },
+      "buildings": [
+        {
+          "x": -110.497,
+          "z": -42.679,
+          "rotationYDegrees": 93.1,
+          "scale": 3.42
+        },
+        {
+          "x": -110.481,
+          "z": -16.675,
+          "rotationYDegrees": 1.9,
+          "scale": 3.02
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-02-04",
+      "kind": "BUILT",
+      "center": {
+        "x": -120,
+        "z": 29.75
+      },
+      "size": {
+        "x": 39.8,
+        "z": 48.3
+      },
+      "buildings": [
+        {
+          "x": -109.265,
+          "z": 18.095,
+          "rotationYDegrees": 0.7,
+          "scale": 2.63
+        },
+        {
+          "x": -129.157,
+          "z": 42.266,
+          "rotationYDegrees": 87.3,
+          "scale": 3.57
+        },
+        {
+          "x": -109.737,
+          "z": 41.7,
+          "rotationYDegrees": 0,
+          "scale": 3.68
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-02-05",
+      "kind": "BUILT",
+      "center": {
+        "x": -120,
+        "z": 85
+      },
+      "size": {
+        "x": 39.8,
+        "z": 45.8
+      },
+      "buildings": [
+        {
+          "x": -131.018,
+          "z": 74.515,
+          "rotationYDegrees": -1.6,
+          "scale": 2.8
+        },
+        {
+          "x": -108.721,
+          "z": 73.572,
+          "rotationYDegrees": 87.1,
+          "scale": 2.63
+        },
+        {
+          "x": -130.97,
+          "z": 96.639,
+          "rotationYDegrees": 88.8,
+          "scale": 2.62
+        },
+        {
+          "x": -110.891,
+          "z": 96.365,
+          "rotationYDegrees": -2.5,
+          "scale": 2.98
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-02-06",
+      "kind": "BUILT",
+      "center": {
+        "x": -120,
+        "z": 139.625
+      },
+      "size": {
+        "x": 39.8,
+        "z": 47.05
+      },
+      "buildings": [
+        {
+          "x": -109.348,
+          "z": 126.906,
+          "rotationYDegrees": 86.1,
+          "scale": 3.01
+        },
+        {
+          "x": -129.581,
+          "z": 151.822,
+          "rotationYDegrees": -0.4,
+          "scale": 3.51
+        },
+        {
+          "x": -110.525,
+          "z": 151.664,
+          "rotationYDegrees": 3.2,
+          "scale": 3.03
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-03-01",
+      "kind": "BUILT",
+      "center": {
+        "x": -72,
+        "z": -139.625
+      },
+      "size": {
+        "x": 39.8,
+        "z": 47.05
+      },
+      "buildings": [
+        {
+          "x": -82.127,
+          "z": -152.428,
+          "rotationYDegrees": 87.1,
+          "scale": 3.63
+        },
+        {
+          "x": -63.413,
+          "z": -152.706,
+          "rotationYDegrees": 86.6,
+          "scale": 3.18
+        },
+        {
+          "x": -61.666,
+          "z": -127.828,
+          "rotationYDegrees": 90,
+          "scale": 3.17
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-03-02",
+      "kind": "BUILT",
+      "center": {
+        "x": -72,
+        "z": -85
+      },
+      "size": {
+        "x": 39.8,
+        "z": 45.8
+      },
+      "buildings": [
+        {
+          "x": -81.223,
+          "z": -96.915,
+          "rotationYDegrees": 87.2,
+          "scale": 3.44
+        },
+        {
+          "x": -61.871,
+          "z": -95.963,
+          "rotationYDegrees": 86.3,
+          "scale": 2.68
+        },
+        {
+          "x": -81.467,
+          "z": -74.103,
+          "rotationYDegrees": 1.9,
+          "scale": 2.58
+        },
+        {
+          "x": -61.848,
+          "z": -74.587,
+          "rotationYDegrees": 2.4,
+          "scale": 3.19
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-03-03",
+      "kind": "BUILT",
+      "center": {
+        "x": -72,
+        "z": -29.75
+      },
+      "size": {
+        "x": 39.8,
+        "z": 48.3
+      },
+      "buildings": [
+        {
+          "x": -80.66,
+          "z": -43.204,
+          "rotationYDegrees": 87.3,
+          "scale": 3.65
+        },
+        {
+          "x": -62.387,
+          "z": -42.366,
+          "rotationYDegrees": 86.7,
+          "scale": 2.98
+        },
+        {
+          "x": -62.993,
+          "z": -16.969,
+          "rotationYDegrees": 91,
+          "scale": 2.94
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-03-04",
+      "kind": "BUILT",
+      "center": {
+        "x": -72,
+        "z": 29.75
+      },
+      "size": {
+        "x": 39.8,
+        "z": 48.3
+      },
+      "buildings": [
+        {
+          "x": -82.37,
+          "z": 17.461,
+          "rotationYDegrees": 88,
+          "scale": 2.67
+        },
+        {
+          "x": -61.706,
+          "z": 17.663,
+          "rotationYDegrees": -1.7,
+          "scale": 3.37
+        },
+        {
+          "x": -62.785,
+          "z": 40.607,
+          "rotationYDegrees": 93.6,
+          "scale": 3.7
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-03-05",
+      "kind": "BUILT",
+      "center": {
+        "x": -72,
+        "z": 85
+      },
+      "size": {
+        "x": 39.8,
+        "z": 45.8
+      },
+      "buildings": [
+        {
+          "x": -82.319,
+          "z": 72.989,
+          "rotationYDegrees": 90,
+          "scale": 2.57
+        },
+        {
+          "x": -61.867,
+          "z": 74.313,
+          "rotationYDegrees": -3.5,
+          "scale": 2.7
+        },
+        {
+          "x": -63.205,
+          "z": 95.169,
+          "rotationYDegrees": 89.8,
+          "scale": 3.6
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-03-06",
+      "kind": "BUILT",
+      "center": {
+        "x": -72,
+        "z": 139.625
+      },
+      "size": {
+        "x": 39.8,
+        "z": 47.05
+      },
+      "buildings": [
+        {
+          "x": -80.718,
+          "z": 127.214,
+          "rotationYDegrees": 90.5,
+          "scale": 3.52
+        },
+        {
+          "x": -81.134,
+          "z": 151.238,
+          "rotationYDegrees": 92.3,
+          "scale": 2.42
+        },
+        {
+          "x": -63.288,
+          "z": 150.882,
+          "rotationYDegrees": 92.1,
+          "scale": 3.4
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-04-01",
+      "kind": "BUILT",
+      "center": {
+        "x": -24.75,
+        "z": -139.625
+      },
+      "size": {
+        "x": 38.3,
+        "z": 47.05
+      },
+      "buildings": [
+        {
+          "x": -35.672,
+          "z": -150.066,
+          "rotationYDegrees": -2.5,
+          "scale": 3.36
+        },
+        {
+          "x": -14.669,
+          "z": -152.628,
+          "rotationYDegrees": 89.8,
+          "scale": 3.02
+        },
+        {
+          "x": -34.735,
+          "z": -127.03,
+          "rotationYDegrees": 3.1,
+          "scale": 2.96
+        },
+        {
+          "x": -14.115,
+          "z": -127.742,
+          "rotationYDegrees": 87.5,
+          "scale": 2.53
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-04-02",
+      "kind": "BUILT",
+      "center": {
+        "x": -24.75,
+        "z": -85
+      },
+      "size": {
+        "x": 38.3,
+        "z": 45.8
+      },
+      "buildings": [
+        {
+          "x": -33.388,
+          "z": -96.175,
+          "rotationYDegrees": 93.7,
+          "scale": 3.17
+        },
+        {
+          "x": -14.896,
+          "z": -95.998,
+          "rotationYDegrees": 1.9,
+          "scale": 3.45
+        },
+        {
+          "x": -35.465,
+          "z": -73.591,
+          "rotationYDegrees": 93.1,
+          "scale": 2.54
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-04-03",
+      "kind": "PLAZA",
+      "center": {
+        "x": -24.75,
+        "z": -29.75
+      },
+      "size": {
+        "x": 38.3,
+        "z": 48.3
+      },
+      "buildings": []
+    },
+    {
+      "blockId": "BLK-04-04",
+      "kind": "PLAZA",
+      "center": {
+        "x": -24.75,
+        "z": 29.75
+      },
+      "size": {
+        "x": 38.3,
+        "z": 48.3
+      },
+      "buildings": []
+    },
+    {
+      "blockId": "BLK-04-05",
+      "kind": "BUILT",
+      "center": {
+        "x": -24.75,
+        "z": 85
+      },
+      "size": {
+        "x": 38.3,
+        "z": 45.8
+      },
+      "buildings": [
+        {
+          "x": -34.276,
+          "z": 73.1,
+          "rotationYDegrees": 88.7,
+          "scale": 3.14
+        },
+        {
+          "x": -14.786,
+          "z": 74.252,
+          "rotationYDegrees": 91.5,
+          "scale": 2.98
+        },
+        {
+          "x": -33.463,
+          "z": 96.218,
+          "rotationYDegrees": 1.2,
+          "scale": 2.63
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-04-06",
+      "kind": "BUILT",
+      "center": {
+        "x": -24.75,
+        "z": 139.625
+      },
+      "size": {
+        "x": 38.3,
+        "z": 47.05
+      },
+      "buildings": [
+        {
+          "x": -34.814,
+          "z": 127.906,
+          "rotationYDegrees": -3.3,
+          "scale": 3.53
+        },
+        {
+          "x": -13.96,
+          "z": 127.379,
+          "rotationYDegrees": -1,
+          "scale": 2.92
+        },
+        {
+          "x": -15.33,
+          "z": 150.063,
+          "rotationYDegrees": 91.9,
+          "scale": 3.22
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-05-01",
+      "kind": "BUILT",
+      "center": {
+        "x": 24.75,
+        "z": -139.625
+      },
+      "size": {
+        "x": 38.3,
+        "z": 47.05
+      },
+      "buildings": [
+        {
+          "x": 14.075,
+          "z": -150.888,
+          "rotationYDegrees": 91.2,
+          "scale": 3.04
+        },
+        {
+          "x": 34.283,
+          "z": -150.557,
+          "rotationYDegrees": 3.1,
+          "scale": 2.46
+        },
+        {
+          "x": 16.306,
+          "z": -127.037,
+          "rotationYDegrees": 93.2,
+          "scale": 3.29
+        },
+        {
+          "x": 34.321,
+          "z": -127.855,
+          "rotationYDegrees": 93.3,
+          "scale": 3.17
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-05-02",
+      "kind": "BUILT",
+      "center": {
+        "x": 24.75,
+        "z": -85
+      },
+      "size": {
+        "x": 38.3,
+        "z": 45.8
+      },
+      "buildings": [
+        {
+          "x": 15.647,
+          "z": -95.632,
+          "rotationYDegrees": 93.3,
+          "scale": 2.51
+        },
+        {
+          "x": 34.999,
+          "z": -96.961,
+          "rotationYDegrees": 1.1,
+          "scale": 2.69
+        },
+        {
+          "x": 15.873,
+          "z": -73.853,
+          "rotationYDegrees": 3,
+          "scale": 3.05
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-05-03",
+      "kind": "PLAZA",
+      "center": {
+        "x": 24.75,
+        "z": -29.75
+      },
+      "size": {
+        "x": 38.3,
+        "z": 48.3
+      },
+      "buildings": []
+    },
+    {
+      "blockId": "BLK-05-04",
+      "kind": "PLAZA",
+      "center": {
+        "x": 24.75,
+        "z": 29.75
+      },
+      "size": {
+        "x": 38.3,
+        "z": 48.3
+      },
+      "buildings": []
+    },
+    {
+      "blockId": "BLK-05-05",
+      "kind": "BUILT",
+      "center": {
+        "x": 24.75,
+        "z": 85
+      },
+      "size": {
+        "x": 38.3,
+        "z": 45.8
+      },
+      "buildings": [
+        {
+          "x": 15.565,
+          "z": 73.877,
+          "rotationYDegrees": 93.4,
+          "scale": 2.6
+        },
+        {
+          "x": 35.449,
+          "z": 74.305,
+          "rotationYDegrees": 87.8,
+          "scale": 2.64
+        },
+        {
+          "x": 14.536,
+          "z": 95.86,
+          "rotationYDegrees": 3.4,
+          "scale": 2.5
+        },
+        {
+          "x": 34.227,
+          "z": 95.348,
+          "rotationYDegrees": -3.1,
+          "scale": 3.32
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-05-06",
+      "kind": "BUILT",
+      "center": {
+        "x": 24.75,
+        "z": 139.625
+      },
+      "size": {
+        "x": 38.3,
+        "z": 47.05
+      },
+      "buildings": [
+        {
+          "x": 16.133,
+          "z": 127.643,
+          "rotationYDegrees": -1.5,
+          "scale": 3.56
+        },
+        {
+          "x": 33.974,
+          "z": 127.759,
+          "rotationYDegrees": 87.7,
+          "scale": 3.18
+        },
+        {
+          "x": 16.003,
+          "z": 151.068,
+          "rotationYDegrees": 0.1,
+          "scale": 2.79
+        },
+        {
+          "x": 34.114,
+          "z": 150.122,
+          "rotationYDegrees": 4,
+          "scale": 3.37
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-06-01",
+      "kind": "BUILT",
+      "center": {
+        "x": 72,
+        "z": -139.625
+      },
+      "size": {
+        "x": 39.8,
+        "z": 47.05
+      },
+      "buildings": [
+        {
+          "x": 61.085,
+          "z": -152.129,
+          "rotationYDegrees": 2.2,
+          "scale": 2.89
+        },
+        {
+          "x": 81.594,
+          "z": -151.301,
+          "rotationYDegrees": 87.2,
+          "scale": 3.6
+        },
+        {
+          "x": 61.704,
+          "z": -127.937,
+          "rotationYDegrees": 91.3,
+          "scale": 2.8
+        },
+        {
+          "x": 83.243,
+          "z": -129.063,
+          "rotationYDegrees": 91.3,
+          "scale": 2.65
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-06-02",
+      "kind": "BUILT",
+      "center": {
+        "x": 72,
+        "z": -85
+      },
+      "size": {
+        "x": 39.8,
+        "z": 45.8
+      },
+      "buildings": [
+        {
+          "x": 62.607,
+          "z": -95.725,
+          "rotationYDegrees": 90.1,
+          "scale": 2.44
+        },
+        {
+          "x": 82.783,
+          "z": -96.05,
+          "rotationYDegrees": -2.3,
+          "scale": 3.12
+        },
+        {
+          "x": 62.343,
+          "z": -72.875,
+          "rotationYDegrees": 89,
+          "scale": 2.42
+        },
+        {
+          "x": 82.122,
+          "z": -73.827,
+          "rotationYDegrees": 87.9,
+          "scale": 3.36
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-06-03",
+      "kind": "BUILT",
+      "center": {
+        "x": 72,
+        "z": -29.75
+      },
+      "size": {
+        "x": 39.8,
+        "z": 48.3
+      },
+      "buildings": [
+        {
+          "x": 61.252,
+          "z": -41.061,
+          "rotationYDegrees": 2.4,
+          "scale": 3.43
+        },
+        {
+          "x": 61.28,
+          "z": -18.801,
+          "rotationYDegrees": -2.9,
+          "scale": 2.44
+        },
+        {
+          "x": 81.777,
+          "z": -17.925,
+          "rotationYDegrees": 87.4,
+          "scale": 2.89
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-06-04",
+      "kind": "BUILT",
+      "center": {
+        "x": 72,
+        "z": 29.75
+      },
+      "size": {
+        "x": 39.8,
+        "z": 48.3
+      },
+      "buildings": [
+        {
+          "x": 81.051,
+          "z": 17.517,
+          "rotationYDegrees": -3,
+          "scale": 2.71
+        },
+        {
+          "x": 61.641,
+          "z": 41.883,
+          "rotationYDegrees": 86.1,
+          "scale": 2.56
+        },
+        {
+          "x": 81.168,
+          "z": 40.471,
+          "rotationYDegrees": 3.1,
+          "scale": 2.71
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-06-05",
+      "kind": "BUILT",
+      "center": {
+        "x": 72,
+        "z": 85
+      },
+      "size": {
+        "x": 39.8,
+        "z": 45.8
+      },
+      "buildings": [
+        {
+          "x": 81.962,
+          "z": 74.319,
+          "rotationYDegrees": 86,
+          "scale": 2.89
+        },
+        {
+          "x": 62.472,
+          "z": 96.129,
+          "rotationYDegrees": 93.3,
+          "scale": 3.34
+        },
+        {
+          "x": 82.134,
+          "z": 95.099,
+          "rotationYDegrees": 3.1,
+          "scale": 2.52
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-06-06",
+      "kind": "BUILT",
+      "center": {
+        "x": 72,
+        "z": 139.625
+      },
+      "size": {
+        "x": 39.8,
+        "z": 47.05
+      },
+      "buildings": [
+        {
+          "x": 60.724,
+          "z": 151.515,
+          "rotationYDegrees": -1.8,
+          "scale": 2.55
+        },
+        {
+          "x": 81.676,
+          "z": 152.357,
+          "rotationYDegrees": 90.2,
+          "scale": 3.58
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-07-01",
+      "kind": "BUILT",
+      "center": {
+        "x": 120,
+        "z": -139.625
+      },
+      "size": {
+        "x": 39.8,
+        "z": 47.05
+      },
+      "buildings": [
+        {
+          "x": 109.036,
+          "z": -152.694,
+          "rotationYDegrees": 88,
+          "scale": 3.09
+        },
+        {
+          "x": 131.07,
+          "z": -151.422,
+          "rotationYDegrees": 90.1,
+          "scale": 3.35
+        },
+        {
+          "x": 108.757,
+          "z": -127.817,
+          "rotationYDegrees": -1.5,
+          "scale": 3.48
+        },
+        {
+          "x": 130.459,
+          "z": -127.416,
+          "rotationYDegrees": 0.7,
+          "scale": 2.92
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-07-02",
+      "kind": "BUILT",
+      "center": {
+        "x": 120,
+        "z": -85
+      },
+      "size": {
+        "x": 39.8,
+        "z": 45.8
+      },
+      "buildings": [
+        {
+          "x": 110.252,
+          "z": -97.475,
+          "rotationYDegrees": -0.4,
+          "scale": 2.64
+        },
+        {
+          "x": 131.067,
+          "z": -95.35,
+          "rotationYDegrees": -3,
+          "scale": 3.37
+        },
+        {
+          "x": 108.792,
+          "z": -73.241,
+          "rotationYDegrees": -1.3,
+          "scale": 3.38
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-07-03",
+      "kind": "BUILT",
+      "center": {
+        "x": 120,
+        "z": -29.75
+      },
+      "size": {
+        "x": 39.8,
+        "z": 48.3
+      },
+      "buildings": [
+        {
+          "x": 130.923,
+          "z": -40.989,
+          "rotationYDegrees": 0.9,
+          "scale": 3.72
+        },
+        {
+          "x": 108.768,
+          "z": -17.478,
+          "rotationYDegrees": 3.1,
+          "scale": 2.91
+        },
+        {
+          "x": 130.191,
+          "z": -18.8,
+          "rotationYDegrees": 1,
+          "scale": 2.86
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-07-04",
+      "kind": "BUILT",
+      "center": {
+        "x": 120,
+        "z": 29.75
+      },
+      "size": {
+        "x": 39.8,
+        "z": 48.3
+      },
+      "buildings": [
+        {
+          "x": 111.24,
+          "z": 17.466,
+          "rotationYDegrees": 86.6,
+          "scale": 2.7
+        },
+        {
+          "x": 130.804,
+          "z": 17.312,
+          "rotationYDegrees": -1.1,
+          "scale": 2.89
+        },
+        {
+          "x": 110.722,
+          "z": 43.165,
+          "rotationYDegrees": 93.8,
+          "scale": 2.85
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-07-05",
+      "kind": "BUILT",
+      "center": {
+        "x": 120,
+        "z": 85
+      },
+      "size": {
+        "x": 39.8,
+        "z": 45.8
+      },
+      "buildings": [
+        {
+          "x": 128.897,
+          "z": 74.164,
+          "rotationYDegrees": 3.9,
+          "scale": 2.49
+        },
+        {
+          "x": 109.411,
+          "z": 97.71,
+          "rotationYDegrees": 93.2,
+          "scale": 2.79
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-07-06",
+      "kind": "BUILT",
+      "center": {
+        "x": 120,
+        "z": 139.625
+      },
+      "size": {
+        "x": 39.8,
+        "z": 47.05
+      },
+      "buildings": [
+        {
+          "x": 110.652,
+          "z": 129.089,
+          "rotationYDegrees": -2.5,
+          "scale": 2.86
+        },
+        {
+          "x": 130.935,
+          "z": 126.599,
+          "rotationYDegrees": 3.2,
+          "scale": 2.85
+        },
+        {
+          "x": 109.579,
+          "z": 150.911,
+          "rotationYDegrees": -1.2,
+          "scale": 3.55
+        },
+        {
+          "x": 128.78,
+          "z": 152.215,
+          "rotationYDegrees": 93.5,
+          "scale": 3.56
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-08-01",
+      "kind": "BUILT",
+      "center": {
+        "x": 171.625,
+        "z": -139.625
+      },
+      "size": {
+        "x": 47.05,
+        "z": 47.05
+      },
+      "buildings": [
+        {
+          "x": 158.874,
+          "z": -152.545,
+          "rotationYDegrees": 91.8,
+          "scale": 3.68
+        },
+        {
+          "x": 182.283,
+          "z": -152.459,
+          "rotationYDegrees": 2.1,
+          "scale": 3.6
+        },
+        {
+          "x": 159.161,
+          "z": -128.912,
+          "rotationYDegrees": -2.1,
+          "scale": 3.86
+        },
+        {
+          "x": 184.438,
+          "z": -128.507,
+          "rotationYDegrees": -1.3,
+          "scale": 3.12
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-08-02",
+      "kind": "BUILT",
+      "center": {
+        "x": 171.625,
+        "z": -85
+      },
+      "size": {
+        "x": 47.05,
+        "z": 45.8
+      },
+      "buildings": [
+        {
+          "x": 159.929,
+          "z": -95.675,
+          "rotationYDegrees": 2.5,
+          "scale": 2.55
+        },
+        {
+          "x": 182.328,
+          "z": -95.508,
+          "rotationYDegrees": -1.9,
+          "scale": 3.83
+        },
+        {
+          "x": 159.783,
+          "z": -72.627,
+          "rotationYDegrees": 93.5,
+          "scale": 3.72
+        },
+        {
+          "x": 184.191,
+          "z": -73.665,
+          "rotationYDegrees": 93.4,
+          "scale": 3.09
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-08-03",
+      "kind": "BUILT",
+      "center": {
+        "x": 171.625,
+        "z": -29.75
+      },
+      "size": {
+        "x": 47.05,
+        "z": 48.3
+      },
+      "buildings": [
+        {
+          "x": 158.869,
+          "z": -40.607,
+          "rotationYDegrees": -0.8,
+          "scale": 3.12
+        },
+        {
+          "x": 183.913,
+          "z": -41.758,
+          "rotationYDegrees": 91.7,
+          "scale": 3.17
+        },
+        {
+          "x": 160.562,
+          "z": -18.634,
+          "rotationYDegrees": -3.9,
+          "scale": 4.07
+        },
+        {
+          "x": 183.692,
+          "z": -18.117,
+          "rotationYDegrees": 87.1,
+          "scale": 4.29
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-08-04",
+      "kind": "PARK",
+      "center": {
+        "x": 171.625,
+        "z": 29.75
+      },
+      "size": {
+        "x": 47.05,
+        "z": 48.3
+      },
+      "buildings": []
+    },
+    {
+      "blockId": "BLK-08-05",
+      "kind": "BUILT",
+      "center": {
+        "x": 171.625,
+        "z": 85
+      },
+      "size": {
+        "x": 47.05,
+        "z": 45.8
+      },
+      "buildings": [
+        {
+          "x": 184.493,
+          "z": 72.348,
+          "rotationYDegrees": -1.8,
+          "scale": 3.88
+        },
+        {
+          "x": 158.7,
+          "z": 95.053,
+          "rotationYDegrees": 89.7,
+          "scale": 4.21
+        },
+        {
+          "x": 182.489,
+          "z": 95.435,
+          "rotationYDegrees": 90.2,
+          "scale": 3.46
+        }
+      ]
+    },
+    {
+      "blockId": "BLK-08-06",
+      "kind": "BUILT",
+      "center": {
+        "x": 171.625,
+        "z": 139.625
+      },
+      "size": {
+        "x": 47.05,
+        "z": 47.05
+      },
+      "buildings": [
+        {
+          "x": 183.101,
+          "z": 127.172,
+          "rotationYDegrees": 91.3,
+          "scale": 2.94
+        },
+        {
+          "x": 159.4,
+          "z": 151.922,
+          "rotationYDegrees": 93.5,
+          "scale": 3.05
+        },
+        {
+          "x": 182.374,
+          "z": 150.702,
+          "rotationYDegrees": 90.7,
+          "scale": 2.51
+        }
+      ]
+    }
+  ],
+  "landmarks": [
+    {
+      "landmarkId": "L-DEPOT",
+      "nodeId": "N-032",
+      "assetId": "depotLandmark",
+      "rotationYDegrees": 0,
+      "scale": 4
+    }
+  ]
+}

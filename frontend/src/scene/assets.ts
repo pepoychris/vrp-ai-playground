@@ -78,7 +78,10 @@ export interface RenderBudget {
   targetFps: number;
   minimumAcceptableFps: number;
   perAsset: AssetBudgetLimits;
+  /** Phase 2 fixture stage. */
   stage: StageBudgetLimits;
+  /** Phase 3 city stage: more geometry, same measurement method. */
+  city: StageBudgetLimits;
   memoryProxyBytesPerInstance: number;
   measurementNotes: string;
 }

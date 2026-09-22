@@ -21,7 +21,7 @@ import {
   Scene,
   WebGLRenderer,
 } from 'three';
-import type { Object3D } from 'three';
+import type { Camera, Object3D } from 'three';
 
 import {
   createAnimationDirector,
@@ -45,7 +45,7 @@ export class WebGLUnavailableError extends Error {
 
 export interface RendererLike {
   setSize(width: number, height: number, updateStyle?: boolean): void;
-  render(scene: Scene, camera: PerspectiveCamera): void;
+  render(scene: Scene, camera: Camera): void;
   dispose(): void;
 }
 
@@ -149,7 +149,11 @@ function describeError(error: unknown): string {
   return String(error);
 }
 
-function createDefaultRenderer(
+/**
+ * Shared renderer factory. Phase 2 uses it for the fixture stage and Phase 3 reuses it
+ * for the city, so both stages create and dispose the WebGL context the same way.
+ */
+export function createDefaultRenderer(
   canvas: HTMLCanvasElement | undefined,
   width: number,
   height: number,

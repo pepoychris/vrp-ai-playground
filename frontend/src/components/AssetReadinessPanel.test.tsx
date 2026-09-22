@@ -108,6 +108,8 @@ describe('AssetReadinessPanel', () => {
 });
 
 describe('SceneStage', () => {
+  // Phase 3 replaced the fixture preview with the city view; the placeholder contract is
+  // unchanged: a canvas, an accessible name, a waiting note and no fetch of its own.
   it('renders an accessible placeholder before the fixtures arrive', () => {
     const fetchStub = vi.fn(() => {
       throw new Error('rendering must not fetch');
@@ -116,7 +118,7 @@ describe('SceneStage', () => {
 
     const markup = renderToStaticMarkup(<SceneStage bundle={null} />);
 
-    expect(markup).toContain('Scene preview');
+    expect(markup).toContain('City view');
     expect(markup).toContain('stage__canvas');
     expect(markup).toContain('role="img"');
     expect(markup).toContain('Waiting for the fixture assets.');

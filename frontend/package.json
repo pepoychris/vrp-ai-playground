@@ -2,14 +2,17 @@
   "name": "roboroute-nexus-frontend",
   "private": true,
   "version": "0.1.0",
-  "description": "RoboRoute Nexus frontend: inactive startup screen plus the MVP Phase 2 fixture asset pipeline and 3D scene shell.",
+  "description": "RoboRoute Nexus frontend: inactive startup screen, the MVP Phase 2 fixture asset pipeline and the MVP Phase 3 city and road graph.",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "benchmark:assets": "node tools/benchmark-assets.mjs",
+    "benchmark:city": "vitest run --reporter=verbose src/city/city-benchmark.test.ts",
     "fixture:assets": "python tools/build_fixture_assets.py",
     "fixture:assets:check": "python tools/build_fixture_assets.py --check",
+    "fixture:city": "node tools/build_city_dataset.mjs",
+    "fixture:city:check": "node tools/build_city_dataset.mjs --check",
     "preview": "vite preview",
     "serve": "node server/static-server.mjs",
     "test": "vitest run"

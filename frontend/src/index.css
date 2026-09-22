@@ -233,15 +233,32 @@ body {
   display: block;
   width: 100%;
   height: 100%;
+  cursor: grab;
+  touch-action: none;
+}
+
+.stage__canvas:focus-visible {
+  outline: 2px solid var(--rr-color-accent, #f0b429);
+  outline-offset: -2px;
+}
+
+.stage__canvas--dragging {
+  cursor: grabbing;
 }
 
 .stage--degraded .stage__canvas {
   display: none;
 }
 
-.stage__note {
+.stage__overlay {
   position: absolute;
   inset: auto 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.stage__note {
   margin: 0;
   padding: 10px 12px;
   background: color-mix(in srgb, var(--surface) 82%, transparent);
@@ -249,8 +266,11 @@ body {
   font-size: 12px;
 }
 
-.stage--degraded .stage__note {
+.stage--degraded .stage__overlay {
   position: static;
+}
+
+.stage--degraded .stage__note {
   background: transparent;
 }
 
