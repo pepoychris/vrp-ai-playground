@@ -97,5 +97,16 @@
       "grab": { "duration": 900, "loop": false },
       "deploy": { "duration": 1000, "loop": false }
     }
+  },
+  "city": {
+    "surfaceColors": {
+      "roadSurface": "#2b323b",
+      "roadMarking": "#6b7480",
+      "blockPad": "#232a33",
+      "parkSurface": "#2c4237",
+      "plazaSurface": "#333a45",
+      "depotApron": "#3f4854"
+    },
+    "routeColors": ["#f0b429", "#7fd1c1", "#9fc4ff", "#e0a33a", "#8e99a8", "#4bbd7a"]
   }
 }

@@ -17,6 +17,14 @@
     "maxMemoryProxyBytes": 33554432,
     "maxInstanceCount": 24
   },
+  "city": {
+    "maxTriangles": 40000,
+    "maxDrawCalls": 24,
+    "maxTextureCount": 8,
+    "maxTextureBytes": 1048576,
+    "maxMemoryProxyBytes": 50331648,
+    "maxInstanceCount": 400
+  },
   "memoryProxyBytesPerInstance": 1024,
   "measurementNotes": "Deterministic budgets only. FPS and GPU memory are host specific and are never reported as measured unless a browser run records them."
 }

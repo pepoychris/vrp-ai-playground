@@ -22,6 +22,12 @@ export const SPACING = rawTokens.spacing;
 export const LIGHTING = rawTokens.lighting;
 export const ICON_TOKENS = rawTokens.icons;
 export const MOTION_TOKENS = rawTokens.motion;
+/**
+ * Surface and route colours for the 3D city. They live in their own namespace because
+ * they are only consumed by scene materials: the interface colours stay in `palette`
+ * and `statusColors`.
+ */
+export const CITY_TOKENS = rawTokens.city;
 
 export interface LampToken {
   color: string;
