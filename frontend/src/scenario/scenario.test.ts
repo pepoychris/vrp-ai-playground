@@ -5,10 +5,12 @@ import {
   MAX_VEHICLES,
   generateOrders,
   generateVehicles,
+  routePlanSummary,
   validateOrderCount,
   validateScenarioSnapshot,
   validateVehicleCount,
 } from './scenario';
+import type { RoutePlan } from './scenario';
 
 describe('seeded scenario generation', () => {
   it('repeats the same fleet and orders for the same seed', () => {
@@ -45,5 +47,83 @@ describe('seeded scenario generation', () => {
     expect(validateScenarioSnapshot(snapshot)).toEqual([]);
     const invalid = { ...snapshot, vehicles: [{ ...vehicles[0], loadKilograms: vehicles[0].capacityKilograms + 1 }] };
     expect(validateScenarioSnapshot(invalid)).toContain('R-01 exceeds kilogram capacity.');
+  });
+});
+
+describe('route plan summary copy', () => {
+  const basePlan: RoutePlan = {
+    scenarioRevision: 5,
+    generatedAt: '2026-09-22T09:00:00.000Z',
+    timeLimitSeconds: 2,
+    solverOutcome: 'FEASIBLE',
+    objectiveIsProvenOptimal: false,
+    objectiveCost: 1084,
+    objectiveCostBreakdown: {
+      distanceMeters: 840,
+      driveSeconds: 84,
+      delaySeconds: 0,
+      dropPenaltyUnits: 1000,
+      unassignedOrderCount: 1,
+    },
+    vehicles: [
+      {
+        vehicleId: 'R-01',
+        nodeSequence: ['N-032', 'N-023'],
+        edgeSequence: ['E-N023-N032'],
+        stops: [
+          {
+            orderId: 'O-001',
+            nodeId: 'N-023',
+            arrivalSeconds: 60,
+            serviceStartSeconds: 60,
+            serviceEndSeconds: 180,
+            delaySeconds: 0,
+          },
+        ],
+        distanceMeters: 840,
+        driveSeconds: 84,
+        loadUtilizationPercent: 73.3,
+        endsAtSeconds: 180,
+      },
+      {
+        vehicleId: 'R-02',
+        nodeSequence: ['N-032'],
+        edgeSequence: [],
+        stops: [],
+        distanceMeters: 0,
+        driveSeconds: 0,
+        loadUtilizationPercent: 0,
+        endsAtSeconds: 0,
+      },
+    ],
+    unassignedOrders: [{ orderId: 'O-002', reason: 'NO_CAPACITY' }],
+  };
+
+  it('labels the plan as best routes found with the search limit', () => {
+    const summary = routePlanSummary(basePlan);
+    expect(summary.headline).toBe('Best routes found');
+    expect(summary.detail).toContain('1 active vehicle');
+    expect(summary.detail).toContain('1 stops');
+    expect(summary.detail).toContain('2s search limit');
+  });
+
+  it('never exposes the raw solver enum or an optimality guarantee', () => {
+    for (const outcome of [
+      'OPTIMAL',
+      'FEASIBLE',
+      'TIME_LIMIT_REACHED',
+      'INFEASIBLE',
+      'NO_SOLUTION',
+    ] as const) {
+      const summary = routePlanSummary({
+        ...basePlan,
+        solverOutcome: outcome,
+        objectiveIsProvenOptimal: outcome === 'OPTIMAL',
+      });
+      const copy = `${summary.headline} ${summary.detail}`.toLowerCase();
+      expect(copy).not.toContain(outcome.toLowerCase());
+      expect(copy).not.toContain('optimal');
+      expect(copy).not.toContain('proven');
+    }
   });
 });

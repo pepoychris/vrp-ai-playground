@@ -39,6 +39,66 @@ export interface Order {
   sequenceIndex: number | null;
 }
 
+export interface RouteStop {
+  orderId: string;
+  nodeId: string;
+  arrivalSeconds: number;
+  serviceStartSeconds: number;
+  serviceEndSeconds: number;
+  delaySeconds: number;
+}
+
+export interface VehicleRoute {
+  vehicleId: string;
+  nodeSequence: string[];
+  edgeSequence: string[];
+  stops: RouteStop[];
+  distanceMeters: number;
+  driveSeconds: number;
+  loadUtilizationPercent: number;
+  endsAtSeconds: number;
+}
+
+export interface RoutePlan {
+  scenarioRevision: number;
+  generatedAt: string;
+  timeLimitSeconds: number;
+  solverOutcome: 'OPTIMAL' | 'FEASIBLE' | 'TIME_LIMIT_REACHED' | 'INFEASIBLE' | 'NO_SOLUTION';
+  objectiveIsProvenOptimal: boolean;
+  objectiveCost: number;
+  objectiveCostBreakdown: {
+    distanceMeters: number;
+    driveSeconds: number;
+    delaySeconds: number;
+    dropPenaltyUnits: number;
+    unassignedOrderCount: number;
+  };
+  vehicles: VehicleRoute[];
+  unassignedOrders: { orderId: string; reason: 'NO_CAPACITY' | 'TIME_WINDOW' | 'UNREACHABLE' | 'DROPPED_BY_PENALTY' }[];
+}
+
+export interface KpiSnapshot {
+  scenarioRevision: number;
+  computedAt: string;
+  distanceTotalMeters: number;
+  plannedDurationSeconds: number;
+  economicCostCents: number;
+  economicCostBreakdown: {
+    activeVehicleFixedCostCents: number;
+    distanceCostCents: number;
+    driveTimeCostCents: number;
+    delayPenaltyCents: number;
+    unassignedOrderPenaltyCents: number;
+  };
+  ordersDelivered: number;
+  ordersPending: number;
+  ordersDelayed: number;
+  ordersUnassigned: number;
+  activeVehicles: number;
+  capacityUtilizationPercentByVehicle: Record<string, number>;
+  lastIntervention: unknown | null;
+}
+
 export interface ScenarioSnapshot {
   scenarioId: string;
   scenarioRevision: number;
@@ -50,11 +110,33 @@ export interface ScenarioSnapshot {
   orders: Order[];
   barriers: unknown[];
   blockedEdgeIds: string[];
-  routePlan: unknown | null;
-  kpis: unknown | null;
+  routePlan: RoutePlan | null;
+  kpis: KpiSnapshot | null;
   simulation: { running: boolean; speedMultiplier: number; tick: number; elapsedSeconds: number };
   appliedCommand: unknown | null;
   emittedAt: string;
+}
+
+export interface RoutePlanSummary {
+  headline: string;
+  detail: string;
+}
+
+/**
+ * User-facing copy for a route plan.
+ *
+ * The panel labels the result as "best routes found" and never shows the raw solver
+ * enum or a promise of proven optimality, which the frozen contract forbids.
+ */
+export function routePlanSummary(plan: RoutePlan): RoutePlanSummary {
+  const activeVehicles = plan.vehicles.filter((route) => route.stops.length > 0).length;
+  const stops = plan.vehicles.reduce((total, route) => total + route.stops.length, 0);
+  return {
+    headline: 'Best routes found',
+    detail:
+      `${activeVehicles} active ${activeVehicles === 1 ? 'vehicle' : 'vehicles'} · ` +
+      `${stops} stops · ${plan.timeLimitSeconds}s search limit`,
+  };
 }
 
 export class SeededPrng {

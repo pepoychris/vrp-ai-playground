@@ -14,10 +14,16 @@ workflow wording when it is touched.
 
 ## Orchestration policy
 
-Use GPT-5.6 Luna with high reasoning for the primary orchestrator. Implementation,
-review, and correction subagents use `deepseek/deepseek-v4.1-flash`. The project config
-intentionally limits the session to one active subagent, so work is serial and
+Use `gpt-5.6-luna` with `high` reasoning for the primary orchestrator. Implementation,
+review, and correction subagents must use `deepseek/deepseek-v4.1-flash`. The project
+config intentionally limits the session to one active subagent, so work is serial and
 review cannot overlap implementation.
+
+The model selection is an execution requirement, not a default or preference. Every
+subagent dispatch must pass the explicit model override
+`deepseek/deepseek-v4.1-flash` (and the orchestrator must remain
+`gpt-5.6-luna`/`high`). Never rely on inherited session defaults. A dispatch without
+these explicit values is invalid and must be corrected before work continues.
 
 Treat each MVP phase as one cohesive packet. Group related work that touches the
 same flow or files into one larger implementation packet; do not launch one agent

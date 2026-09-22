@@ -7,6 +7,7 @@ import {
   MIN_ORDERS,
   MIN_VEHICLES,
   type ScenarioSnapshot,
+  routePlanSummary,
 } from '../scenario/scenario';
 
 export interface ScenarioControlsProps {
@@ -15,6 +16,7 @@ export interface ScenarioControlsProps {
   error: string | null;
   onDeployFleet: (count: number, seed: number) => void;
   onGenerateOrders: (count: number, seed: number) => void;
+  onOptimize: () => void;
   onReset: () => void;
 }
 
@@ -24,6 +26,7 @@ export function ScenarioControls({
   error,
   onDeployFleet,
   onGenerateOrders,
+  onOptimize,
   onReset,
 }: ScenarioControlsProps) {
   const [vehicleCount, setVehicleCount] = useState(2);
@@ -54,6 +57,9 @@ export function ScenarioControls({
         <button type="button" className="refresh" disabled={busy} onClick={() => onGenerateOrders(orderCount, seed)}>
           Generate Orders
         </button>
+        <button type="button" className="refresh" disabled={busy || !snapshot || snapshot.vehicles.length === 0 || snapshot.orders.length === 0} onClick={onOptimize}>
+          Optimize Routes
+        </button>
         <button type="button" className="refresh" disabled={busy || !snapshot} onClick={onReset}>
           Reset Colony
         </button>
@@ -75,6 +81,23 @@ export function ScenarioControls({
             ))}
           </div>
           {snapshot.orders.length > 0 ? <p className="panel__note">{snapshot.orders.length} orders on reachable delivery nodes.</p> : null}
+          {snapshot.routePlan && snapshot.kpis && snapshot.routePlan.scenarioRevision === snapshot.scenarioRevision && snapshot.kpis.scenarioRevision === snapshot.scenarioRevision ? (
+            <section className="route-summary" aria-label="Route and KPI summary">
+              <p className="panel__note">
+                {routePlanSummary(snapshot.routePlan).headline} · {routePlanSummary(snapshot.routePlan).detail} · revision {snapshot.scenarioRevision}
+              </p>
+              <div className="card-grid">
+                <article className="robot-card"><strong>{snapshot.kpis.economicCostCents} cents</strong><span>Economic cost</span></article>
+                <article className="robot-card"><strong>{snapshot.kpis.distanceTotalMeters.toFixed(0)} m</strong><span>Planned distance</span></article>
+                <article className="robot-card"><strong>{snapshot.kpis.ordersUnassigned}</strong><span>Unassigned orders</span></article>
+              </div>
+              {snapshot.routePlan.vehicles.filter((route) => route.stops.length > 0).map((route) => (
+                <p className="panel__note" key={route.vehicleId}>
+                  {route.vehicleId}: {route.stops.length} stops · {route.distanceMeters.toFixed(0)} m · {route.driveSeconds}s
+                </p>
+              ))}
+            </section>
+          ) : null}
         </div>
       ) : (
         <p className="panel__note">No active colony. Deploy a fleet or generate orders to create one.</p>

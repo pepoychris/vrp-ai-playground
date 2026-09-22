@@ -7,3 +7,6 @@ fastapi==0.141.1
 httpx==0.28.1
 pydantic==2.13.5
 uvicorn==0.53.0
+# Phase 5 bounded vehicle-routing solver. The implementation retains a deterministic
+# fallback for minimal environments, while the production image uses this wheel.
+ortools==9.15.6755

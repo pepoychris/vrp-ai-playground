@@ -4,7 +4,7 @@ import { AssetReadinessPanel } from './components/AssetReadinessPanel';
 import { SceneStage } from './components/SceneStage';
 import { ScenarioControls } from './components/ScenarioControls';
 import { StatusScreen } from './components/StatusScreen';
-import { createScenario, deployFleet, generateOrders, resetScenario } from './api/client';
+import { createScenario, deployFleet, generateOrders, optimizeScenario, resetScenario } from './api/client';
 import {
   persistScenario,
   readPersistedScenario,
@@ -84,6 +84,23 @@ export function App() {
     }
   }, [scenario]);
 
+  const handleOptimize = useCallback(async () => {
+    if (!scenario) return;
+    setScenarioBusy(true);
+    setScenarioError(null);
+    try {
+      const next = await optimizeScenario<ScenarioSnapshot>(
+        scenario.scenarioId,
+        scenario.scenarioRevision,
+      );
+      if (next.scenarioRevision >= scenario.scenarioRevision) setScenario(next);
+    } catch (error) {
+      setScenarioError(error instanceof Error ? error.message : 'Route optimization failed.');
+    } finally {
+      setScenarioBusy(false);
+    }
+  }, [scenario]);
+
   const displayReadiness = scenario
     ? {
         ...readiness,
@@ -116,6 +133,7 @@ export function App() {
             error={scenarioError}
             onDeployFleet={(count, seed) => void applyScenarioCommand('fleet', count, seed)}
             onGenerateOrders={(count, seed) => void applyScenarioCommand('orders', count, seed)}
+            onOptimize={() => void handleOptimize()}
             onReset={() => void handleReset()}
           />
           <AssetReadinessPanel readiness={assetReadiness} onReload={reload} />
