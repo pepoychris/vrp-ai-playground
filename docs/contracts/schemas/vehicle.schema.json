@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://roboroute.local/contracts/vehicle.schema.json",
+  "title": "Vehicle",
+  "description": "Vehiculo robot de la flota. Maximo 6 por escenario.",
+  "type": "object",
+  "required": [
+    "vehicleId",
+    "capacityKilograms",
+    "capacityCubicMeters",
+    "loadKilograms",
+    "loadCubicMeters",
+    "batteryPercent",
+    "speedKilometersPerHour",
+    "costPerKilometerCents",
+    "costPerMinuteCents",
+    "fixedCostCents",
+    "currentNodeId",
+    "status",
+    "assignedOrderIds"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "vehicleId": {
+      "$ref": "common.schema.json#/$defs/vehicleId"
+    },
+    "capacityKilograms": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "description": "Capacidad de carga en kilogramos (kg). Siempre mayor que cero."
+    },
+    "capacityCubicMeters": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "description": "Capacidad de volumen en metros cubicos (m3)."
+    },
+    "loadKilograms": {
+      "$ref": "common.schema.json#/$defs/kilograms"
+    },
+    "loadCubicMeters": {
+      "$ref": "common.schema.json#/$defs/cubicMeters"
+    },
+    "batteryPercent": {
+      "$ref": "common.schema.json#/$defs/percent"
+    },
+    "speedKilometersPerHour": {
+      "$ref": "common.schema.json#/$defs/kilometersPerHour"
+    },
+    "costPerKilometerCents": {
+      "$ref": "common.schema.json#/$defs/euroCents"
+    },
+    "costPerMinuteCents": {
+      "$ref": "common.schema.json#/$defs/euroCents"
+    },
+    "fixedCostCents": {
+      "$ref": "common.schema.json#/$defs/euroCents"
+    },
+    "currentNodeId": {
+      "oneOf": [
+        {
+          "$ref": "common.schema.json#/$defs/nodeId"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Nodo actual del vehiculo en el grafo. null solo mientras el vehiculo no se ha colocado."
+    },
+    "status": {
+      "$ref": "common.schema.json#/$defs/vehicleStatus"
+    },
+    "assignedOrderIds": {
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/orderId"
+      },
+      "description": "Pedidos asignados en el ultimo plan valido."
+    }
+  }
+}

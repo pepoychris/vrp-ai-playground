@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://roboroute.local/contracts/scenario-revision.schema.json",
+  "title": "ScenarioRevision",
+  "description": "Snapshot atomico y autoritativo de un escenario. Cada mutacion publica uno nuevo con scenarioRevision incrementado. El frontend descarta cualquier snapshot de revision menor.",
+  "type": "object",
+  "required": [
+    "scenarioId",
+    "scenarioRevision",
+    "previousRevision",
+    "status",
+    "seed",
+    "graph",
+    "vehicles",
+    "orders",
+    "barriers",
+    "blockedEdgeIds",
+    "routePlan",
+    "kpis",
+    "simulation",
+    "appliedCommand",
+    "emittedAt"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "scenarioId": {
+      "$ref": "common.schema.json#/$defs/scenarioId"
+    },
+    "scenarioRevision": {
+      "$ref": "common.schema.json#/$defs/scenarioRevisionNumber"
+    },
+    "previousRevision": {
+      "oneOf": [
+        {
+          "$ref": "common.schema.json#/$defs/scenarioRevisionNumber"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "status": {
+      "$ref": "common.schema.json#/$defs/scenarioStatus"
+    },
+    "seed": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Semilla del generador reproducible del escenario."
+    },
+    "graph": {
+      "type": "object",
+      "required": ["cityId", "graphVersion", "nodes", "edges"],
+      "additionalProperties": false,
+      "properties": {
+        "cityId": {
+          "$ref": "common.schema.json#/$defs/cityId"
+        },
+        "graphVersion": {
+          "$ref": "common.schema.json#/$defs/graphVersion"
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "road-node.schema.json"
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "$ref": "road-edge.schema.json"
+          }
+        }
+      },
+      "description": "Grafo inmutable dentro del escenario: nodos y aristas no cambian entre revisiones. Lo unico que cambia es blockedEdgeIds."
+    },
+    "vehicles": {
+      "type": "array",
+      "maxItems": 6,
+      "items": {
+        "$ref": "vehicle.schema.json"
+      }
+    },
+    "orders": {
+      "type": "array",
+      "maxItems": 24,
+      "items": {
+        "$ref": "order.schema.json"
+      }
+    },
+    "barriers": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "$ref": "barrier.schema.json"
+      }
+    },
+    "blockedEdgeIds": {
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/edgeId"
+      },
+      "description": "Fuente de verdad del bloqueo. Deriva exactamente de las barreras activas: {b.blockedEdgeId}."
+    },
+    "routePlan": {
+      "oneOf": [
+        {
+          "$ref": "route-plan.schema.json"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Ultimo plan valido. null mientras no se haya calculado una mision."
+    },
+    "kpis": {
+      "oneOf": [
+        {
+          "$ref": "kpi-snapshot.schema.json"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "simulation": {
+      "type": "object",
+      "required": ["running", "speedMultiplier", "tick", "elapsedSeconds"],
+      "additionalProperties": false,
+      "properties": {
+        "running": {
+          "type": "boolean"
+        },
+        "speedMultiplier": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 8
+        },
+        "tick": {
+          "$ref": "common.schema.json#/$defs/tick"
+        },
+        "elapsedSeconds": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Reloj de simulacion en segundos. No crea revisiones nuevas."
+        }
+      }
+    },
+    "appliedCommand": {
+      "oneOf": [
+        {
+          "$ref": "envelopes.schema.json#/$defs/appliedCommand"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Comando que produjo esta revision. null en la revision inicial del escenario."
+    },
+    "emittedAt": {
+      "$ref": "common.schema.json#/$defs/timestamp"
+    }
+  }
+}

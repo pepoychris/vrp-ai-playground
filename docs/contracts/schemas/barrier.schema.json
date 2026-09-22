@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://roboroute.local/contracts/barrier.schema.json",
+  "title": "Barrier",
+  "description": "Barrera robotica colocada sobre una arista real del grafo. Maximo 3 activas por escenario.",
+  "type": "object",
+  "required": ["barrierId", "blockedEdgeId", "position", "placedAtRevision"],
+  "additionalProperties": false,
+  "properties": {
+    "barrierId": {
+      "$ref": "common.schema.json#/$defs/barrierId"
+    },
+    "blockedEdgeId": {
+      "$ref": "common.schema.json#/$defs/edgeId"
+    },
+    "position": {
+      "$ref": "common.schema.json#/$defs/point3d"
+    },
+    "placedAtRevision": {
+      "$ref": "common.schema.json#/$defs/scenarioRevisionNumber"
+    }
+  }
+}

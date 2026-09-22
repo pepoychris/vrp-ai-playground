@@ -1,0 +1,34 @@
+{
+  "scenarioRevision": 5,
+  "computedAt": "2026-09-22T09:12:30.120Z",
+  "distanceTotalMeters": 840,
+  "plannedDurationSeconds": 294,
+  "economicCostCents": 2070,
+  "economicCostBreakdown": {
+    "activeVehicleFixedCostCents": 500,
+    "distanceCostCents": 42,
+    "driveTimeCostCents": 28,
+    "delayPenaltyCents": 0,
+    "unassignedOrderPenaltyCents": 1500
+  },
+  "ordersDelivered": 0,
+  "ordersPending": 2,
+  "ordersDelayed": 0,
+  "ordersUnassigned": 1,
+  "activeVehicles": 1,
+  "capacityUtilizationPercentByVehicle": {
+    "R-01": 73.3,
+    "R-02": 0
+  },
+  "lastIntervention": {
+    "kind": "BARRIER_PLACED",
+    "comparedToRevision": 4,
+    "delta": {
+      "distanceTotalMeters": 240,
+      "plannedDurationSeconds": 24,
+      "economicCostCents": 20,
+      "ordersDelayed": 0,
+      "ordersUnassigned": 0
+    }
+  }
+}

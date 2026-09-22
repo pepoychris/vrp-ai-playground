@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://roboroute.local/contracts/order.schema.json",
+  "title": "Order",
+  "description": "Pedido de ultima milla. Se coloca siempre en un nodo con kind DELIVERY alcanzable desde el deposito.",
+  "type": "object",
+  "required": [
+    "orderId",
+    "deliveryNodeId",
+    "weightKilograms",
+    "volumeCubicMeters",
+    "priority",
+    "timeWindow",
+    "serviceSeconds",
+    "status",
+    "assignedVehicleId",
+    "sequenceIndex"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "orderId": {
+      "$ref": "common.schema.json#/$defs/orderId"
+    },
+    "deliveryNodeId": {
+      "$ref": "common.schema.json#/$defs/nodeId"
+    },
+    "weightKilograms": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "description": "Peso del pedido en kilogramos (kg)."
+    },
+    "volumeCubicMeters": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "description": "Volumen del pedido en metros cubicos (m3)."
+    },
+    "priority": {
+      "$ref": "common.schema.json#/$defs/priority"
+    },
+    "timeWindow": {
+      "type": "object",
+      "required": ["startSeconds", "endSeconds"],
+      "additionalProperties": false,
+      "properties": {
+        "startSeconds": {
+          "$ref": "common.schema.json#/$defs/seconds"
+        },
+        "endSeconds": {
+          "$ref": "common.schema.json#/$defs/seconds"
+        }
+      },
+      "description": "Ventana horaria en segundos desde t0. Debe cumplirse startSeconds < endSeconds."
+    },
+    "serviceSeconds": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Tiempo de servicio en el punto de entrega, en segundos."
+    },
+    "status": {
+      "$ref": "common.schema.json#/$defs/orderStatus"
+    },
+    "assignedVehicleId": {
+      "oneOf": [
+        {
+          "$ref": "common.schema.json#/$defs/vehicleId"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "sequenceIndex": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 0
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Posicion dentro de la ruta del vehiculo asignado, empezando en 0."
+    }
+  }
+}

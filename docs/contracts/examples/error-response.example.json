@@ -1,0 +1,13 @@
+{
+  "error": {
+    "code": "SNAP_OUT_OF_RADIUS",
+    "message": "El punto de suelta esta a 31.4 m del nodo valido mas cercano.",
+    "details": {
+      "distanceMeters": 31.4,
+      "maxRadiusMeters": 12
+    },
+    "scenarioRevision": 4,
+    "commandId": "9d2f4c11-3a76-4d0b-9c6e-5b1f8a7d2e33",
+    "retryable": false
+  }
+}

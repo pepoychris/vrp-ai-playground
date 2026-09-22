@@ -1,0 +1,227 @@
+{
+  "contractVersion": 1,
+  "frozenAt": "2026-09-22",
+  "sourceOfTruth": "MVP_ROBOROUTE_ULTIMA_MILLA.md#8-contrato-mínimo-de-api",
+  "endpoints": [
+    {
+      "id": 1,
+      "method": "POST",
+      "path": "/api/scenarios",
+      "kind": "mutation",
+      "bumpsRevision": true,
+      "successStatus": 201,
+      "errorCodes": ["VALIDATION_ERROR"]
+    },
+    {
+      "id": 2,
+      "method": "DELETE",
+      "path": "/api/scenarios/{scenarioId}",
+      "kind": "mutation",
+      "bumpsRevision": true,
+      "successStatus": 200,
+      "errorCodes": ["SCENARIO_NOT_FOUND"]
+    },
+    {
+      "id": 3,
+      "method": "POST",
+      "path": "/api/scenarios/{scenarioId}/vehicles/generate",
+      "kind": "mutation",
+      "bumpsRevision": true,
+      "successStatus": 200,
+      "errorCodes": ["VALIDATION_ERROR", "SCENARIO_NOT_FOUND"]
+    },
+    {
+      "id": 4,
+      "method": "POST",
+      "path": "/api/scenarios/{scenarioId}/orders/generate",
+      "kind": "mutation",
+      "bumpsRevision": true,
+      "successStatus": 200,
+      "errorCodes": ["VALIDATION_ERROR", "SCENARIO_NOT_FOUND"]
+    },
+    {
+      "id": 5,
+      "method": "POST",
+      "path": "/api/scenarios/{scenarioId}/optimize",
+      "kind": "mutation",
+      "bumpsRevision": true,
+      "successStatus": 200,
+      "errorCodes": [
+        "VALIDATION_ERROR",
+        "SCENARIO_NOT_FOUND",
+        "NO_FLEET_DEPLOYED",
+        "NO_ORDERS_AVAILABLE"
+      ]
+    },
+    {
+      "id": 6,
+      "method": "POST",
+      "path": "/api/scenarios/{scenarioId}/simulation/start",
+      "kind": "mutation",
+      "bumpsRevision": true,
+      "successStatus": 200,
+      "errorCodes": ["VALIDATION_ERROR", "SCENARIO_NOT_FOUND"]
+    },
+    {
+      "id": 7,
+      "method": "POST",
+      "path": "/api/scenarios/{scenarioId}/simulation/pause",
+      "kind": "mutation",
+      "bumpsRevision": true,
+      "successStatus": 200,
+      "errorCodes": [
+        "VALIDATION_ERROR",
+        "SCENARIO_NOT_FOUND",
+        "SIMULATION_NOT_RUNNING"
+      ]
+    },
+    {
+      "id": 8,
+      "method": "PATCH",
+      "path": "/api/scenarios/{scenarioId}/vehicles/{vehicleId}/position",
+      "kind": "mutation",
+      "bumpsRevision": true,
+      "successStatus": 200,
+      "errorCodes": [
+        "VALIDATION_ERROR",
+        "SCENARIO_NOT_FOUND",
+        "VEHICLE_NOT_FOUND",
+        "SNAP_OUT_OF_RADIUS"
+      ]
+    },
+    {
+      "id": 9,
+      "method": "POST",
+      "path": "/api/scenarios/{scenarioId}/barriers",
+      "kind": "mutation",
+      "bumpsRevision": true,
+      "successStatus": 200,
+      "errorCodes": [
+        "VALIDATION_ERROR",
+        "SCENARIO_NOT_FOUND",
+        "BARRIER_LIMIT_REACHED",
+        "SNAP_NO_VALID_EDGE"
+      ]
+    },
+    {
+      "id": 10,
+      "method": "DELETE",
+      "path": "/api/scenarios/{scenarioId}/barriers/{barrierId}",
+      "kind": "mutation",
+      "bumpsRevision": true,
+      "successStatus": 200,
+      "errorCodes": ["SCENARIO_NOT_FOUND", "BARRIER_NOT_FOUND"]
+    },
+    {
+      "id": 11,
+      "method": "GET",
+      "path": "/api/scenarios/{scenarioId}",
+      "kind": "read",
+      "bumpsRevision": false,
+      "successStatus": 200,
+      "errorCodes": ["SCENARIO_NOT_FOUND"]
+    },
+    {
+      "id": 12,
+      "method": "GET",
+      "path": "/api/scenarios/{scenarioId}/events",
+      "kind": "stream",
+      "bumpsRevision": false,
+      "successStatus": 200,
+      "errorCodes": ["SCENARIO_NOT_FOUND"]
+    },
+    {
+      "id": 13,
+      "method": "GET",
+      "path": "/api/ai/status",
+      "kind": "read",
+      "bumpsRevision": false,
+      "successStatus": 200,
+      "errorCodes": []
+    },
+    {
+      "id": 14,
+      "method": "POST",
+      "path": "/api/ai/model/install",
+      "kind": "mutation",
+      "bumpsRevision": false,
+      "successStatus": 202,
+      "errorCodes": ["AI_SERVICE_UNAVAILABLE", "AI_INSTALL_IN_PROGRESS"]
+    },
+    {
+      "id": 15,
+      "method": "GET",
+      "path": "/api/ai/model/install/events",
+      "kind": "stream",
+      "bumpsRevision": false,
+      "successStatus": 200,
+      "errorCodes": ["AI_SERVICE_UNAVAILABLE"]
+    },
+    {
+      "id": 16,
+      "method": "POST",
+      "path": "/api/ai/activate",
+      "kind": "mutation",
+      "bumpsRevision": false,
+      "successStatus": 200,
+      "errorCodes": ["AI_MODEL_NOT_INSTALLED", "AI_SERVICE_UNAVAILABLE"]
+    },
+    {
+      "id": 17,
+      "method": "POST",
+      "path": "/api/ai/chat",
+      "kind": "mutation",
+      "bumpsRevision": false,
+      "successStatus": 200,
+      "errorCodes": [
+        "VALIDATION_ERROR",
+        "MODEL_OVERRIDE_FORBIDDEN",
+        "SCENARIO_NOT_FOUND",
+        "AI_MODEL_NOT_LOADED",
+        "AI_OUTPUT_INVALID",
+        "AI_SERVICE_UNAVAILABLE"
+      ]
+    },
+    {
+      "id": 18,
+      "method": "POST",
+      "path": "/api/ai/reports/shift",
+      "kind": "mutation",
+      "bumpsRevision": false,
+      "successStatus": 200,
+      "errorCodes": [
+        "VALIDATION_ERROR",
+        "SCENARIO_NOT_FOUND",
+        "AI_MODEL_NOT_LOADED",
+        "AI_OUTPUT_INVALID",
+        "AI_SERVICE_UNAVAILABLE"
+      ]
+    },
+    {
+      "id": 19,
+      "method": "POST",
+      "path": "/api/ai/proposals/{proposalId}/confirm",
+      "kind": "mutation",
+      "bumpsRevision": true,
+      "successStatus": 200,
+      "errorCodes": [
+        "VALIDATION_ERROR",
+        "PROPOSAL_NOT_FOUND",
+        "SCENARIO_NOT_FOUND"
+      ]
+    },
+    {
+      "id": 20,
+      "method": "POST",
+      "path": "/api/ai/proposals/{proposalId}/reject",
+      "kind": "mutation",
+      "bumpsRevision": true,
+      "successStatus": 200,
+      "errorCodes": [
+        "VALIDATION_ERROR",
+        "PROPOSAL_NOT_FOUND",
+        "SCENARIO_NOT_FOUND"
+      ]
+    }
+  ]
+}

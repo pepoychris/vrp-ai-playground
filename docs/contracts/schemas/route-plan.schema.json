@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://roboroute.local/contracts/route-plan.schema.json",
+  "title": "RoutePlan",
+  "description": "Mejores rutas encontradas por el optimizador para una revision concreta. No afirma optimalidad: solverOutcome y objectiveIsProvenOptimal describen lo que devolvio el solver.",
+  "type": "object",
+  "required": [
+    "scenarioRevision",
+    "generatedAt",
+    "timeLimitSeconds",
+    "solverOutcome",
+    "objectiveIsProvenOptimal",
+    "objectiveCost",
+    "objectiveCostBreakdown",
+    "vehicles",
+    "unassignedOrders"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "scenarioRevision": {
+      "$ref": "common.schema.json#/$defs/scenarioRevisionNumber"
+    },
+    "generatedAt": {
+      "$ref": "common.schema.json#/$defs/timestamp"
+    },
+    "timeLimitSeconds": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10,
+      "description": "Limite temporal aplicado a la busqueda. El MVP usa 1 o 2 segundos."
+    },
+    "solverOutcome": {
+      "$ref": "common.schema.json#/$defs/solverOutcome"
+    },
+    "objectiveIsProvenOptimal": {
+      "type": "boolean",
+      "description": "true solo si el solver demuestra optimalidad dentro del limite. La UI nunca lo presenta como garantia de optimalidad."
+    },
+    "objectiveCost": {
+      "$ref": "common.schema.json#/$defs/objectiveUnits"
+    },
+    "objectiveCostBreakdown": {
+      "type": "object",
+      "required": [
+        "distanceMeters",
+        "driveSeconds",
+        "delaySeconds",
+        "dropPenaltyUnits",
+        "unassignedOrderCount"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "distanceMeters": {
+          "$ref": "common.schema.json#/$defs/nonNegativeMeters"
+        },
+        "driveSeconds": {
+          "$ref": "common.schema.json#/$defs/seconds"
+        },
+        "delaySeconds": {
+          "$ref": "common.schema.json#/$defs/seconds"
+        },
+        "dropPenaltyUnits": {
+          "$ref": "common.schema.json#/$defs/objectiveUnits"
+        },
+        "unassignedOrderCount": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "description": "Descomposicion fisica del objetivo. La escala interna del modelo se fija en la Fase 5."
+    },
+    "vehicles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/vehicleRoute"
+      }
+    },
+    "unassignedOrders": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/unassignedOrder"
+      }
+    }
+  },
+  "$defs": {
+    "vehicleRoute": {
+      "type": "object",
+      "title": "Ruta de un vehiculo",
+      "required": [
+        "vehicleId",
+        "nodeSequence",
+        "edgeSequence",
+        "stops",
+        "distanceMeters",
+        "driveSeconds",
+        "loadUtilizationPercent",
+        "endsAtSeconds"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "vehicleId": {
+          "$ref": "common.schema.json#/$defs/vehicleId"
+        },
+        "nodeSequence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "common.schema.json#/$defs/nodeId"
+          },
+          "description": "Secuencia exacta de nodos. Una ruta sin paradas es [nodeIdDelDeposito]."
+        },
+        "edgeSequence": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/edgeId"
+          },
+          "description": "Aristas recorridas, en el mismo orden que los pares de nodeSequence. Vacia si no hay desplazamiento."
+        },
+        "stops": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/stop"
+          }
+        },
+        "distanceMeters": {
+          "$ref": "common.schema.json#/$defs/nonNegativeMeters"
+        },
+        "driveSeconds": {
+          "$ref": "common.schema.json#/$defs/seconds"
+        },
+        "loadUtilizationPercent": {
+          "$ref": "common.schema.json#/$defs/percent"
+        },
+        "endsAtSeconds": {
+          "$ref": "common.schema.json#/$defs/seconds"
+        }
+      }
+    },
+    "stop": {
+      "type": "object",
+      "title": "Parada de entrega",
+      "required": [
+        "orderId",
+        "nodeId",
+        "arrivalSeconds",
+        "serviceStartSeconds",
+        "serviceEndSeconds",
+        "delaySeconds"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "orderId": {
+          "$ref": "common.schema.json#/$defs/orderId"
+        },
+        "nodeId": {
+          "$ref": "common.schema.json#/$defs/nodeId"
+        },
+        "arrivalSeconds": {
+          "$ref": "common.schema.json#/$defs/seconds"
+        },
+        "serviceStartSeconds": {
+          "$ref": "common.schema.json#/$defs/seconds"
+        },
+        "serviceEndSeconds": {
+          "$ref": "common.schema.json#/$defs/seconds"
+        },
+        "delaySeconds": {
+          "$ref": "common.schema.json#/$defs/seconds"
+        }
+      }
+    },
+    "unassignedOrder": {
+      "type": "object",
+      "title": "Pedido sin asignar",
+      "required": ["orderId", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "orderId": {
+          "$ref": "common.schema.json#/$defs/orderId"
+        },
+        "reason": {
+          "$ref": "common.schema.json#/$defs/unassignedReason"
+        }
+      }
+    }
+  }
+}

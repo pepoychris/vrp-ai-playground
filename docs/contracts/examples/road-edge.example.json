@@ -1,0 +1,13 @@
+{
+  "edgeId": "E-N002-N005",
+  "fromNodeId": "N-002",
+  "toNodeId": "N-005",
+  "bidirectional": true,
+  "lengthMeters": 240,
+  "speedLimitKph": 40,
+  "visualSplineControlPoints": [
+    { "x": 240, "y": 0, "z": 0 },
+    { "x": 240, "y": 0, "z": 120 },
+    { "x": 240, "y": 0, "z": 240 }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "answer": "La distancia de R-01 subio de 600 m a 840 m. La barrera B-1 bloquea la arista E-N002-N007, el acceso directo al muelle sur, y el plan vigente la rodea por N-005 y N-006. El coste economico subio 20 centimos y no hay pedidos nuevos sin asignar.",
+  "usedRevision": 5,
+  "references": [
+    "routePlan.vehicles[0].distanceMeters",
+    "blockedEdgeIds",
+    "kpis.lastIntervention.delta.distanceTotalMeters",
+    "kpis.economicCostCents"
+  ],
+  "proposal": {
+    "proposalId": "prop-2026-09-22-0001",
+    "kind": "REQUEST_REOPTIMIZATION",
+    "summary": "Recalcular la mision marcando O-003 como no asignable por capacidad.",
+    "payload": {
+      "orderIds": ["O-003"],
+      "reason": "capacidad insuficiente de la flota actual"
+    },
+    "status": "PENDING",
+    "revisionToApply": 5
+  },
+  "timingsMs": {
+    "total": 2841,
+    "load": 120,
+    "promptEval": 610,
+    "eval": 2100
+  }
+}

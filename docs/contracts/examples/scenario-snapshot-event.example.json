@@ -1,0 +1,11 @@
+{
+  "eventId": "5:41",
+  "eventSeq": 41,
+  "type": "scenario.snapshot",
+  "scenarioRevision": 5,
+  "emittedAt": "2026-09-22T09:12:30.505Z",
+  "commandId": "b7d1a0c2-5e4f-4c9a-9d31-6a2f7c8e4b10",
+  "payload": {
+    "$exampleRef": "scenario-revision.example.json"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "scenarioRevision": 5,
+  "generatedAt": "2026-09-22T09:12:30.100Z",
+  "timeLimitSeconds": 2,
+  "solverOutcome": "FEASIBLE",
+  "objectiveIsProvenOptimal": false,
+  "objectiveCost": 1084,
+  "objectiveCostBreakdown": {
+    "distanceMeters": 840,
+    "driveSeconds": 84,
+    "delaySeconds": 0,
+    "dropPenaltyUnits": 1000,
+    "unassignedOrderCount": 1
+  },
+  "vehicles": [
+    {
+      "vehicleId": "R-01",
+      "nodeSequence": ["N-001", "N-002", "N-005", "N-006", "N-007"],
+      "edgeSequence": [
+        "E-N001-N002",
+        "E-N002-N005",
+        "E-N005-N006",
+        "E-N006-N007"
+      ],
+      "stops": [
+        {
+          "orderId": "O-001",
+          "nodeId": "N-006",
+          "arrivalSeconds": 60,
+          "serviceStartSeconds": 60,
+          "serviceEndSeconds": 180,
+          "delaySeconds": 0
+        },
+        {
+          "orderId": "O-002",
+          "nodeId": "N-007",
+          "arrivalSeconds": 204,
+          "serviceStartSeconds": 204,
+          "serviceEndSeconds": 294,
+          "delaySeconds": 0
+        }
+      ],
+      "distanceMeters": 840,
+      "driveSeconds": 84,
+      "loadUtilizationPercent": 73.3,
+      "endsAtSeconds": 294
+    },
+    {
+      "vehicleId": "R-02",
+      "nodeSequence": ["N-001"],
+      "edgeSequence": [],
+      "stops": [],
+      "distanceMeters": 0,
+      "driveSeconds": 0,
+      "loadUtilizationPercent": 0,
+      "endsAtSeconds": 0
+    }
+  ],
+  "unassignedOrders": [{ "orderId": "O-003", "reason": "NO_CAPACITY" }]
+}

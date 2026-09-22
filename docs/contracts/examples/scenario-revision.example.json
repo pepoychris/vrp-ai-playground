@@ -1,0 +1,224 @@
+{
+  "scenarioId": "8f14e45f-ceea-4f1a-9a1c-2b3d4e5f6a70",
+  "scenarioRevision": 5,
+  "previousRevision": 4,
+  "status": "READY",
+  "seed": 20260922,
+  "graph": {
+    "cityId": "robot-city",
+    "graphVersion": 1,
+    "nodes": [
+      { "nodeId": "N-001", "kind": "DEPOT", "position": { "x": 0, "y": 0, "z": 0 }, "label": "Deposito central" },
+      { "nodeId": "N-002", "kind": "JUNCTION", "position": { "x": 240, "y": 0, "z": 0 } },
+      { "nodeId": "N-003", "kind": "JUNCTION", "position": { "x": 0, "y": 0, "z": 120 } },
+      { "nodeId": "N-004", "kind": "JUNCTION", "position": { "x": 0, "y": 0, "z": 240 } },
+      { "nodeId": "N-005", "kind": "JUNCTION", "position": { "x": 240, "y": 0, "z": 240 } },
+      { "nodeId": "N-006", "kind": "DELIVERY", "position": { "x": 360, "y": 0, "z": 240 }, "label": "Muelle norte" },
+      { "nodeId": "N-007", "kind": "DELIVERY", "position": { "x": 360, "y": 0, "z": 0 }, "label": "Muelle sur" }
+    ],
+    "edges": [
+      { "edgeId": "E-N001-N002", "fromNodeId": "N-001", "toNodeId": "N-002", "bidirectional": true, "lengthMeters": 240, "speedLimitKph": 40 },
+      { "edgeId": "E-N001-N003", "fromNodeId": "N-001", "toNodeId": "N-003", "bidirectional": true, "lengthMeters": 120, "speedLimitKph": 40 },
+      {
+        "edgeId": "E-N002-N005",
+        "fromNodeId": "N-002",
+        "toNodeId": "N-005",
+        "bidirectional": true,
+        "lengthMeters": 240,
+        "speedLimitKph": 40,
+        "visualSplineControlPoints": [
+          { "x": 240, "y": 0, "z": 0 },
+          { "x": 240, "y": 0, "z": 120 },
+          { "x": 240, "y": 0, "z": 240 }
+        ]
+      },
+      { "edgeId": "E-N002-N007", "fromNodeId": "N-002", "toNodeId": "N-007", "bidirectional": true, "lengthMeters": 120, "speedLimitKph": 40 },
+      { "edgeId": "E-N003-N004", "fromNodeId": "N-003", "toNodeId": "N-004", "bidirectional": true, "lengthMeters": 120, "speedLimitKph": 40 },
+      { "edgeId": "E-N004-N005", "fromNodeId": "N-004", "toNodeId": "N-005", "bidirectional": true, "lengthMeters": 240, "speedLimitKph": 40 },
+      { "edgeId": "E-N005-N006", "fromNodeId": "N-005", "toNodeId": "N-006", "bidirectional": true, "lengthMeters": 120, "speedLimitKph": 40 },
+      { "edgeId": "E-N006-N007", "fromNodeId": "N-006", "toNodeId": "N-007", "bidirectional": true, "lengthMeters": 240, "speedLimitKph": 40 }
+    ]
+  },
+  "vehicles": [
+    {
+      "vehicleId": "R-01",
+      "capacityKilograms": 30,
+      "capacityCubicMeters": 1.5,
+      "loadKilograms": 22,
+      "loadCubicMeters": 1.1,
+      "batteryPercent": 78.5,
+      "speedKilometersPerHour": 36,
+      "costPerKilometerCents": 50,
+      "costPerMinuteCents": 20,
+      "fixedCostCents": 500,
+      "currentNodeId": "N-006",
+      "status": "EN_ROUTE",
+      "assignedOrderIds": ["O-001", "O-002"]
+    },
+    {
+      "vehicleId": "R-02",
+      "capacityKilograms": 30,
+      "capacityCubicMeters": 1.5,
+      "loadKilograms": 0,
+      "loadCubicMeters": 0,
+      "batteryPercent": 91,
+      "speedKilometersPerHour": 36,
+      "costPerKilometerCents": 50,
+      "costPerMinuteCents": 20,
+      "fixedCostCents": 500,
+      "currentNodeId": "N-001",
+      "status": "AVAILABLE",
+      "assignedOrderIds": []
+    }
+  ],
+  "orders": [
+    {
+      "orderId": "O-001",
+      "deliveryNodeId": "N-006",
+      "weightKilograms": 12,
+      "volumeCubicMeters": 0.6,
+      "priority": "URGENT",
+      "timeWindow": { "startSeconds": 0, "endSeconds": 600 },
+      "serviceSeconds": 120,
+      "status": "ASSIGNED",
+      "assignedVehicleId": "R-01",
+      "sequenceIndex": 0
+    },
+    {
+      "orderId": "O-002",
+      "deliveryNodeId": "N-007",
+      "weightKilograms": 10,
+      "volumeCubicMeters": 0.5,
+      "priority": "NORMAL",
+      "timeWindow": { "startSeconds": 0, "endSeconds": 900 },
+      "serviceSeconds": 90,
+      "status": "ASSIGNED",
+      "assignedVehicleId": "R-01",
+      "sequenceIndex": 1
+    },
+    {
+      "orderId": "O-003",
+      "deliveryNodeId": "N-006",
+      "weightKilograms": 40,
+      "volumeCubicMeters": 2,
+      "priority": "NORMAL",
+      "timeWindow": { "startSeconds": 0, "endSeconds": 900 },
+      "serviceSeconds": 60,
+      "status": "UNASSIGNED",
+      "assignedVehicleId": null,
+      "sequenceIndex": null
+    }
+  ],
+  "barriers": [
+    {
+      "barrierId": "B-1",
+      "blockedEdgeId": "E-N002-N007",
+      "position": { "x": 300, "y": 0, "z": 0 },
+      "placedAtRevision": 4
+    }
+  ],
+  "blockedEdgeIds": ["E-N002-N007"],
+  "routePlan": {
+    "scenarioRevision": 5,
+    "generatedAt": "2026-09-22T09:12:30.100Z",
+    "timeLimitSeconds": 2,
+    "solverOutcome": "FEASIBLE",
+    "objectiveIsProvenOptimal": false,
+    "objectiveCost": 1084,
+    "objectiveCostBreakdown": {
+      "distanceMeters": 840,
+      "driveSeconds": 84,
+      "delaySeconds": 0,
+      "dropPenaltyUnits": 1000,
+      "unassignedOrderCount": 1
+    },
+    "vehicles": [
+      {
+        "vehicleId": "R-01",
+        "nodeSequence": ["N-001", "N-002", "N-005", "N-006", "N-007"],
+        "edgeSequence": ["E-N001-N002", "E-N002-N005", "E-N005-N006", "E-N006-N007"],
+        "stops": [
+          {
+            "orderId": "O-001",
+            "nodeId": "N-006",
+            "arrivalSeconds": 60,
+            "serviceStartSeconds": 60,
+            "serviceEndSeconds": 180,
+            "delaySeconds": 0
+          },
+          {
+            "orderId": "O-002",
+            "nodeId": "N-007",
+            "arrivalSeconds": 204,
+            "serviceStartSeconds": 204,
+            "serviceEndSeconds": 294,
+            "delaySeconds": 0
+          }
+        ],
+        "distanceMeters": 840,
+        "driveSeconds": 84,
+        "loadUtilizationPercent": 73.3,
+        "endsAtSeconds": 294
+      },
+      {
+        "vehicleId": "R-02",
+        "nodeSequence": ["N-001"],
+        "edgeSequence": [],
+        "stops": [],
+        "distanceMeters": 0,
+        "driveSeconds": 0,
+        "loadUtilizationPercent": 0,
+        "endsAtSeconds": 0
+      }
+    ],
+    "unassignedOrders": [{ "orderId": "O-003", "reason": "NO_CAPACITY" }]
+  },
+  "kpis": {
+    "scenarioRevision": 5,
+    "computedAt": "2026-09-22T09:12:30.120Z",
+    "distanceTotalMeters": 840,
+    "plannedDurationSeconds": 294,
+    "economicCostCents": 2070,
+    "economicCostBreakdown": {
+      "activeVehicleFixedCostCents": 500,
+      "distanceCostCents": 42,
+      "driveTimeCostCents": 28,
+      "delayPenaltyCents": 0,
+      "unassignedOrderPenaltyCents": 1500
+    },
+    "ordersDelivered": 0,
+    "ordersPending": 2,
+    "ordersDelayed": 0,
+    "ordersUnassigned": 1,
+    "activeVehicles": 1,
+    "capacityUtilizationPercentByVehicle": {
+      "R-01": 73.3,
+      "R-02": 0
+    },
+    "lastIntervention": {
+      "kind": "BARRIER_PLACED",
+      "comparedToRevision": 4,
+      "delta": {
+        "distanceTotalMeters": 240,
+        "plannedDurationSeconds": 24,
+        "economicCostCents": 20,
+        "ordersDelayed": 0,
+        "ordersUnassigned": 0
+      }
+    }
+  },
+  "simulation": {
+    "running": false,
+    "speedMultiplier": 1,
+    "tick": 0,
+    "elapsedSeconds": 0
+  },
+  "appliedCommand": {
+    "commandId": "b7d1a0c2-5e4f-4c9a-9d31-6a2f7c8e4b10",
+    "kind": "BARRIER_PLACED",
+    "appliedAgainstRevision": 4,
+    "rebased": false,
+    "replayed": false
+  },
+  "emittedAt": "2026-09-22T09:12:30.500Z"
+}
