@@ -115,8 +115,9 @@ export function StatusScreen({ readiness, refreshing, onRefresh, scene }: Status
             tone="state state--idle"
           />
           <p className="panel__note">
-            No active scenario. The city stays inactive with no fleet and no orders
-            deployed.
+            {readiness.scenarioRevision === 0
+              ? 'No active scenario. The city stays inactive with no fleet and no orders deployed.'
+              : 'Scenario data is ready. Routes and simulation remain idle until a later command.'}
           </p>
         </section>
 

@@ -166,6 +166,10 @@ async def asgi_post(app: FastAPI, path: str, **kwargs: Any) -> httpx.Response:
     return await asgi_request(app, "POST", path, **kwargs)
 
 
+async def asgi_delete(app: FastAPI, path: str, **kwargs: Any) -> httpx.Response:
+    return await asgi_request(app, "DELETE", path, **kwargs)
+
+
 async def run_lifespan(app: FastAPI) -> list[dict[str, object]]:
     """Drive the ASGI lifespan protocol, so any startup hook would run here.
 
