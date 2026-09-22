@@ -1,0 +1,12 @@
+{
+  "orderId": "O-001",
+  "deliveryNodeId": "N-006",
+  "weightKilograms": 12,
+  "volumeCubicMeters": 0.6,
+  "priority": "URGENT",
+  "timeWindow": { "startSeconds": 0, "endSeconds": 600 },
+  "serviceSeconds": 120,
+  "status": "ASSIGNED",
+  "assignedVehicleId": "R-01",
+  "sequenceIndex": 0
+}

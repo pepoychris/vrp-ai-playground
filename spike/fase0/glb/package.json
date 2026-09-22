@@ -1,0 +1,14 @@
+{
+  "name": "roboroute-phase0-glb-spike",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Prueba tecnica de Fase 0: cargar un GLB y seleccionarlo con Raycaster. No forma parte del producto.",
+  "scripts": {
+    "verify": "node verify_glb_node.mjs",
+    "serve": "python -m http.server 4173 --directory ."
+  },
+  "dependencies": {
+    "three": "0.186.0"
+  }
+}

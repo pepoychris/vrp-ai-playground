@@ -1,0 +1,15 @@
+{
+  "eventId": "0:7",
+  "eventSeq": 7,
+  "type": "ai.install",
+  "scenarioRevision": null,
+  "emittedAt": "2026-09-22T09:08:02.140Z",
+  "commandId": null,
+  "payload": {
+    "state": "DOWNLOADING",
+    "modelName": "qwen3:4b",
+    "percent": 42.5,
+    "statusText": "pulling 3e4cb1417446",
+    "error": null
+  }
+}

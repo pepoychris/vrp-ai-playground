@@ -1,0 +1,501 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://roboroute.local/contracts/events.schema.json",
+  "title": "Eventos SSE",
+  "description": "Payloads de los dos flujos SSE. El campo type discrimina la variante. Los eventos de simulacion van atados a una revision y llevan su propio tick; no crean revisiones.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/scenarioSnapshotEvent"
+    },
+    {
+      "$ref": "#/$defs/scenarioSimulationEvent"
+    },
+    {
+      "$ref": "#/$defs/scenarioOptimizerEvent"
+    },
+    {
+      "$ref": "#/$defs/scenarioResyncEvent"
+    },
+    {
+      "$ref": "#/$defs/scenarioErrorEvent"
+    },
+    {
+      "$ref": "#/$defs/aiInstallEvent"
+    },
+    {
+      "$ref": "#/$defs/aiStatusEvent"
+    }
+  ],
+  "$defs": {
+    "scenarioSnapshotEvent": {
+      "type": "object",
+      "title": "scenario.snapshot",
+      "required": [
+        "eventId",
+        "eventSeq",
+        "type",
+        "scenarioRevision",
+        "emittedAt",
+        "commandId",
+        "payload"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "pattern": "^[0-9]+:[0-9]+$",
+          "description": "Identificador del evento, con formato {scenarioRevision}:{eventSeq}. Es el valor que el navegador reenvia en Last-Event-ID."
+        },
+        "eventSeq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "type": {
+          "const": "scenario.snapshot"
+        },
+        "scenarioRevision": {
+          "$ref": "common.schema.json#/$defs/scenarioRevisionNumber"
+        },
+        "emittedAt": {
+          "$ref": "common.schema.json#/$defs/timestamp"
+        },
+        "commandId": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/commandId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "payload": {
+          "$ref": "scenario-revision.schema.json"
+        }
+      }
+    },
+    "scenarioSimulationEvent": {
+      "type": "object",
+      "title": "scenario.simulation",
+      "required": [
+        "eventId",
+        "eventSeq",
+        "type",
+        "scenarioRevision",
+        "emittedAt",
+        "commandId",
+        "payload"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "pattern": "^[0-9]+:[0-9]+$"
+        },
+        "eventSeq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "type": {
+          "const": "scenario.simulation"
+        },
+        "scenarioRevision": {
+          "$ref": "common.schema.json#/$defs/scenarioRevisionNumber"
+        },
+        "emittedAt": {
+          "$ref": "common.schema.json#/$defs/timestamp"
+        },
+        "commandId": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/commandId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "payload": {
+          "$ref": "#/$defs/simulationPayload"
+        }
+      }
+    },
+    "simulationPayload": {
+      "type": "object",
+      "required": ["tick", "elapsedSeconds", "positions"],
+      "additionalProperties": false,
+      "properties": {
+        "tick": {
+          "$ref": "common.schema.json#/$defs/tick"
+        },
+        "elapsedSeconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "positions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["vehicleId", "position", "nodeId", "edgeId", "distanceAlongRouteMeters"],
+            "additionalProperties": false,
+            "properties": {
+              "vehicleId": {
+                "$ref": "common.schema.json#/$defs/vehicleId"
+              },
+              "position": {
+                "$ref": "common.schema.json#/$defs/point3d"
+              },
+              "nodeId": {
+                "oneOf": [
+                  {
+                    "$ref": "common.schema.json#/$defs/nodeId"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "edgeId": {
+                "oneOf": [
+                  {
+                    "$ref": "common.schema.json#/$defs/edgeId"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "distanceAlongRouteMeters": {
+                "$ref": "common.schema.json#/$defs/nonNegativeMeters"
+              }
+            }
+          }
+        }
+      }
+    },
+    "scenarioOptimizerEvent": {
+      "type": "object",
+      "title": "scenario.optimizer",
+      "required": [
+        "eventId",
+        "eventSeq",
+        "type",
+        "scenarioRevision",
+        "emittedAt",
+        "commandId",
+        "payload"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "pattern": "^[0-9]+:[0-9]+$"
+        },
+        "eventSeq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "type": {
+          "const": "scenario.optimizer"
+        },
+        "scenarioRevision": {
+          "$ref": "common.schema.json#/$defs/scenarioRevisionNumber"
+        },
+        "emittedAt": {
+          "$ref": "common.schema.json#/$defs/timestamp"
+        },
+        "commandId": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/commandId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "payload": {
+          "type": "object",
+          "required": ["phase", "durationMs", "solverOutcome", "scenarioRevision"],
+          "additionalProperties": false,
+          "properties": {
+            "phase": {
+              "type": "string",
+              "enum": ["STARTED", "FINISHED", "FAILED"]
+            },
+            "durationMs": {
+              "oneOf": [
+                {
+                  "$ref": "common.schema.json#/$defs/milliseconds"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "solverOutcome": {
+              "oneOf": [
+                {
+                  "$ref": "common.schema.json#/$defs/solverOutcome"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "scenarioRevision": {
+              "$ref": "common.schema.json#/$defs/scenarioRevisionNumber"
+            }
+          }
+        }
+      }
+    },
+    "scenarioResyncEvent": {
+      "type": "object",
+      "title": "scenario.resync",
+      "required": [
+        "eventId",
+        "eventSeq",
+        "type",
+        "scenarioRevision",
+        "emittedAt",
+        "commandId",
+        "payload"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "pattern": "^[0-9]+:[0-9]+$"
+        },
+        "eventSeq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "type": {
+          "const": "scenario.resync"
+        },
+        "scenarioRevision": {
+          "$ref": "common.schema.json#/$defs/scenarioRevisionNumber"
+        },
+        "emittedAt": {
+          "$ref": "common.schema.json#/$defs/timestamp"
+        },
+        "commandId": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/commandId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "payload": {
+          "type": "object",
+          "required": ["reason", "currentRevision"],
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "type": "string",
+              "enum": ["BUFFER_EXPIRED", "UNKNOWN_EVENT_ID"]
+            },
+            "currentRevision": {
+              "$ref": "common.schema.json#/$defs/scenarioRevisionNumber"
+            }
+          }
+        }
+      }
+    },
+    "scenarioErrorEvent": {
+      "type": "object",
+      "title": "scenario.error",
+      "required": [
+        "eventId",
+        "eventSeq",
+        "type",
+        "scenarioRevision",
+        "emittedAt",
+        "commandId",
+        "payload"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "pattern": "^[0-9]+:[0-9]+$"
+        },
+        "eventSeq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "type": {
+          "const": "scenario.error"
+        },
+        "scenarioRevision": {
+          "$ref": "common.schema.json#/$defs/scenarioRevisionNumber"
+        },
+        "emittedAt": {
+          "$ref": "common.schema.json#/$defs/timestamp"
+        },
+        "commandId": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/commandId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "payload": {
+          "$ref": "envelopes.schema.json#/$defs/errorResponse"
+        }
+      }
+    },
+    "aiInstallEvent": {
+      "type": "object",
+      "title": "ai.install",
+      "required": [
+        "eventId",
+        "eventSeq",
+        "type",
+        "scenarioRevision",
+        "emittedAt",
+        "commandId",
+        "payload"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "pattern": "^[0-9]+:[0-9]+$"
+        },
+        "eventSeq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "type": {
+          "const": "ai.install"
+        },
+        "scenarioRevision": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/scenarioRevisionNumber"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "null: la instalacion del modelo no depende de una revision del escenario."
+        },
+        "emittedAt": {
+          "$ref": "common.schema.json#/$defs/timestamp"
+        },
+        "commandId": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/commandId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "payload": {
+          "type": "object",
+          "required": ["state", "modelName", "percent", "statusText", "error"],
+          "additionalProperties": false,
+          "properties": {
+            "state": {
+              "type": "string",
+              "enum": ["IDLE", "DOWNLOADING", "VERIFYING", "COMPLETED", "FAILED"]
+            },
+            "modelName": {
+              "type": "string",
+              "const": "qwen3:4b"
+            },
+            "percent": {
+              "oneOf": [
+                {
+                  "$ref": "common.schema.json#/$defs/percent"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "null mientras el backend no pueda calcular el progreso."
+            },
+            "statusText": {
+              "type": "string",
+              "description": "Estado traducido del stream de Ollama; el contrato no fija claves internas de Ollama."
+            },
+            "error": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "aiStatusEvent": {
+      "type": "object",
+      "title": "ai.status",
+      "required": [
+        "eventId",
+        "eventSeq",
+        "type",
+        "scenarioRevision",
+        "emittedAt",
+        "commandId",
+        "payload"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "pattern": "^[0-9]+:[0-9]+$"
+        },
+        "eventSeq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "type": {
+          "const": "ai.status"
+        },
+        "scenarioRevision": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/scenarioRevisionNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "emittedAt": {
+          "$ref": "common.schema.json#/$defs/timestamp"
+        },
+        "commandId": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/commandId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "payload": {
+          "$ref": "envelopes.schema.json#/$defs/aiStatus"
+        }
+      }
+    }
+  }
+}

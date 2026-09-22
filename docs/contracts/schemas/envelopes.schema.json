@@ -1,0 +1,464 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://roboroute.local/contracts/envelopes.schema.json",
+  "title": "Envelopes de comando, respuesta, error y respuestas de IA",
+  "description": "Envelopes congelados en la Fase 0. Toda mutacion lleva commandId y scenarioRevision; toda mutacion devuelve el snapshot atomico completo de la nueva revision.",
+  "$defs": {
+    "commandEnvelope": {
+      "type": "object",
+      "title": "Envelope de comando",
+      "description": "Campos comunes de todo comando que muta estado. Cada endpoint anade los suyos.",
+      "required": ["commandId", "scenarioRevision"],
+      "additionalProperties": true,
+      "properties": {
+        "commandId": {
+          "$ref": "common.schema.json#/$defs/commandId"
+        },
+        "scenarioRevision": {
+          "$ref": "common.schema.json#/$defs/scenarioRevisionNumber"
+        }
+      }
+    },
+    "appliedCommand": {
+      "type": "object",
+      "title": "Comando aplicado",
+      "required": [
+        "commandId",
+        "kind",
+        "appliedAgainstRevision",
+        "rebased",
+        "replayed"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "commandId": {
+          "$ref": "common.schema.json#/$defs/commandId"
+        },
+        "kind": {
+          "$ref": "common.schema.json#/$defs/interventionKind"
+        },
+        "appliedAgainstRevision": {
+          "$ref": "common.schema.json#/$defs/scenarioRevisionNumber"
+        },
+        "rebased": {
+          "type": "boolean",
+          "description": "true cuando la revision base del cliente no era la vigente y el servidor aplico el comando sobre una mas reciente."
+        },
+        "replayed": {
+          "type": "boolean",
+          "description": "true cuando se devuelve el resultado guardado de un commandId ya procesado, sin volver a mutar."
+        }
+      }
+    },
+    "positionSnapResult": {
+      "type": "object",
+      "title": "Resultado del snap de garra",
+      "required": [
+        "requestedWorldPoint",
+        "snappedNodeId",
+        "snappedPosition",
+        "distanceMeters",
+        "accepted",
+        "rejectionCode"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "requestedWorldPoint": {
+          "$ref": "common.schema.json#/$defs/point3d"
+        },
+        "snappedNodeId": {
+          "$ref": "common.schema.json#/$defs/nodeId"
+        },
+        "snappedPosition": {
+          "$ref": "common.schema.json#/$defs/point3d"
+        },
+        "distanceMeters": {
+          "$ref": "common.schema.json#/$defs/nonNegativeMeters"
+        },
+        "accepted": {
+          "type": "boolean"
+        },
+        "rejectionCode": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/snapRejectionCode"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "barrierPlacementResult": {
+      "type": "object",
+      "title": "Resultado de colocar una barrera",
+      "required": [
+        "barrierId",
+        "blockedEdgeId",
+        "projectedPoint",
+        "distanceMeters",
+        "accepted",
+        "rejectionCode"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "barrierId": {
+          "$ref": "common.schema.json#/$defs/barrierId"
+        },
+        "blockedEdgeId": {
+          "$ref": "common.schema.json#/$defs/edgeId"
+        },
+        "projectedPoint": {
+          "$ref": "common.schema.json#/$defs/point3d"
+        },
+        "distanceMeters": {
+          "$ref": "common.schema.json#/$defs/nonNegativeMeters"
+        },
+        "accepted": {
+          "type": "boolean"
+        },
+        "rejectionCode": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/snapRejectionCode"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "successResponse": {
+      "type": "object",
+      "title": "Respuesta de mutacion",
+      "required": [
+        "scenarioId",
+        "scenarioRevision",
+        "previousRevision",
+        "emittedAt",
+        "appliedCommand",
+        "revision"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "scenarioId": {
+          "$ref": "common.schema.json#/$defs/scenarioId"
+        },
+        "scenarioRevision": {
+          "$ref": "common.schema.json#/$defs/scenarioRevisionNumber"
+        },
+        "previousRevision": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/scenarioRevisionNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "emittedAt": {
+          "$ref": "common.schema.json#/$defs/timestamp"
+        },
+        "appliedCommand": {
+          "$ref": "#/$defs/appliedCommand"
+        },
+        "revision": {
+          "$ref": "scenario-revision.schema.json"
+        },
+        "result": {
+          "description": "Objeto especifico del endpoint. Las formas conocidas son positionSnap y barrierPlacement.",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/positionSnapResult"
+            },
+            {
+              "$ref": "#/$defs/barrierPlacementResult"
+            },
+            {
+              "$ref": "route-plan.schema.json"
+            },
+            {
+              "$ref": "#/$defs/installJob"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "errorCode": {
+      "type": "string",
+      "enum": [
+        "VALIDATION_ERROR",
+        "MODEL_OVERRIDE_FORBIDDEN",
+        "SCENARIO_NOT_FOUND",
+        "VEHICLE_NOT_FOUND",
+        "ORDER_NOT_FOUND",
+        "BARRIER_NOT_FOUND",
+        "PROPOSAL_NOT_FOUND",
+        "BARRIER_LIMIT_REACHED",
+        "NO_FLEET_DEPLOYED",
+        "NO_ORDERS_AVAILABLE",
+        "SIMULATION_NOT_RUNNING",
+        "SNAP_OUT_OF_RADIUS",
+        "SNAP_NO_VALID_EDGE",
+        "AI_SERVICE_UNAVAILABLE",
+        "AI_MODEL_NOT_INSTALLED",
+        "AI_MODEL_NOT_LOADED",
+        "AI_INSTALL_IN_PROGRESS",
+        "AI_OUTPUT_INVALID",
+        "INTERNAL_ERROR"
+      ],
+      "description": "Catalogo cerrado de codigos de error del contrato v1."
+    },
+    "errorResponse": {
+      "type": "object",
+      "title": "Envelope de error",
+      "required": ["error"],
+      "additionalProperties": false,
+      "properties": {
+        "error": {
+          "type": "object",
+          "required": ["code", "message", "retryable"],
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "$ref": "#/$defs/errorCode"
+            },
+            "message": {
+              "type": "string",
+              "minLength": 1
+            },
+            "details": {
+              "type": "object",
+              "description": "Contexto adicional del error, especifico de cada codigo."
+            },
+            "scenarioRevision": {
+              "oneOf": [
+                {
+                  "$ref": "common.schema.json#/$defs/scenarioRevisionNumber"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "commandId": {
+              "oneOf": [
+                {
+                  "$ref": "common.schema.json#/$defs/commandId"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "retryable": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "installJob": {
+      "type": "object",
+      "title": "Trabajo de instalacion del modelo",
+      "required": ["jobId", "state", "modelName", "startedAt"],
+      "additionalProperties": false,
+      "properties": {
+        "jobId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "state": {
+          "type": "string",
+          "enum": ["IDLE", "DOWNLOADING", "VERIFYING", "COMPLETED", "FAILED"]
+        },
+        "modelName": {
+          "type": "string",
+          "const": "qwen3:4b",
+          "description": "Fijado por el backend. El navegador no puede cambiarlo."
+        },
+        "startedAt": {
+          "$ref": "common.schema.json#/$defs/timestamp"
+        },
+        "finishedAt": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/timestamp"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "aiStatus": {
+      "type": "object",
+      "title": "Estado del nucleo de IA",
+      "required": [
+        "serviceAvailable",
+        "modelInstalled",
+        "modelLoaded",
+        "modelName"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "serviceAvailable": {
+          "type": "boolean",
+          "description": "Ollama responde a traves de la red interna del stack."
+        },
+        "modelInstalled": {
+          "type": "boolean",
+          "description": "qwen3:4b aparece en /api/tags."
+        },
+        "modelLoaded": {
+          "type": "boolean",
+          "description": "qwen3:4b esta cargado en memoria tras POST /api/ai/activate."
+        },
+        "modelName": {
+          "type": "string",
+          "const": "qwen3:4b"
+        },
+        "installJob": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/installJob"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "proposalKind": {
+      "type": "string",
+      "enum": [
+        "SET_VEHICLE_UNAVAILABLE",
+        "DELAY_VEHICLE",
+        "REQUEST_REOPTIMIZATION"
+      ],
+      "description": "Propuestas que el modelo puede sugerir. Ninguna se aplica sin confirmacion humana."
+    },
+    "aiProposal": {
+      "type": "object",
+      "title": "Propuesta de accion sugerida por la IA",
+      "required": ["proposalId", "kind", "summary", "payload", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "proposalId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "$ref": "#/$defs/proposalKind"
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "payload": {
+          "type": "object"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["PENDING", "CONFIRMED", "REJECTED"]
+        },
+        "revisionToApply": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/scenarioRevisionNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "aiChatResponse": {
+      "type": "object",
+      "title": "Respuesta de chat",
+      "required": [
+        "answer",
+        "usedRevision",
+        "references",
+        "proposal",
+        "timingsMs"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "answer": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Respuesta en espanol basada exclusivamente en el snapshot validado."
+        },
+        "usedRevision": {
+          "$ref": "common.schema.json#/$defs/scenarioRevisionNumber"
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Ruta de campo del snapshot, p. ej. kpis.economicCostCents."
+          }
+        },
+        "proposal": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/aiProposal"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "timingsMs": {
+          "type": "object",
+          "required": ["total"],
+          "additionalProperties": {
+            "$ref": "common.schema.json#/$defs/milliseconds"
+          }
+        }
+      }
+    },
+    "aiReportResponse": {
+      "type": "object",
+      "title": "Informe de turno",
+      "required": [
+        "scenarioRevision",
+        "generatedAt",
+        "markdown",
+        "report",
+        "schemaVersion"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "scenarioRevision": {
+          "$ref": "common.schema.json#/$defs/scenarioRevisionNumber"
+        },
+        "generatedAt": {
+          "$ref": "common.schema.json#/$defs/timestamp"
+        },
+        "markdown": {
+          "type": "string",
+          "minLength": 1
+        },
+        "report": {
+          "type": "object",
+          "description": "Informe estructurado validado contra JSON Schema antes de responder."
+        },
+        "schemaVersion": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

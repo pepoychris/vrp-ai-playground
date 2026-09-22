@@ -1,0 +1,4 @@
+# Dependencias de verificacion de la Fase 0 (no son dependencias de producto).
+# Versiones fijadas y justificadas en docs/contracts/versions.md.
+jsonschema==4.26.0
+ortools==9.15.6755

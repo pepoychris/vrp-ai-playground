@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://roboroute.local/contracts/kpi-snapshot.schema.json",
+  "title": "KpiSnapshot",
+  "description": "Indicadores de una revision. El coste economico se calcula de forma determinista y es independiente del objetivo del optimizador.",
+  "type": "object",
+  "required": [
+    "scenarioRevision",
+    "computedAt",
+    "distanceTotalMeters",
+    "plannedDurationSeconds",
+    "economicCostCents",
+    "economicCostBreakdown",
+    "ordersDelivered",
+    "ordersPending",
+    "ordersDelayed",
+    "ordersUnassigned",
+    "activeVehicles",
+    "capacityUtilizationPercentByVehicle",
+    "lastIntervention"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "scenarioRevision": {
+      "$ref": "common.schema.json#/$defs/scenarioRevisionNumber"
+    },
+    "computedAt": {
+      "$ref": "common.schema.json#/$defs/timestamp"
+    },
+    "distanceTotalMeters": {
+      "$ref": "common.schema.json#/$defs/nonNegativeMeters"
+    },
+    "plannedDurationSeconds": {
+      "$ref": "common.schema.json#/$defs/seconds"
+    },
+    "economicCostCents": {
+      "$ref": "common.schema.json#/$defs/euroCents"
+    },
+    "economicCostBreakdown": {
+      "type": "object",
+      "required": [
+        "activeVehicleFixedCostCents",
+        "distanceCostCents",
+        "driveTimeCostCents",
+        "delayPenaltyCents",
+        "unassignedOrderPenaltyCents"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "activeVehicleFixedCostCents": {
+          "$ref": "common.schema.json#/$defs/euroCents"
+        },
+        "distanceCostCents": {
+          "$ref": "common.schema.json#/$defs/euroCents"
+        },
+        "driveTimeCostCents": {
+          "$ref": "common.schema.json#/$defs/euroCents"
+        },
+        "delayPenaltyCents": {
+          "$ref": "common.schema.json#/$defs/euroCents"
+        },
+        "unassignedOrderPenaltyCents": {
+          "$ref": "common.schema.json#/$defs/euroCents"
+        }
+      },
+      "description": "La suma de los cinco campos debe ser exactamente economicCostCents."
+    },
+    "ordersDelivered": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "ordersPending": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "ordersDelayed": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "ordersUnassigned": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "activeVehicles": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 6,
+      "description": "Vehiculos con al menos una parada en el ultimo plan. Solo ellos suman coste fijo."
+    },
+    "capacityUtilizationPercentByVehicle": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^R-0[1-6]$"
+      },
+      "additionalProperties": {
+        "$ref": "common.schema.json#/$defs/percent"
+      }
+    },
+    "lastIntervention": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/interventionImpact"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "interventionImpact": {
+      "type": "object",
+      "title": "Impacto de la ultima intervencion",
+      "required": ["kind", "comparedToRevision", "delta"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "$ref": "common.schema.json#/$defs/interventionKind"
+        },
+        "comparedToRevision": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/scenarioRevisionNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "delta": {
+          "type": "object",
+          "required": [
+            "distanceTotalMeters",
+            "plannedDurationSeconds",
+            "economicCostCents",
+            "ordersDelayed",
+            "ordersUnassigned"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "distanceTotalMeters": {
+              "type": "number",
+              "description": "Diferencia firmada en metros (m) respecto a comparedToRevision."
+            },
+            "plannedDurationSeconds": {
+              "type": "integer",
+              "description": "Diferencia firmada en segundos (s)."
+            },
+            "economicCostCents": {
+              "type": "integer",
+              "description": "Diferencia firmada en centimos de euro."
+            },
+            "ordersDelayed": {
+              "type": "integer",
+              "description": "Diferencia firmada del numero de pedidos retrasados."
+            },
+            "ordersUnassigned": {
+              "type": "integer",
+              "description": "Diferencia firmada del numero de pedidos sin asignar."
+            }
+          }
+        }
+      }
+    }
+  }
+}

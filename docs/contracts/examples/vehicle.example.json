@@ -1,0 +1,15 @@
+{
+  "vehicleId": "R-01",
+  "capacityKilograms": 30,
+  "capacityCubicMeters": 1.5,
+  "loadKilograms": 22,
+  "loadCubicMeters": 1.1,
+  "batteryPercent": 78.5,
+  "speedKilometersPerHour": 36,
+  "costPerKilometerCents": 50,
+  "costPerMinuteCents": 20,
+  "fixedCostCents": 500,
+  "currentNodeId": "N-006",
+  "status": "EN_ROUTE",
+  "assignedOrderIds": ["O-001", "O-002"]
+}

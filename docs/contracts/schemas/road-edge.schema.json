@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://roboroute.local/contracts/road-edge.schema.json",
+  "title": "RoadEdge",
+  "description": "Tramo de carretera entre dos nodos. No tiene campo blocked: la lista blockedEdgeIds de ScenarioRevision es la unica fuente de verdad del bloqueo.",
+  "type": "object",
+  "required": [
+    "edgeId",
+    "fromNodeId",
+    "toNodeId",
+    "bidirectional",
+    "lengthMeters",
+    "speedLimitKph"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "edgeId": {
+      "$ref": "common.schema.json#/$defs/edgeId"
+    },
+    "fromNodeId": {
+      "$ref": "common.schema.json#/$defs/nodeId"
+    },
+    "toNodeId": {
+      "$ref": "common.schema.json#/$defs/nodeId"
+    },
+    "bidirectional": {
+      "type": "boolean",
+      "description": "true en todas las aristas del MVP: bloquear la arista bloquea ambos sentidos."
+    },
+    "lengthMeters": {
+      "$ref": "common.schema.json#/$defs/positiveMeters"
+    },
+    "speedLimitKph": {
+      "$ref": "common.schema.json#/$defs/kilometersPerHour"
+    },
+    "visualSplineControlPoints": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "$ref": "common.schema.json#/$defs/point3d"
+      },
+      "description": "Solo presentacion: suaviza la carretera visible. No se usa para calcular distancias ni rutas."
+    }
+  }
+}
