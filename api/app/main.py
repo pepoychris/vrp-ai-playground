@@ -1,7 +1,7 @@
-"""FastAPI application for the RoboRoute Nexus backend (MVP Phase 4).
+"""FastAPI application for the RoboRoute Nexus backend (MVP Phase 5).
 
-Phase 4 adds explicit scenario creation, deterministic fleet and order generation,
-and reset.  No scenario is generated during application startup.
+Phase 5 adds bounded shortest-path routing, deterministic fleet/order generation,
+route plans, KPI snapshots and reset. No scenario is generated during startup.
 
 Starting this application performs no network call, no database write and no model
 download. There is no startup hook: scenario generation only happens after an
@@ -19,6 +19,7 @@ from .scenario import (
     FleetGenerateRequest,
     OrdersGenerateRequest,
     ScenarioCreateRequest,
+    OptimizeRequest,
     ScenarioResetResponse,
     ScenarioRevisionResponse,
     ScenarioStore,
@@ -26,8 +27,8 @@ from .scenario import (
 
 API_TITLE = "RoboRoute Nexus API"
 API_SUMMARY = (
-    "Last-mile control tower backend. Phase 4 exposes deterministic scenario "
-    "creation, fleet and order generation, reset, and AI readiness."
+    "Last-mile control tower backend. Phase 5 exposes deterministic scenarios, "
+    "bounded route optimisation, KPIs, reset, and AI readiness."
 )
 
 
@@ -125,6 +126,30 @@ def create_app(
     ) -> ScenarioRevisionResponse:
         return ScenarioRevisionResponse.model_validate(
             app.state.scenario_store.generate_orders(scenario_id, request.count)
+        )
+
+    @app.post(
+        "/api/scenarios/{scenario_id}/optimize",
+        response_model=ScenarioRevisionResponse,
+        tags=["scenarios"],
+    )
+    async def optimize_scenario(
+        scenario_id: str, request: OptimizeRequest | None = None
+    ) -> ScenarioRevisionResponse:
+        """Compute bounded best routes and publish one atomic scenario revision.
+
+        The frozen command envelope (``commandId``, ``scenarioRevision``) is honoured
+        when the client sends it: a repeated ``commandId`` is replayed and does not
+        mutate the scenario twice, and a stale ``scenarioRevision`` is rebased.
+        """
+        resolved_request = request or OptimizeRequest()
+        return ScenarioRevisionResponse.model_validate(
+            app.state.scenario_store.optimize(
+                scenario_id,
+                resolved_request.timeLimitSeconds,
+                command_id=resolved_request.commandId,
+                client_revision=resolved_request.scenarioRevision,
+            )
         )
 
     return app

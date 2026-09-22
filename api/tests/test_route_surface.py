@@ -1,4 +1,4 @@
-"""Phase 4 exposes readiness plus explicit scenario generation mutations."""
+"""Phase 5 exposes readiness, scenario generation and bounded optimisation."""
 
 from __future__ import annotations
 
@@ -25,6 +25,7 @@ EXPECTED_PRODUCT_ROUTES = {
     "/api/scenarios/{scenario_id}",
     "/api/scenarios/{scenario_id}/vehicles/generate",
     "/api/scenarios/{scenario_id}/orders/generate",
+    "/api/scenarios/{scenario_id}/optimize",
 }
 DOC_ROUTE_PATHS = {"/openapi.json", "/docs", "/docs/oauth2-redirect", "/redoc"}
 FORBIDDEN_PATH_FRAGMENTS = (

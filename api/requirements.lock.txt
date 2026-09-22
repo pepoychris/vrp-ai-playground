@@ -10,6 +10,7 @@
 annotated-doc==0.0.5
 annotated-types==0.8.0
 anyio==4.15.1
+absl-py==2.5.0
 certifi==2026.7.22
 click==8.5.0
 fastapi==0.141.1
@@ -19,6 +20,11 @@ httpx==0.28.1
 idna==3.20
 pydantic==2.13.5
 pydantic-core==2.46.5
+pandas==3.0.6
+numpy==2.5.3
+ortools==9.15.6755
+protobuf==6.33.6
+immutabledict==4.3.1
 starlette==1.6.0
 typing-extensions==4.16.0
 typing-inspection==0.4.4
