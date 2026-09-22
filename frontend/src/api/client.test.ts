@@ -1,11 +1,15 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
+  createScenario,
   DisallowedRequestError,
+  deployFleet,
+  generateOrders,
   HttpError,
   READ_ONLY_PATHS,
   getJson,
   isReadOnlyPath,
+  resetScenario,
 } from './client';
 
 afterEach(() => {
@@ -54,5 +58,23 @@ describe('read-only surface', () => {
     );
 
     await expect(getJson('/api/ai/status')).rejects.toBeInstanceOf(HttpError);
+  });
+});
+
+describe('Phase 4 mutations', () => {
+  it('uses explicit JSON commands for scenario generation and reset', async () => {
+    const fetchStub = vi.fn(async (_input: unknown, _init?: RequestInit) =>
+      new Response(JSON.stringify({ scenarioId: 's-1' }), { status: 200 }),
+    );
+    vi.stubGlobal('fetch', fetchStub);
+
+    await createScenario(1);
+    await deployFleet('s-1', 2);
+    await generateOrders('s-1', 6);
+    await resetScenario('s-1');
+
+    expect(fetchStub).toHaveBeenCalledTimes(4);
+    expect(fetchStub.mock.calls[1][1]).toMatchObject({ method: 'POST', body: JSON.stringify({ count: 2 }) });
+    expect(fetchStub.mock.calls[3][1]).toMatchObject({ method: 'DELETE' });
   });
 });

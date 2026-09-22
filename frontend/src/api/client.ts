@@ -1,11 +1,8 @@
 /**
- * The only HTTP surface this frontend is allowed to use (MVP Phase 1).
+ * The only HTTP surface this frontend is allowed to use.
  *
- * Phase 1 renders readiness only, so the allowlist holds the two read endpoints the
- * status screen needs: the API probe and the AI readiness report. There is
- * deliberately no helper that sends a body, and no way to name a model: the
- * scenario, fleet, order, route, simulation and AI command endpoints belong to
- * later phases and must not be reachable from this screen.
+ * Readiness remains read-only, while Phase 4 mutations are exposed through named
+ * helpers below. The browser still cannot choose an AI model or call Ollama.
  */
 
 export const READ_ONLY_PATHS = ['/health', '/api/ai/status'] as const;
@@ -25,6 +22,16 @@ export class HttpError extends Error {
   constructor(status: number, path: string) {
     super(`GET ${path} failed with HTTP ${status}`);
     this.name = 'HttpError';
+    this.status = status;
+  }
+}
+
+export class ApiRequestError extends Error {
+  readonly status: number;
+
+  constructor(status: number, path: string, message: string) {
+    super(`${path} failed with HTTP ${status}: ${message}`);
+    this.name = 'ApiRequestError';
     this.status = status;
   }
 }
@@ -49,4 +56,39 @@ export async function getJson<T>(path: string, signal?: AbortSignal): Promise<T>
   }
 
   return (await response.json()) as T;
+}
+
+async function mutation<T>(method: 'POST' | 'DELETE', path: string, body?: unknown): Promise<T> {
+  const response = await fetch(path, {
+    method,
+    headers: { accept: 'application/json', 'content-type': 'application/json' },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  if (!response.ok) {
+    let message = response.statusText || 'request failed';
+    try {
+      const payload = (await response.json()) as { detail?: string };
+      if (typeof payload.detail === 'string') message = payload.detail;
+    } catch {
+      // The status and path are enough when an upstream response is not JSON.
+    }
+    throw new ApiRequestError(response.status, path, message);
+  }
+  return (await response.json()) as T;
+}
+
+export function createScenario<T>(seed: number): Promise<T> {
+  return mutation<T>('POST', '/api/scenarios', { seed });
+}
+
+export function deployFleet<T>(scenarioId: string, count: number): Promise<T> {
+  return mutation<T>('POST', `/api/scenarios/${encodeURIComponent(scenarioId)}/vehicles/generate`, { count });
+}
+
+export function generateOrders<T>(scenarioId: string, count: number): Promise<T> {
+  return mutation<T>('POST', `/api/scenarios/${encodeURIComponent(scenarioId)}/orders/generate`, { count });
+}
+
+export function resetScenario<T>(scenarioId: string): Promise<T> {
+  return mutation<T>('DELETE', `/api/scenarios/${encodeURIComponent(scenarioId)}`);
 }

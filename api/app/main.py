@@ -1,25 +1,33 @@
-"""FastAPI application for the RoboRoute Nexus backend (MVP Phase 1).
+"""FastAPI application for the RoboRoute Nexus backend (MVP Phase 4).
 
-Phase 1 scope: the infrastructure probe ``GET /health`` and the read-only AI
-readiness report ``GET /api/ai/status``.
+Phase 4 adds explicit scenario creation, deterministic fleet and order generation,
+and reset.  No scenario is generated during application startup.
 
 Starting this application performs no network call, no database write and no model
-download. There is no startup hook: the scenario, fleet, orders, routes, simulation
-and model-install endpoints belong to later phases and do not exist yet.
+download. There is no startup hook: scenario generation only happens after an
+explicit request from the frontend.
 """
 
 from __future__ import annotations
 
-from fastapi import FastAPI
+from fastapi import FastAPI, status
 
 from .config import MODEL_NAME, SERVICE_NAME, SERVICE_VERSION, Settings
 from .contracts import AiStatus, HealthResponse
 from .ollama_client import OllamaProbe
+from .scenario import (
+    FleetGenerateRequest,
+    OrdersGenerateRequest,
+    ScenarioCreateRequest,
+    ScenarioResetResponse,
+    ScenarioRevisionResponse,
+    ScenarioStore,
+)
 
 API_TITLE = "RoboRoute Nexus API"
 API_SUMMARY = (
-    "Last-mile control tower backend. Phase 1 exposes the infrastructure probe and "
-    "the AI readiness report only."
+    "Last-mile control tower backend. Phase 4 exposes deterministic scenario "
+    "creation, fleet and order generation, reset, and AI readiness."
 )
 
 
@@ -41,6 +49,7 @@ def create_app(
     app = FastAPI(title=API_TITLE, summary=API_SUMMARY, version=SERVICE_VERSION)
     app.state.settings = resolved_settings
     app.state.ollama_probe = probe
+    app.state.scenario_store = ScenarioStore()
 
     @app.get("/health", response_model=HealthResponse, tags=["infrastructure"])
     async def health() -> HealthResponse:
@@ -62,6 +71,60 @@ def create_app(
             modelLoaded=status.has_loaded(MODEL_NAME),
             modelName=MODEL_NAME,
             installJob=None,
+        )
+
+    @app.post(
+        "/api/scenarios",
+        response_model=ScenarioRevisionResponse,
+        status_code=status.HTTP_201_CREATED,
+        tags=["scenarios"],
+    )
+    async def create_scenario(request: ScenarioCreateRequest | None = None) -> ScenarioRevisionResponse:
+        """Create an empty, reproducible scenario; generation remains user-triggered."""
+        resolved_request = request or ScenarioCreateRequest()
+        return ScenarioRevisionResponse.model_validate(
+            app.state.scenario_store.create(resolved_request.seed)
+        )
+
+    @app.get(
+        "/api/scenarios/{scenario_id}",
+        response_model=ScenarioRevisionResponse,
+        tags=["scenarios"],
+    )
+    async def get_scenario(scenario_id: str) -> ScenarioRevisionResponse:
+        return ScenarioRevisionResponse.model_validate(app.state.scenario_store.get(scenario_id))
+
+    @app.delete(
+        "/api/scenarios/{scenario_id}",
+        response_model=ScenarioResetResponse,
+        tags=["scenarios"],
+    )
+    async def reset_scenario(scenario_id: str) -> ScenarioResetResponse:
+        """Remove the current snapshot, routes, barriers and simulation state."""
+        return app.state.scenario_store.reset(scenario_id)
+
+    @app.post(
+        "/api/scenarios/{scenario_id}/vehicles/generate",
+        response_model=ScenarioRevisionResponse,
+        tags=["scenarios"],
+    )
+    async def generate_fleet(
+        scenario_id: str, request: FleetGenerateRequest
+    ) -> ScenarioRevisionResponse:
+        return ScenarioRevisionResponse.model_validate(
+            app.state.scenario_store.deploy_fleet(scenario_id, request.count)
+        )
+
+    @app.post(
+        "/api/scenarios/{scenario_id}/orders/generate",
+        response_model=ScenarioRevisionResponse,
+        tags=["scenarios"],
+    )
+    async def generate_orders(
+        scenario_id: str, request: OrdersGenerateRequest
+    ) -> ScenarioRevisionResponse:
+        return ScenarioRevisionResponse.model_validate(
+            app.state.scenario_store.generate_orders(scenario_id, request.count)
         )
 
     return app

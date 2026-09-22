@@ -1,4 +1,4 @@
-"""Phase 1 exposes readiness only: no scenario, fleet, order or AI command."""
+"""Phase 4 exposes readiness plus explicit scenario generation mutations."""
 
 from __future__ import annotations
 
@@ -18,10 +18,16 @@ from api.app.config import (
 )
 from api.tests.support import asgi_get, asgi_post, build_app, handler_with_paths, models_payload
 
-EXPECTED_PRODUCT_ROUTES = {"/health", "/api/ai/status"}
+EXPECTED_PRODUCT_ROUTES = {
+    "/health",
+    "/api/ai/status",
+    "/api/scenarios",
+    "/api/scenarios/{scenario_id}",
+    "/api/scenarios/{scenario_id}/vehicles/generate",
+    "/api/scenarios/{scenario_id}/orders/generate",
+}
 DOC_ROUTE_PATHS = {"/openapi.json", "/docs", "/docs/oauth2-redirect", "/redoc"}
 FORBIDDEN_PATH_FRAGMENTS = (
-    "/api/scenarios",
     "/api/ai/model/install",
     "/api/ai/activate",
     "/api/ai/chat",
@@ -31,7 +37,7 @@ FORBIDDEN_PATH_FRAGMENTS = (
 
 
 class RouteSurfaceTests(unittest.IsolatedAsyncioTestCase):
-    def test_exposes_exactly_the_phase_1_product_routes(self) -> None:
+    def test_exposes_exactly_the_phase_4_product_routes(self) -> None:
         app, _ = build_app(handler_with_paths(models_payload(), models_payload()))
         paths = {route.path for route in app.routes}
 
@@ -41,12 +47,15 @@ class RouteSurfaceTests(unittest.IsolatedAsyncioTestCase):
             for fragment in FORBIDDEN_PATH_FRAGMENTS:
                 self.assertNotIn(fragment, path)
 
-    def test_no_mutating_method_is_exposed(self) -> None:
+    def test_phase4_exposes_only_declared_mutations(self) -> None:
         app, _ = build_app(handler_with_paths(models_payload(), models_payload()))
 
         for route in app.routes:
             methods = getattr(route, "methods", None) or set()
-            self.assertFalse({"POST", "PUT", "PATCH", "DELETE"} & methods, route.path)
+            if methods & {"POST", "DELETE"}:
+                self.assertTrue(route.path.startswith("/api/scenarios"), route.path)
+            else:
+                self.assertFalse({"POST", "PUT", "PATCH", "DELETE"} & methods, route.path)
 
     async def test_business_paths_are_not_routable(self) -> None:
         app, _ = build_app(handler_with_paths(models_payload(), models_payload()))
