@@ -1,15 +1,20 @@
 :root {
-  --surface: #14161a;
-  --surface-raised: #1b1e23;
-  --surface-quiet: #171a1f;
-  --border: #2a2f37;
-  --text: #e7e9ee;
-  --text-muted: #9aa2ae;
-  --accent: #f0b429;
-  --ok: #4bbd7a;
-  --off: #d9604f;
-  --idle: #7f8896;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  /* The --rr-* custom properties are written at runtime from
+     `src/scene/visual-tokens.json`; the literals here are the no-JavaScript fallback. */
+  --surface: var(--rr-color-surface, #14161a);
+  --surface-raised: var(--rr-color-surface-raised, #1b1e23);
+  --surface-quiet: var(--rr-color-surface-quiet, #171a1f);
+  --border: var(--rr-color-border, #2a2f37);
+  --text: var(--rr-color-text, #e7e9ee);
+  --text-muted: var(--rr-color-text-muted, #9aa2ae);
+  --accent: var(--rr-color-accent, #f0b429);
+  --ok: var(--rr-status-ready, #4bbd7a);
+  --off: var(--rr-status-error, #d9604f);
+  --idle: var(--rr-status-idle, #7f8896);
+  --loading: var(--rr-status-loading, #f0b429);
+  --degraded: var(--rr-status-degraded, #e0a33a);
+  --stage-background: var(--rr-color-sky, #111317);
+  font-family: var(--rr-font-family, 'Segoe UI', system-ui, -apple-system, sans-serif);
   color-scheme: dark;
 }
 
@@ -164,6 +169,14 @@ body {
   color: var(--idle);
 }
 
+.state--loading {
+  color: var(--loading);
+}
+
+.state--degraded {
+  color: var(--degraded);
+}
+
 .notes {
   margin: 0;
   padding-left: 18px;
@@ -173,6 +186,72 @@ body {
 
 .notes li + li {
   margin-top: 6px;
+}
+
+.notes--error {
+  color: var(--off);
+  margin-top: 12px;
+}
+
+.panel__error {
+  margin: 12px 0 0;
+  color: var(--off);
+  font-size: 13px;
+}
+
+.refresh--inline {
+  margin-top: 16px;
+}
+
+.progress {
+  overflow: hidden;
+  height: 6px;
+  margin-top: 14px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--surface);
+}
+
+.progress__fill {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transition: width var(--rr-motion-base, 220ms) var(--rr-easing-standard, ease-out);
+}
+
+.stage {
+  position: relative;
+  overflow: hidden;
+  margin-top: 4px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--stage-background);
+  aspect-ratio: 16 / 9;
+}
+
+.stage__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.stage--degraded .stage__canvas {
+  display: none;
+}
+
+.stage__note {
+  position: absolute;
+  inset: auto 0 0 0;
+  margin: 0;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.stage--degraded .stage__note {
+  position: static;
+  background: transparent;
 }
 
 .screen__footer {

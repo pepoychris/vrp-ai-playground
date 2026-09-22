@@ -10,6 +10,12 @@ screen**: the Docker Compose stack, a minimal FastAPI backend and a minimal Reac
 frontend that report readiness without creating a scenario, deploying a fleet or
 downloading a model.
 
+**Phase 2 delivers the visual identity and the local 3D asset pipeline**: the design
+tokens, five deterministic fixture GLB assets served from this origin, a
+LoadingManager-driven asset readiness surface, the animation vocabulary
+(`idle`, `move`, `grab`, `deploy`) and the renderer/resource budgets with a
+deterministic benchmark.
+
 ## Stack
 
 | Service | Image / base | Host port | Networks | Purpose |
@@ -73,6 +79,32 @@ the frozen contract does not describe it, so its shape is fixed here.
 The backend also resolves `ROBOROUTE_DB_PATH` and mounts the SQLite volume, but
 Phase 1 writes nothing to it and creates no scenario at startup.
 
+## Implemented in Phase 2
+
+The control tower now loads a local fixture library and previews it, without any city,
+road graph or scenario behaviour.
+
+| Piece | Where |
+|---|---|
+| Visual tokens (palette, typography, status colours, spacing, lighting, icons, motion) | [`frontend/src/scene/visual-tokens.json`](frontend/src/scene/visual-tokens.json), documented in [`frontend/docs/visual-identity.md`](frontend/docs/visual-identity.md) |
+| Fixture assets and their contract | [`frontend/public/assets/models/`](frontend/public/assets/models), [`frontend/src/scene/asset-contract.json`](frontend/src/scene/asset-contract.json) |
+| Deterministic generator (no Blender required) | [`frontend/tools/build_fixture_assets.py`](frontend/tools/build_fixture_assets.py) |
+| Loader with real progress and recoverable failures | [`frontend/src/scene/load-assets.ts`](frontend/src/scene/load-assets.ts) |
+| Scene shell, lighting rig and animation director | [`frontend/src/scene/scene-shell.ts`](frontend/src/scene/scene-shell.ts), [`frontend/src/scene/animation-clips.ts`](frontend/src/scene/animation-clips.ts) |
+| Budgets and the deterministic benchmark | [`frontend/src/scene/render-budget.json`](frontend/src/scene/render-budget.json), [`frontend/tools/benchmark-assets.mjs`](frontend/tools/benchmark-assets.mjs) |
+
+Operational detail, budgets and the headless measurement boundary live in
+[`frontend/docs/phase-2-asset-pipeline-runbook.md`](frontend/docs/phase-2-asset-pipeline-runbook.md).
+
+The five fixtures are procedural stand-ins because this machine has no Blender
+toolchain; the runbook states that limitation and the contract that authored art must
+keep. Frame rate and GPU memory are budgets, never reported as measured: the benchmark
+is headless and has no WebGL context.
+
+The status screen keeps the Phase 1 readiness behaviour and adds two panels: the
+fixture library state (with real progress and a reload action) and the scene preview.
+Three.js is imported dynamically, so the first paint never waits for the 3D bundle.
+
 ## Approved inference settings
 
 Fixed in `api/app/config.py` and in the `ollama` service environment:
@@ -120,6 +152,13 @@ cd frontend
 npm run build
 npm test
 
+# Frontend: deterministic asset benchmark and fixture contract check
+npm run benchmark:assets
+npm run fixture:assets:check
+
+# Regenerate the fixture assets after editing the asset contract or the palette
+npm run fixture:assets
+
 # Compose: schema, services, volumes and networks
 docker compose config
 
@@ -140,11 +179,13 @@ no ranges; `integrity` hashes are recorded in `package-lock.json`):
 | Package | Version |
 |---|---|
 | `react`, `react-dom` | 19.3.0 |
+| `three` | 0.186.0 |
 | `typescript` | 7.0.2 |
 | `vite` | 8.3.0 |
 | `@vitejs/plugin-react` | 6.1.1 |
 | `vitest` | 5.0.1 |
 | `@types/react`, `@types/react-dom` | 19.3.0 |
+| `@types/three` | 0.186.0 |
 | `@types/node` | 24.13.6 |
 
 `docs/contracts/versions.md` remains the Phase 0 record of the approved versions.
@@ -152,6 +193,11 @@ Phase 1 adds only development-only type packages to that set; the runtime
 dependencies (`react`, `react-dom`, `typescript`, `vite`, `@vitejs/plugin-react`,
 `vitest`, `fastapi`, `uvicorn`, `pydantic`, `httpx`, `jsonschema`) all keep the
 versions frozen in Phase 0.
+
+Phase 2 promotes `three` 0.186.0 and `@types/three` 0.186.0 from the Phase 0 approved
+list to direct frontend dependencies. No version changes: the pinned versions, the
+GLTFLoader import path and the GLB fixture pattern are the ones Phase 0 fixed in
+`spike/fase0/glb`.
 
 Regenerate the Python lock after changing `api/requirements.txt`:
 
@@ -167,9 +213,13 @@ pip chooses the wheel that matches the build platform.
 ## Phase boundaries
 
 Implemented now: the Compose stack, the persistent volumes, the two read endpoints,
-the global `IDLE` state and the inactive status screen.
+the global `IDLE` state, the inactive status screen, the visual tokens, the local
+fixture asset library with its deterministic generator, the asset readiness surface,
+the animation vocabulary and the renderer/resource budgets with their benchmark.
 
-Not implemented here, and owned by later phases: the Three.js city and the GLB
-pipeline, the road graph, scenario/fleet/order/route/simulation endpoints and SSE,
-OR-Tools optimisation, SQLite scenario persistence, model installation, preloading,
-chat, reports, authentication and the visual identity.
+Not implemented here, and owned by later phases: the Three.js city and its road graph,
+`nearestRoadNode()`/`nearestRoadEdge()`, scenario/fleet/order/route/simulation
+endpoints and SSE, OR-Tools optimisation, SQLite scenario persistence, model
+installation, preloading, chat, reports and authentication. The fixture assets are
+stand-ins, not final art; replacing them is allowed as long as the asset contract and
+the budgets in `frontend/src/scene/render-budget.json` stay green.

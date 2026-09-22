@@ -1,0 +1,24 @@
+{
+  "capturedAt": "2026-09-22",
+  "groundRadius": 9,
+  "camera": {
+    "fov": 45,
+    "near": 0.5,
+    "far": 120,
+    "position": [9.5, 8.5, 11.5],
+    "lookAt": [0, 1, 0]
+  },
+  "instances": [
+    { "assetId": "depotLandmark", "position": [0, 0, 0], "rotationYDegrees": 0, "scale": 1 },
+    { "assetId": "robotVehicle", "position": [-3.2, 0, -3.4], "rotationYDegrees": 0, "scale": 1 },
+    { "assetId": "robotVehicle", "position": [-1.6, 0, -3.4], "rotationYDegrees": 0, "scale": 1 },
+    { "assetId": "robotVehicle", "position": [0, 0, -3.4], "rotationYDegrees": 0, "scale": 1 },
+    { "assetId": "robotVehicle", "position": [1.6, 0, -3.4], "rotationYDegrees": 0, "scale": 1 },
+    { "assetId": "robotVehicle", "position": [3.2, 0, -3.4], "rotationYDegrees": 0, "scale": 1 },
+    { "assetId": "robotVehicle", "position": [-2.4, 0, 3.6], "rotationYDegrees": 90, "scale": 1 },
+    { "assetId": "robotClaw", "position": [3.6, 0, 1.4], "rotationYDegrees": -30, "scale": 1 },
+    { "assetId": "barrier", "position": [-4.2, 0, 1.6], "rotationYDegrees": 20, "scale": 1 },
+    { "assetId": "buildingFixture", "position": [4.6, 0, -1.6], "rotationYDegrees": 15, "scale": 1 },
+    { "assetId": "buildingFixture", "position": [-5.2, 0, -1.0], "rotationYDegrees": -10, "scale": 1 }
+  ]
+}
