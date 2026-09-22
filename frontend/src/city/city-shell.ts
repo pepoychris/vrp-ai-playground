@@ -94,7 +94,11 @@ export interface CityShellOptions {
  * stops, the vehicles themselves and the active barriers of a road closure.
  */
 export interface ScenarioSceneState {
-  routes: readonly { vehicleId: string; edgeIds: readonly string[] }[];
+  routes: readonly {
+    vehicleId: string;
+    startNodeId?: string | null;
+    edgeIds: readonly string[];
+  }[];
   vehicles: readonly VehiclePlacement[];
   barriers?: readonly BarrierPlacement[];
 }
@@ -247,6 +251,7 @@ export function createCityShell(options: CityShellOptions): CityShell {
         if (route.edgeIds.length === 0) return;
         const surface = createRouteVisual(network, route.edgeIds, {
           colorHex: vehicleColorHex(index),
+          startNodeId: route.startNodeId,
         });
         surface.name = `Route-${route.vehicleId}`;
         surface.userData.vehicleId = route.vehicleId;

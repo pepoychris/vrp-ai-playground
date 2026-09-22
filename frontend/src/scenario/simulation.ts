@@ -277,12 +277,16 @@ export function routeForVehicle(plan: RoutePlan, vehicleId: string): VehicleRout
 /** Route surfaces for the current plan: one per vehicle that actually drives. */
 export function routeSurfaces(
   snapshot: ScenarioSnapshot,
-): { vehicleId: string; edgeIds: readonly string[] }[] {
+): { vehicleId: string; startNodeId: string | null; edgeIds: readonly string[] }[] {
   const plan = currentRoutePlan(snapshot);
   if (!plan) return [];
   return plan.vehicles
     .filter((route) => route.edgeSequence.length > 0)
-    .map((route) => ({ vehicleId: route.vehicleId, edgeIds: route.edgeSequence }));
+    .map((route) => ({
+      vehicleId: route.vehicleId,
+      startNodeId: route.nodeSequence[0] ?? null,
+      edgeIds: route.edgeSequence,
+    }));
 }
 
 /**

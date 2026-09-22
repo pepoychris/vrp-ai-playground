@@ -70,6 +70,11 @@ export interface RouteVisualOptions {
   widthMeters?: number;
   heightMeters?: number;
   colorHex?: string;
+  startNodeId?: string | null;
+}
+
+export interface RoutePolylineOptions {
+  startNodeId?: string | null;
 }
 
 function planarLength(a: CityPoint, b: CityPoint): number {
@@ -269,13 +274,14 @@ export function buildRoadMesh(network: RoadNetwork): RoadMeshBuild {
 export function routePolyline(
   network: RoadNetwork,
   edgeIds: readonly string[],
+  options: RoutePolylineOptions = {},
 ): RoutePolyline {
   if (edgeIds.length === 0) {
     return { points: [], nodeIds: [], edgeIds: [] };
   }
   const points: CityPoint[] = [];
   const nodeIds: string[] = [];
-  let cursor: string | null = null;
+  let cursor: string | null = options.startNodeId ?? null;
 
   for (const edgeId of edgeIds) {
     const edge = network.edges.get(edgeId);
@@ -326,7 +332,7 @@ export function createRouteVisual(
   options: RouteVisualOptions = {},
 ): Mesh {
   const presentation = network.dataset.presentation;
-  const polyline = routePolyline(network, edgeIds);
+  const polyline = routePolyline(network, edgeIds, { startNodeId: options.startNodeId });
   const geometry = buildRibbonGeometry(polyline.points, {
     widthMeters: options.widthMeters ?? presentation.routeWidthMeters,
     heightMeters: options.heightMeters ?? presentation.routeSurfaceHeightMeters,
