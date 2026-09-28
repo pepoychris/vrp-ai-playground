@@ -1,29 +1,28 @@
-# Registro de versiones aprobadas
+# Approved version log
 
-Captura: **2026-09-22** (Europe/Madrid). Todas las versiones de esta tabla se han
-leído de la fuente oficial del registro correspondiente, no de memoria ni de
-estimaciones. Los hashes permiten comprobar que el artefacto descargado es el mismo
-que se aprobó en Fase 0.
+Captured on **2026-09-22** (Europe/Madrid). Every version in this table was read from
+the official source of the corresponding registry, not from memory or from estimates.
+The hashes let you check that the downloaded artefact is the one approved in Phase 0.
 
-## Política de pinning
+## Pinning policy
 
-1. **Ninguna dependencia se declara con `latest`, `^`, `~` ni rangos abiertos.** Se
-   fija la versión exacta en `package.json` / `requirements*.txt` y en las etiquetas
-   de imagen de Docker.
-2. Cada versión fijada lleva su fuente oficial y, cuando el registro lo publica, su
-   hash (`integrity` en npm, `sha256` en PyPI, digest en el registro de modelos).
-3. Las **referencias oficiales** (documentación de API) se citan aparte y no se
-   consideran versiones: sirven para no inventar métodos ni parámetros.
-4. Las dependencias transitivas se congelan con lockfile en la Fase 1
-   (`package-lock.json`, `requirements.lock.txt`). Este documento fija las directas.
-5. Actualizar una versión exige: comprobar la fuente oficial, actualizar este
-   documento, actualizar el lockfile en la misma fase y anotar el motivo.
+1. **No dependency is declared with `latest`, `^`, `~` or open ranges.** The exact
+   version is pinned in `package.json` / `requirements*.txt` and in the Docker image
+   tags.
+2. Every pinned version carries its official source and, when the registry publishes
+   it, its hash (`integrity` on npm, `sha256` on PyPI, digest in the model registry).
+3. **Official references** (API documentation) are cited separately and are not treated
+   as versions: they exist so that methods and parameters are not invented.
+4. Transitive dependencies are frozen with a lockfile in Phase 1
+   (`package-lock.json`, `requirements.lock.txt`). This document pins the direct ones.
+5. Updating a version requires: checking the official source, updating this document,
+   updating the lockfile in the same phase and recording the reason.
 
-## Entorno local verificado
+## Verified local environment
 
-Comandos ejecutados en la máquina de desarrollo el 2026-09-22:
+Commands run on the development machine on 2026-09-22:
 
-| Herramienta | Versión observada |
+| Tool | Observed version |
 |---|---|
 | Node.js | 24.21.0 |
 | npm | 12.0.2 |
@@ -31,15 +30,15 @@ Comandos ejecutados en la máquina de desarrollo el 2026-09-22:
 | Docker | 29.8.0 |
 | git | 2.51.2 (windows.1) |
 
-Estas versiones son las del entorno donde se ejecutan las pruebas de la Fase 0. No
-son todavía las de la entrega: las de la entrega son las imágenes Docker fijadas más
-abajo.
+These versions belong to the environment where the Phase 0 tests run. They are not yet
+the delivery versions: the delivery versions are the pinned Docker images further
+below.
 
 ## Frontend
 
-Fuente: registro npm (`https://registry.npmjs.org/<paquete>/<versión>`).
+Source: npm registry (`https://registry.npmjs.org/<package>/<version>`).
 
-| Paquete | Versión fijada | `integrity` (sha512) |
+| Package | Pinned version | `integrity` (sha512) |
 |---|---|---|
 | `react` | 19.3.0 | `sha512-E8LUcbtBWt20bbl2YoHfx4ZDBdxVTfOKtCZn9cDSJ4l6/nuoApcpIBcj47t2wZoVX8g2ZHuMHbiShgCR1T5Sog==` |
 | `react-dom` | 19.3.0 | `sha512-JDk8dgif51OjFoDE70+OT9ICyYr+69HlmihNwp1+Nsfbna3t5sIiCa9ZJktDmQ4/1b/rn26hIAR2uYXDMr5r0Q==` |
@@ -51,20 +50,20 @@ Fuente: registro npm (`https://registry.npmjs.org/<paquete>/<versión>`).
 | `vitest` | 5.0.1 | `sha512-iA95lQbKEkvrtTkdAgnWbXfbipWiiWe/hDl2P5tMi6WFwD76G0NxXAGp/M9EOcYupeGJRr6wppMc7CoA41TQjg==` |
 | `@playwright/test` | 1.63.0 | `sha512-oxMK4vllB9RK5NQ2l1pq1IfOf2AvnEuj/vYGDj0H2nMtmtZpKtCwt/l00GEO6xjGfpBNAvjovvYdCm50dRQkpQ==` |
 
-Notas de riesgo a resolver en la Fase 1, no en la Fase 0:
+Risk notes to resolve in Phase 1, not in Phase 0:
 
-- `typescript` 7.x es la generación nativa del compilador. La Fase 1 debe comprobar
-  que `vite` 8.3.0 + `@vitejs/plugin-react` 6.1.1 + `typescript` 7.0.2 compilan el
-  esqueleto sin errores y, si no lo hace, registrar la desviación con la versión más
-  cercana en este mismo documento.
-- Las versiones de navegador de Playwright no se fijan aquí. La Fase 9 decide si se
-  fija el binario; hoy solo se fija la versión del paquete de test.
+- `typescript` 7.x is the native generation of the compiler. Phase 1 must check that
+  `vite` 8.3.0 + `@vitejs/plugin-react` 6.1.1 + `typescript` 7.0.2 compile the skeleton
+  without errors and, if they do not, record the deviation with the closest version in
+  this same document.
+- The Playwright browser versions are not pinned here. Phase 9 decides whether the
+  binary is pinned; today only the test package version is pinned.
 
 ## Backend
 
-Fuente: PyPI (`https://pypi.org/pypi/<paquete>/<versión>/json`).
+Source: PyPI (`https://pypi.org/pypi/<package>/<version>/json`).
 
-| Paquete | Versión fijada | Artefacto comprobado | sha256 |
+| Package | Pinned version | Checked artefact | sha256 |
 |---|---|---|---|
 | `fastapi` | 0.141.1 | `fastapi-0.141.1-py3-none-any.whl` | `bfb91aa2d334c61cb35ba9a116fc123b3d3df31640b801cf57a7a78ec3f603b3` |
 | `uvicorn` | 0.53.0 | `uvicorn-0.53.0-py3-none-any.whl` | `e8dca71ec86dce5f04e333f0d56cdedf942446e6643b9cea1af0d6d3a02cb03e` |
@@ -73,84 +72,84 @@ Fuente: PyPI (`https://pypi.org/pypi/<paquete>/<versión>/json`).
 | `jsonschema` | 4.26.0 | `jsonschema-4.26.0-py3-none-any.whl` | `d489f15263b8d200f8387e64b4c3a75f06629559fb73deb8fdfb525f2dab50ce` |
 | `httpx` | 0.28.1 | `httpx-0.28.1-py3-none-any.whl` | `d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad` |
 
-`ortools` 9.15.6755 publica ruedas para CPython 3.9 a 3.14 en `win_amd64`, entre
-ellas `cp314`, que es la que necesita el Python local 3.14.7. La instalación se
-verificó en la Fase 0: `ortools` arrastra `numpy`, `pandas`, `protobuf` y `absl-py`, y
-también traen rueda `cp314`. El conjunto resuelto queda fijado en
+`ortools` 9.15.6755 publishes wheels for CPython 3.9 to 3.14 on `win_amd64`, including
+`cp314`, which is the one the local Python 3.14.7 needs. The installation was verified
+in Phase 0: `ortools` pulls in `numpy`, `pandas`, `protobuf` and `absl-py`, and they
+also ship a `cp314` wheel. The resolved set is frozen in
 `spike/fase0/requirements-phase0.lock.txt`.
 
-## Infraestructura (imágenes base)
+## Infrastructure (base images)
 
-| Imagen | Etiqueta fijada | Fuente |
+| Image | Pinned tag | Source |
 |---|---|---|
-| Node (build frontend) | `node:24.21.0-bookworm-slim` | Docker Hub, etiqueta verificada |
-| Python (API) | `python:3.14.7-slim-bookworm` | Docker Hub, etiqueta verificada |
-| Ollama | `ollama/ollama:0.34.2` | Docker Hub, etiqueta verificada; release `v0.34.2` en GitHub (2026-09-15) |
+| Node (frontend build) | `node:24.21.0-bookworm-slim` | Docker Hub, verified tag |
+| Python (API) | `python:3.14.7-slim-bookworm` | Docker Hub, verified tag |
+| Ollama | `ollama/ollama:0.34.2` | Docker Hub, verified tag; release `v0.34.2` on GitHub (2026-09-15) |
 
-Los puertos y volúmenes se deciden en la Fase 1: el MVP exige volumen persistente
-para `/root/.ollama` y para la base de datos, y prohíbe publicar `11434` en la
-entrega final.
+Ports and volumes are decided in Phase 1: the MVP requires a persistent volume for
+`/root/.ollama` and for the database, and forbids publishing `11434` in the final
+delivery.
 
-## Modelo de IA
+## AI model
 
-| Elemento | Valor fijado | Fuente |
+| Item | Pinned value | Source |
 |---|---|---|
-| Referencia | `qwen3:4b` | `https://ollama.com/library/qwen3:4b` |
-| Capa de pesos | `sha256:3e4cb14174460404e7a233e531675303b2fbf7749c02f91864fe311ab6344e4f` (2.497.280.480 bytes) | manifiesto del registro de Ollama |
-| Configuración | `sha256:e18a783aae5525fd2852fc94c985541a77e791e034abc2d3056474d59de336fc` | manifiesto del registro de Ollama |
-| Plantilla | `sha256:2d54db2b9bb29ce7db54fea63a891f5859603813c555b1f88b5e0994652897f9` | manifiesto del registro de Ollama |
-| Licencia | `sha256:d18a5cc71b84bc4af394a31116bd3932b42241de70c77d2b76d69a314ec8aa12` | manifiesto del registro de Ollama |
-| Parámetros | `sha256:cff3f395ef3756ab63e58b0ad1b32bb6f802905cae1472e6a12034e4246fbbdb` | manifiesto del registro de Ollama |
+| Reference | `qwen3:4b` | `https://ollama.com/library/qwen3:4b` |
+| Weights layer | `sha256:3e4cb14174460404e7a233e531675303b2fbf7749c02f91864fe311ab6344e4f` (2,497,280,480 bytes) | Ollama registry manifest |
+| Configuration | `sha256:e18a783aae5525fd2852fc94c985541a77e791e034abc2d3056474d59de336fc` | Ollama registry manifest |
+| Template | `sha256:2d54db2b9bb29ce7db54fea63a891f5859603813c555b1f88b5e0994652897f9` | Ollama registry manifest |
+| Licence | `sha256:d18a5cc71b84bc4af394a31116bd3932b42241de70c77d2b76d69a314ec8aa12` | Ollama registry manifest |
+| Parameters | `sha256:cff3f395ef3756ab63e58b0ad1b32bb6f802905cae1472e6a12034e4246fbbdb` | Ollama registry manifest |
 
-El tamaño de descarga (~2,5 GB) obliga a que la instalación sea un botón con barra
-de progreso y a que el modelo viva en un volumen persistente. La Fase 8 debe
-comprobar que el digest tras `pull` coincide con la capa de pesos de esta tabla; si
-Ollama republica la etiqueta, la diferencia se reporta antes de actualizar.
+The download size (~2.5 GB) forces the installation to be a button with a progress bar
+and the model to live on a persistent volume. Phase 8 must check that the digest after
+`pull` matches the weights layer in this table; if Ollama republishes the tag, the
+difference is reported before updating.
 
-## Configuración de inferencia aprobada
+## Approved inference configuration
 
-Nombres verificados en la documentación oficial de Ollama (`/api/chat` y `/faq`):
+Names verified in the official Ollama documentation (`/api/chat` and `/faq`):
 
-| Ajuste | Valor | Mecanismo |
+| Setting | Value | Mechanism |
 |---|---|---|
-| Modelo | `qwen3:4b` | constante en el backend, nunca enviada por el navegador |
-| Contexto | 8192 tokens | `options.num_ctx` por petición (la FAQ indica 4096 por defecto) |
-| Thinking | desactivado | `think: false` en `/api/chat` |
-| Temperatura de consultas | 0.2 | `options.temperature` |
-| Temperatura de informes | 0 | `options.temperature` |
-| Paralelismo | 1 | `OLLAMA_NUM_PARALLEL=1` |
-| Modelos cargados a la vez | 1 | `OLLAMA_MAX_LOADED_MODELS=1` |
-| Sin nube | activo | `OLLAMA_NO_CLOUD=1` |
+| Model | `qwen3:4b` | constant in the backend, never sent by the browser |
+| Context | 8192 tokens | `options.num_ctx` per request (the FAQ states 4096 by default) |
+| Thinking | disabled | `think: false` in `/api/chat` |
+| Question temperature | 0.2 | `options.temperature` |
+| Report temperature | 0 | `options.temperature` |
+| Parallelism | 1 | `OLLAMA_NUM_PARALLEL=1` |
+| Models loaded at once | 1 | `OLLAMA_MAX_LOADED_MODELS=1` |
+| No cloud | enabled | `OLLAMA_NO_CLOUD=1` |
 
-`OLLAMA_NUM_PARALLEL`, `OLLAMA_MAX_LOADED_MODELS` y `OLLAMA_NO_CLOUD` aparecen en la
-FAQ oficial de Ollama; `OLLAMA_NO_CLOUD=1` es la forma documentada de desactivar las
-funciones de nube. `keep_alive` y `format` (JSON o JSON Schema) pertenecen al cuerpo
-de `/api/chat`. Nada de esto se expone al navegador.
+`OLLAMA_NUM_PARALLEL`, `OLLAMA_MAX_LOADED_MODELS` and `OLLAMA_NO_CLOUD` appear in the
+official Ollama FAQ; `OLLAMA_NO_CLOUD=1` is the documented way to disable the cloud
+features. `keep_alive` and `format` (JSON or JSON Schema) belong to the `/api/chat`
+body. None of this is exposed to the browser.
 
-## Referencias oficiales (sin versión fijada)
+## Official references (no pinned version)
 
-Estas URLs son la única fuente aceptada para no inventar métodos:
+These URLs are the only accepted source so that methods are not invented:
 
-| Uso | Referencia |
+| Use | Reference |
 |---|---|
-| Three.js fundamentos | https://threejs.org/manual/pages/fundamentals.html |
+| Three.js fundamentals | https://threejs.org/manual/pages/fundamentals.html |
 | Three.js GLTFLoader | https://threejs.org/docs/pages/GLTFLoader.html |
 | Three.js Raycaster | https://threejs.org/docs/pages/Raycaster.html |
 | Three.js InstancedMesh | https://threejs.org/docs/pages/InstancedMesh.html |
 | OR-Tools routing | https://developers.google.com/optimization/routing |
 | OR-Tools CVRP | https://developers.google.com/optimization/routing/cvrp |
 | OR-Tools VRPTW | https://developers.google.com/optimization/routing/vrptw |
-| OR-Tools penalizaciones | https://developers.google.com/optimization/routing/penalties |
+| OR-Tools penalties | https://developers.google.com/optimization/routing/penalties |
 | Ollama Docker | https://docs.ollama.com/docker |
 | Ollama chat API | https://docs.ollama.com/api/chat |
 | Ollama pull API | https://docs.ollama.com/api/pull |
 | Ollama tags API | https://docs.ollama.com/api/tags |
-| Ollama FAQ (env vars, contexto) | https://docs.ollama.com/faq |
+| Ollama FAQ (env vars, context) | https://docs.ollama.com/faq |
 | Ollama structured outputs | https://docs.ollama.com/capabilities/structured-outputs |
 | Ollama tool calling | https://docs.ollama.com/capabilities/tool-calling |
 | Ollama thinking | https://docs.ollama.com/capabilities/thinking |
 
-## Cómo se reprodujo esta tabla
+## How this table was reproduced
 
 ```powershell
 # npm
@@ -160,12 +159,12 @@ npm view three version
 # PyPI
 (Invoke-RestMethod "https://pypi.org/pypi/ortools/9.15.6755/json").info.version
 
-# etiquetas de imagen
+# image tags
 curl.exe -s -o NUL -w "%{http_code}" https://hub.docker.com/v2/repositories/node/tags/24.21.0-bookworm-slim
 
-# manifiesto del modelo
+# model manifest
 curl.exe -sDI -H "Accept: application/vnd.docker.distribution.manifest.v2+json" https://registry.ollama.ai/v2/library/qwen3/manifests/4b
 ```
 
-Requiere red. Sin red, este documento se lee como contrato ya aprobado y las pruebas
-de Fase 0 no vuelven a consultar los registros.
+It requires network access. Without network, this document is read as an already
+approved contract and the Phase 0 tests do not query the registries again.

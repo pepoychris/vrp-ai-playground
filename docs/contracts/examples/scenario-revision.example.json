@@ -3,18 +3,17 @@
   "scenarioRevision": 5,
   "previousRevision": 4,
   "status": "READY",
-  "seed": 20260922,
   "graph": {
     "cityId": "robot-city",
     "graphVersion": 1,
     "nodes": [
-      { "nodeId": "N-001", "kind": "DEPOT", "position": { "x": 0, "y": 0, "z": 0 }, "label": "Deposito central" },
+      { "nodeId": "N-001", "kind": "DEPOT", "position": { "x": 0, "y": 0, "z": 0 }, "label": "Central depot" },
       { "nodeId": "N-002", "kind": "JUNCTION", "position": { "x": 240, "y": 0, "z": 0 } },
       { "nodeId": "N-003", "kind": "JUNCTION", "position": { "x": 0, "y": 0, "z": 120 } },
       { "nodeId": "N-004", "kind": "JUNCTION", "position": { "x": 0, "y": 0, "z": 240 } },
       { "nodeId": "N-005", "kind": "JUNCTION", "position": { "x": 240, "y": 0, "z": 240 } },
-      { "nodeId": "N-006", "kind": "DELIVERY", "position": { "x": 360, "y": 0, "z": 240 }, "label": "Muelle norte" },
-      { "nodeId": "N-007", "kind": "DELIVERY", "position": { "x": 360, "y": 0, "z": 0 }, "label": "Muelle sur" }
+      { "nodeId": "N-006", "kind": "DELIVERY", "position": { "x": 360, "y": 0, "z": 240 }, "label": "North dock" },
+      { "nodeId": "N-007", "kind": "DELIVERY", "position": { "x": 360, "y": 0, "z": 0 }, "label": "South dock" }
     ],
     "edges": [
       { "edgeId": "E-N001-N002", "fromNodeId": "N-001", "toNodeId": "N-002", "bidirectional": true, "lengthMeters": 240, "speedLimitKph": 40 },

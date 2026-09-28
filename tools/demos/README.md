@@ -40,11 +40,20 @@ node tools/demos/capture_execution.mjs
 
 # Copilot: activation, a grounded question, the validated answer, the report and its download.
 node tools/demos/capture_copilot.mjs
+
+# Published stills: landing, live city, running clock, road closure, reopen, builder.
+node tools/demos/capture_screenshots.mjs
 ```
 
 `capture_execution.mjs` also captures the city canvas at 2x, which becomes the landing hero.
 `capture_copilot.mjs` saves the downloaded Markdown next to the frames and records the answer
 and its latency in `.frames/copilot.json` for the captions.
+
+`capture_screenshots.mjs` captures the README/product stills. The deck's top bar is sticky,
+so a plain full-page screenshot paints it twice, once over the first card; the script
+neutralises the sticky surfaces for the capture, records the header band height in
+`.frames/screens/manifest.json` and `build_screenshots.py` crops that band away. The stills
+are captured at 2x and downsampled, so the published PNG is crisp without being huge.
 
 Nothing is captured until the real answer arrives; if the model cannot be reached the script
 fails instead of inventing a conversation.
@@ -53,6 +62,7 @@ fails instead of inventing a conversation.
 
 ```powershell
 .\.venv\Scripts\python.exe tools\demos\build_gifs.py
+.\.venv\Scripts\python.exe tools\demos\build_screenshots.py
 ```
 
 This writes:
@@ -62,6 +72,12 @@ This writes:
 | `assets/demos/roboroute-execution.gif` | the deck frames, captioned chapter by chapter |
 | `assets/demos/roboroute-ai-report.gif` | the copilot frames, ending on the opened report |
 | `assets/screenshots/hero-city.png` | the 2x city canvas, trimmed for the landing hero |
+| `assets/screenshots/landing.png` | the landing page, captured as the reader sees it |
+| `assets/screenshots/optimized-fleet.png` | the live city with a published plan |
+| `assets/screenshots/simulation-running.png` | the clock running at x4 |
+| `assets/screenshots/road-closures.png` | the dashboard with a closed road |
+| `assets/screenshots/road-reopened.png` | the same road reopened |
+| `assets/screenshots/scenario-builder.png` | the scenario builder surface |
 
 When the live frames are absent the script still runs: the execution demo falls back to the
 committed state stills, and the AI demo falls back to a storyboard that is labelled

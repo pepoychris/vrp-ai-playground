@@ -1,108 +1,108 @@
-# Prueba técnica de la Fase 0
+# Phase 0 technical spike
 
-Material de verificación, no de producto. Aquí está la implementación mínima que
-demuestra que los contratos de `docs/contracts/` se pueden cumplir con las
-tecnologías del MVP. La Fase 3 y la Fase 5 reimplementan estas piezas dentro del
-backend; este directorio se puede descartar entonces.
+Verification material, not product. This is the minimal implementation that proves the
+contracts in `docs/contracts/` can be satisfied with the MVP technologies. Phase 3 and
+Phase 5 reimplement these pieces inside the backend; this directory can be dropped
+after that.
 
-## Contenido
+## Contents
 
-| Ruta | Qué demuestra |
+| Path | What it proves |
 |---|---|
-| `world/coords.py` | Conversión mundo Three.js ↔ grafo, distancias XZ y tiempo de conducción. |
-| `world/graph.py` | Snap a nodo y arista, bloqueo bidireccional de aristas, Dijkstra y matrices de distancia. |
-| `revision_guard.py` | Descarte de resultados obsoletos por `scenarioRevision`, `tick` y `commandId`. |
-| `vrp_min.py` | VRP mínimo con OR-Tools sobre el grafo del contrato: capacidad, abandono penalizado y estado del solver. |
-| `tools/validate_contracts.py` | Valida esquemas, ejemplos, coherencia del ejemplo dorado y cobertura del contrato REST. |
-| `glb/` | GLB de prueba, spike de navegador y verificación sin navegador con `GLTFLoader` y `Raycaster`. |
-| `tests/` | 41 pruebas (`unittest`) de coordenadas, grafo, descarte de resultados y contrato. |
+| `world/coords.py` | Three.js world ↔ graph conversion, XZ distances and drive time. |
+| `world/graph.py` | Node and edge snap, bidirectional edge blocking, Dijkstra and distance matrices. |
+| `revision_guard.py` | Discarding stale results by `scenarioRevision`, `tick` and `commandId`. |
+| `vrp_min.py` | Minimal OR-Tools VRP over the contract graph: capacity, penalised abandonment and solver status. |
+| `tools/validate_contracts.py` | Validates schemas, examples, golden-example coherence and REST contract coverage. |
+| `glb/` | Fixture GLB, browser spike and headless verification with `GLTFLoader` and `Raycaster`. |
+| `tests/` | 41 `unittest` tests for coordinates, graph, discarding stale results and the contract. |
 
-## Dependencias
+## Dependencies
 
 ```bash
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r spike/fase0/requirements-phase0.txt
 ```
 
-Versiones fijadas y hashes: `docs/contracts/versions.md`. El conjunto resuelto
-quedó congelado en `requirements-phase0.lock.txt`.
+Pinned versions and hashes: `docs/contracts/versions.md`. The resolved set was frozen in
+`requirements-phase0.lock.txt`.
 
-Para el spike de GLB:
+For the GLB spike:
 
 ```bash
 cd spike/fase0/glb
 npm install
 ```
 
-Instala solo `three` 0.186.0 (versión fijada, sin rangos).
+It installs only `three` 0.186.0 (pinned version, no ranges).
 
-## Comandos de verificación
+## Verification commands
 
-Desde la raíz del repositorio:
+From the repository root:
 
 ```bash
-# 1. pruebas de las reglas mundo/grafo y de descarte de resultados
+# 1. tests for the world/graph rules and for discarding stale results
 .\.venv\Scripts\python.exe -m unittest discover -s spike/fase0/tests -t .
 
-# 2. valida esquemas, ejemplos, composición y cobertura REST
+# 2. validates schemas, examples, composition and REST coverage
 .\.venv\Scripts\python.exe spike/fase0/tools/validate_contracts.py
 
-# 3. VRP mínimo con OR-Tools
+# 3. minimal VRP with OR-Tools
 .\.venv\Scripts\python.exe spike/fase0/vrp_min.py
 
-# 4. GLB: carga y selección sin navegador
+# 4. GLB: load and selection without a browser
 cd spike/fase0/glb
 npm run verify
 ```
 
-Regenerar el GLB de prueba (determinista, sin dependencias):
+Regenerate the fixture GLB (deterministic, no dependencies):
 
 ```bash
 python spike/fase0/glb/tools/make_fixture_glb.py
 ```
 
-Verificación manual en navegador (opcional):
+Manual browser verification (optional):
 
 ```bash
 cd spike/fase0/glb
 npm run serve      # python -m http.server 4173 --directory .
-# abrir http://localhost:4173/web/ y hacer clic en el cubo
+# open http://localhost:4173/web/ and click the cube
 ```
 
-La página publica `window.__spikeStatus` con `glbLoaded`, `meshCount`, `vertexCount`,
-`selected` y `objectName` para poder comprobarlo desde la consola.
+The page exposes `window.__spikeStatus` with `glbLoaded`, `meshCount`, `vertexCount`,
+`selected` and `objectName` so it can be checked from the console.
 
-## Resultados medidos (2026-09-22)
+## Measured results (2026-09-22)
 
-- `unittest`: 41 pruebas, todas correctas.
-- `validate_contracts.py`: 191 comprobaciones, sin fallos (`RESULTADO: OK`).
-- `vrp_min.py`: `ROUTING_SUCCESS` → `FEASIBLE`, O-003 (40 kg) abandonado por
-  capacidad, 1200 m de recorrido con regreso al depósito. El resumen marca
+- `unittest`: 41 tests, all passing.
+- `validate_contracts.py`: 190 checks, no failures (`RESULT: OK`).
+- `vrp_min.py`: `ROUTING_SUCCESS` → `FEASIBLE`, O-003 (40 kg) abandoned because of
+  capacity, 1200 m of travel returning to the depot. The summary reports
   `objectiveIsProvenOptimal: false`.
-- `npm run verify`: GLB válido, 24 vértices y 36 índices, caja 2×2×2 en el origen y
-  `Raycaster` seleccionando `SpikeCube`.
+- `npm run verify`: valid GLB, 24 vertices and 36 indices, a 2×2×2 box at the origin and
+  `Raycaster` selecting `SpikeCube`.
 
-## Supuestos y desviaciones
+## Assumptions and deviations
 
-1. **Ciclo cerrado en el VRP del spike.** `vrp_min.py` modela un CVRP clásico que
-   regresa al depósito, así que su distancia (1200 m) no coincide con la del plan del
-   ejemplo dorado (840 m), que termina en la última parada. La decisión de si el
-   `RoutePlan` incluye el regreso se fija en la Fase 5.
-2. **Escala del objetivo.** El spike usa metros como coste de arco; la escala
-   definitiva del modelo se decide en la Fase 5. Lo que sí queda congelado es que
-   `objectiveCost` no es dinero y no implica optimalidad.
-3. **Sin comprobación automática en navegador.** `playwright` no está instalado en
-   este entorno (requiere descargar binarios de navegador). La verificación headless
-   cubre la carga del GLB y la selección con `Raycaster` usando el mismo `GLTFLoader`
-   de three.js; el spike de navegador queda documentado para comprobación manual, y
-   la Fase 9 decide si se automatiza.
-4. **Sin Docker en esta fase.** Las imágenes base están fijadas en
-   `docs/contracts/versions.md`, pero no se levanta ningún contenedor: eso es Fase 1.
-5. **`ortools` no expone constantes Python** para `routing.status()` en 9.15.6755; los
-   nombres se leen del descriptor del enum `RoutingSearchStatus.Value`, sin escribir
-   identificadores a mano.
+1. **Closed cycle in the spike VRP.** `vrp_min.py` models a classic CVRP that returns to
+   the depot, so its distance (1200 m) does not match the golden plan example (840 m),
+   which ends at the last stop. Whether the `RoutePlan` includes the return trip is
+   decided in Phase 5.
+2. **Objective scale.** The spike uses meters as the arc cost; the final scale of the
+   model is decided in Phase 5. What is already frozen is that `objectiveCost` is not
+   money and does not imply optimality.
+3. **No automated browser check.** `playwright` is not installed in this environment
+   (it needs browser binaries to be downloaded). The headless verification covers the
+   GLB load and the `Raycaster` selection using the same three.js `GLTFLoader`; the
+   browser spike stays documented for manual checking, and Phase 9 decides whether it
+   is automated.
+4. **No Docker in this phase.** The base images are pinned in
+   `docs/contracts/versions.md`, but no container is started: that is Phase 1.
+5. **`ortools` exposes no Python constants** for `routing.status()` in 9.15.6755; the
+   names are read from the `RoutingSearchStatus.Value` enum descriptor, without writing
+   identifiers by hand.
 
-## Fuera de alcance
+## Out of scope
 
-Pantallas finales, simulación, backend productivo, Docker Compose, Ollama real,
-autenticación, mapas externos y datos de producción. Nada de eso se ha tocado.
+Final screens, simulation, production backend, Docker Compose, real Ollama,
+authentication, external maps and production data. None of that has been touched.

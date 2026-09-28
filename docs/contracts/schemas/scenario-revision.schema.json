@@ -2,14 +2,13 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://roboroute.local/contracts/scenario-revision.schema.json",
   "title": "ScenarioRevision",
-  "description": "Snapshot atomico y autoritativo de un escenario. Cada mutacion publica uno nuevo con scenarioRevision incrementado. El frontend descarta cualquier snapshot de revision menor.",
+  "description": "Atomic and authoritative snapshot of a scenario. Every mutation publishes a new one with an incremented scenarioRevision. The frontend discards any snapshot with a lower revision.",
   "type": "object",
   "required": [
     "scenarioId",
     "scenarioRevision",
     "previousRevision",
     "status",
-    "seed",
     "graph",
     "vehicles",
     "orders",
@@ -42,11 +41,6 @@
     "status": {
       "$ref": "common.schema.json#/$defs/scenarioStatus"
     },
-    "seed": {
-      "type": "integer",
-      "minimum": 0,
-      "description": "Semilla del generador reproducible del escenario."
-    },
     "graph": {
       "type": "object",
       "required": ["cityId", "graphVersion", "nodes", "edges"],
@@ -71,7 +65,7 @@
           }
         }
       },
-      "description": "Grafo inmutable dentro del escenario: nodos y aristas no cambian entre revisiones. Lo unico que cambia es blockedEdgeIds."
+        "description": "Immutable graph inside the scenario: nodes and edges do not change between revisions. The only thing that changes is blockedEdgeIds."
     },
     "vehicles": {
       "type": "array",
@@ -99,7 +93,7 @@
       "items": {
         "$ref": "common.schema.json#/$defs/edgeId"
       },
-      "description": "Fuente de verdad del bloqueo. Deriva exactamente de las barreras activas: {b.blockedEdgeId}."
+        "description": "Source of truth for blocking. It derives exactly from the active barriers: {b.blockedEdgeId}."
     },
     "routePlan": {
       "oneOf": [
@@ -110,7 +104,7 @@
           "type": "null"
         }
       ],
-      "description": "Ultimo plan valido. null mientras no se haya calculado una mision."
+        "description": "Latest valid plan. null until a mission has been computed."
     },
     "kpis": {
       "oneOf": [
@@ -141,7 +135,7 @@
         "elapsedSeconds": {
           "type": "number",
           "minimum": 0,
-          "description": "Reloj de simulacion en segundos. No crea revisiones nuevas."
+        "description": "Simulation clock in seconds. It does not create new revisions."
         }
       }
     },
@@ -154,7 +148,7 @@
           "type": "null"
         }
       ],
-      "description": "Comando que produjo esta revision. null en la revision inicial del escenario."
+        "description": "Command that produced this revision. null on the initial scenario revision."
     },
     "emittedAt": {
       "$ref": "common.schema.json#/$defs/timestamp"

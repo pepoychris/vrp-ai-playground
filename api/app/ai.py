@@ -595,7 +595,6 @@ def build_snapshot_context(snapshot: Mapping[str, Any]) -> dict[str, Any]:
     context: dict[str, Any] = {
         "scenarioRevision": snapshot["scenarioRevision"],
         "status": snapshot["status"],
-        "seed": snapshot["seed"],
         "vehicleCount": len(snapshot["vehicles"]),
         "orderCount": len(snapshot["orders"]),
         "vehicles": [
@@ -721,22 +720,22 @@ def grounded_references(candidates: list[str], context: Mapping[str, Any]) -> li
 
 
 SYSTEM_PROMPT: Final = (
-    "Eres el copiloto de RoboRoute Nexus, una torre de control de reparto de ultima milla "
-    "en una ciudad robotica ficticia.\n"
-    "Respondes SIEMPRE en espanol y SOLO con los datos del JSON de escenario que se te "
-    "entrega.\n"
-    "Reglas obligatorias:\n"
-    "- No inventes cifras, identificadores ni causas. Si un dato no aparece en el JSON, "
-    "di que no consta.\n"
-    "- Cita en \"references\" las rutas de campo exactas del JSON que sustentan tu "
-    "respuesta (por ejemplo kpis.economicCostCents).\n"
-    "- No expliques tu razonamiento interno ni muestres tus pasos intermedios.\n"
-    "- Solo puedes proponer acciones de estos tipos: SET_VEHICLE_UNAVAILABLE "
-    "(payload: {vehicleId}), DELAY_VEHICLE (payload: {vehicleId, delaySeconds}) o "
+    "You are the RoboRoute Nexus copilot, a last-mile delivery control tower in a "
+    "fictional robot city.\n"
+    "You ALWAYS answer in English and ONLY with the data from the scenario JSON you "
+    "are given.\n"
+    "Mandatory rules:\n"
+    "- Never invent figures, identifiers or causes. If a value is not in the JSON, "
+    "say that it is not on record.\n"
+    "- In \"references\", cite the exact JSON field paths that support your "
+    "answer (for example kpis.economicCostCents).\n"
+    "- Do not explain your internal reasoning and do not show intermediate steps.\n"
+    "- You may only propose actions of these types: SET_VEHICLE_UNAVAILABLE "
+    "(payload: {vehicleId}), DELAY_VEHICLE (payload: {vehicleId, delaySeconds}) or "
     "REQUEST_REOPTIMIZATION (payload: {reason}).\n"
-    "- Una propuesta es solo una sugerencia: nunca afirmes que ya se ha aplicado, porque "
-    "requiere confirmacion humana.\n"
-    "- Si no hay ninguna accion util que proponer, omite el campo \"proposal\"."
+    "- A proposal is only a suggestion: never claim it has already been applied, because "
+    "it requires human confirmation.\n"
+    "- If there is no useful action to propose, omit the \"proposal\" field."
 )
 
 CHAT_FORMAT_SCHEMA: Final = {
@@ -771,7 +770,7 @@ REPORT_FORMAT_SCHEMA: Final = {
 
 def scenario_context_message(context: Mapping[str, Any]) -> str:
     return (
-        "Escenario validado por el backend. Es la unica fuente de datos permitida:\n"
+        "Scenario validated by the backend. It is the only permitted data source:\n"
         + json.dumps(context, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     )
 
@@ -869,7 +868,6 @@ def build_report_skeleton(snapshot: Mapping[str, Any]) -> dict[str, Any]:
         "scenarioRevision": snapshot["scenarioRevision"],
         "generatedAt": utc_now(),
         "status": snapshot["status"],
-        "seed": snapshot["seed"],
         "planAvailable": kpis is not None,
         "metrics": {
             "vehicleCount": len(snapshot["vehicles"]),
@@ -915,70 +913,70 @@ def report_markdown(report: Mapping[str, Any]) -> str:
     narrative = report.get("narrative") or {}
     revision = report["scenarioRevision"]
     lines: list[str] = [
-        f"# Informe de turno - revision {revision}",
+        f"# Shift report - revision {revision}",
         "",
-        f"Generado: {report['generatedAt']} · Estado: {report['status']} · Semilla: {report['seed']}",
+        f"Generated: {report['generatedAt']} | Status: {report['status']}",
         "",
     ]
 
-    lines.append("## Resumen")
+    lines.append("## Summary")
     lines.append("")
-    lines.append(str(narrative.get("summary", "Sin resumen.")))
+    lines.append(str(narrative.get("summary", "No summary.")))
     lines.append("")
 
-    lines.append("## Metricas del plan")
+    lines.append("## Plan metrics")
     lines.append("")
     if report.get("planAvailable"):
         lines.extend(
             [
-                "| Metrica | Valor |",
+                "| Metric | Value |",
                 "| --- | --- |",
-                f"| Distancia planificada | {metrics['distanceTotalMeters']} m |",
-                f"| Duracion planificada | {metrics['plannedDurationSeconds']} s |",
-                f"| Coste economico | {metrics['economicCostCents']} centimos |",
-                f"| Vehiculos activos | {metrics['activeVehicles']} |",
-                f"| Pedidos pendientes | {metrics['ordersPending']} |",
-                f"| Pedidos retrasados | {metrics['ordersDelayed']} |",
-                f"| Pedidos sin asignar | {metrics['ordersUnassigned']} |",
+                f"| Planned distance | {metrics['distanceTotalMeters']} m |",
+                f"| Planned duration | {metrics['plannedDurationSeconds']} s |",
+                f"| Economic cost | {metrics['economicCostCents']} cents |",
+                f"| Active vehicles | {metrics['activeVehicles']} |",
+                f"| Orders pending | {metrics['ordersPending']} |",
+                f"| Orders delayed | {metrics['ordersDelayed']} |",
+                f"| Orders unassigned | {metrics['ordersUnassigned']} |",
             ]
         )
     else:
-        lines.append("No hay plan calculado en esta revision.")
+        lines.append("No plan has been computed at this revision.")
     lines.extend(
         [
             "",
-            f"Flota desplegada: {metrics['vehicleCount']} · Pedidos: {metrics['orderCount']} · "
-            f"Cierres activos: {metrics['activeClosures']}",
+            f"Fleet deployed: {metrics['vehicleCount']} | Orders: {metrics['orderCount']} | "
+            f"Active closures: {metrics['activeClosures']}",
             "",
         ]
     )
 
     comparison = report.get("comparison")
-    lines.append("## Comparacion A/B de la ultima intervencion")
+    lines.append("## A/B comparison of the last intervention")
     lines.append("")
     if comparison:
         delta = comparison["delta"]
         lines.extend(
             [
-                f"Intervencion: {comparison['kind']} frente a la revision {comparison['comparedToRevision']}",
+                f"Intervention: {comparison['kind']} against revision {comparison['comparedToRevision']}",
                 "",
-                "| Metrica | Delta |",
+                "| Metric | Delta |",
                 "| --- | --- |",
-                f"| Distancia | {delta['distanceTotalMeters']} m |",
-                f"| Duracion | {delta['plannedDurationSeconds']} s |",
-                f"| Coste economico | {delta['economicCostCents']} centimos |",
-                f"| Pedidos retrasados | {delta['ordersDelayed']} |",
-                f"| Pedidos sin asignar | {delta['ordersUnassigned']} |",
+                f"| Distance | {delta['distanceTotalMeters']} m |",
+                f"| Duration | {delta['plannedDurationSeconds']} s |",
+                f"| Economic cost | {delta['economicCostCents']} cents |",
+                f"| Orders delayed | {delta['ordersDelayed']} |",
+                f"| Orders unassigned | {delta['ordersUnassigned']} |",
             ]
         )
     else:
-        lines.append("No hay una intervencion previa con la que comparar.")
+        lines.append("There is no earlier intervention to compare against.")
     lines.append("")
 
     for key, title in (
-        ("highlights", "Puntos clave"),
-        ("risks", "Riesgos"),
-        ("recommendations", "Recomendaciones"),
+        ("highlights", "Highlights"),
+        ("risks", "Risks"),
+        ("recommendations", "Recommendations"),
     ):
         entries = list(narrative.get(key) or [])
         lines.append(f"## {title}")
@@ -986,25 +984,25 @@ def report_markdown(report: Mapping[str, Any]) -> str:
         if entries:
             lines.extend(f"- {entry}" for entry in entries)
         else:
-            lines.append("Sin entradas.")
+            lines.append("No entries.")
         lines.append("")
 
     unassigned = list(report.get("unassignedOrders") or [])
     closures = list(report.get("closures") or [])
     if unassigned or closures:
-        lines.append("## Incidencias")
+        lines.append("## Incidents")
         lines.append("")
         lines.extend(
-            f"- {item['orderId']} sin asignar: {item['reason']}" for item in unassigned
+            f"- {item['orderId']} unassigned: {item['reason']}" for item in unassigned
         )
         lines.extend(
-            f"- Cierre {item['barrierId']} sobre {item['blockedEdgeId']}" for item in closures
+            f"- Closure {item['barrierId']} on {item['blockedEdgeId']}" for item in closures
         )
         lines.append("")
 
     lines.append("---")
     lines.append("")
-    lines.append(f"Informe generado por {SERVICE_NAME} con el modelo local {MODEL_NAME}.")
+    lines.append(f"Report generated by {SERVICE_NAME} with the local model {MODEL_NAME}.")
     return "\n".join(lines)
 
 
@@ -1277,8 +1275,8 @@ class AiCopilot:
             {
                 "role": "user",
                 "content": (
-                    "Redacta el informe de turno en espanol con los campos summary, "
-                    "highlights, risks y recommendations. Usa solo las cifras del JSON."
+                    "Write the shift report in English with the fields summary, "
+                    "highlights, risks and recommendations. Use only the figures in the JSON."
                 ),
             },
         ]

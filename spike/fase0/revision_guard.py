@@ -1,8 +1,8 @@
-"""Implementacion de referencia de las reglas de descarte de resultados obsoletos.
+"""Reference implementation of the stale-result discard rules.
 
-Especificacion: `docs/contracts/rest-sse.md`, seccion 4. El frontend de la Fase 6
-reimplementara estas reglas en TypeScript; aqui sirven como referencia ejecutable y
-como prueba de que la regla se puede aplicar con el contrato congelado.
+Specification: `docs/contracts/rest-sse.md`, section 4. The Phase 6 frontend reimplements
+these rules in TypeScript; here they serve as an executable reference and as proof that
+the rule can be applied with the frozen contract.
 """
 
 from __future__ import annotations
@@ -13,7 +13,7 @@ from typing import Mapping
 
 @dataclass
 class RevisionGuard:
-    """Lleva la ultima revision y el ultimo tick aplicados."""
+    """Track the last applied revision and the last applied tick."""
 
     max_applied_revision: int = -1
     max_applied_tick: int = -1
@@ -23,11 +23,11 @@ class RevisionGuard:
     applied: int = field(default=0)
 
     def begin_command(self, command_id: str) -> None:
-        """Marca el comando en vuelo; solo su respuesta se aceptara como directa."""
+        """Mark the in-flight command; only its response is accepted as direct."""
         self.pending_command_id = command_id
 
     def accept_command_response(self, response: Mapping[str, object]) -> bool:
-        """Acepta la respuesta solo si pertenece al comando pendiente."""
+        """Accept the response only when it belongs to the pending command."""
         command_id = response.get("commandId")
         if self.pending_command_id is not None and command_id != self.pending_command_id:
             self.discarded += 1
@@ -39,7 +39,7 @@ class RevisionGuard:
         return True
 
     def accept_snapshot(self, scenario_revision: int) -> bool:
-        """Acepta un snapshot solo si no es mas antiguo que lo ya aplicado."""
+        """Accept a snapshot only when it is not older than what was already applied."""
         if scenario_revision < self.max_applied_revision:
             self.discarded += 1
             return False
@@ -47,7 +47,7 @@ class RevisionGuard:
         return True
 
     def accept_telemetry(self, scenario_revision: int, tick: int) -> bool:
-        """Descarta telemetria de una revision vieja o con tick repetido."""
+        """Discard telemetry from an old revision or with a repeated tick."""
         if scenario_revision < self.max_applied_revision:
             self.discarded += 1
             return False
@@ -55,7 +55,7 @@ class RevisionGuard:
             self.discarded += 1
             return False
         if scenario_revision > self.max_applied_revision:
-            # La telemetria no crea revisiones: informa de una revision ya aplicada.
+            # Telemetry does not create revisions: it reports an already applied revision.
             self.discarded += 1
             return False
         self.max_applied_tick = tick
@@ -63,7 +63,7 @@ class RevisionGuard:
         return True
 
     def accept_event(self, event: Mapping[str, object]) -> bool:
-        """Aplica la regla que corresponde al tipo de evento SSE."""
+        """Apply the rule that matches the SSE event type."""
         event_type = event.get("type")
         if event_type == "scenario.resync":
             self.resync_required = True
@@ -79,12 +79,12 @@ class RevisionGuard:
                 self.discarded += 1
                 return False
             return self.accept_telemetry(revision, tick)
-        # Avisos sin estado (optimizador, errores, IA) no cambian la revision aplicada.
+        # Stateless notices (optimizer, errors, AI) do not change the applied revision.
         self.applied += 1
         return True
 
     def complete_resync(self, scenario_revision: int) -> None:
-        """Cierra un resync con el snapshot obtenido por GET."""
+        """Close a resync with the snapshot obtained through GET."""
         self.resync_required = False
         self.max_applied_tick = -1
         self._apply_revision(scenario_revision)

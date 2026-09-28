@@ -25,8 +25,8 @@ Two production defects reported from the deployed stack are part of this phase:
 
 ## Guided demo (3–5 minutes)
 
-Start from a cold stack and keep the seed visible: the demo is repeatable because every
-scenario is a function of that seed.
+Start from a cold stack: every execution is generated fresh by the backend, so the demo
+shows a new fleet and a new set of orders every time it is run.
 
 ```powershell
 docker compose up --build
@@ -37,12 +37,12 @@ Then open <http://localhost:8080>.
 | Time | Action | What the audience should see |
 |---|---|---|
 | 0:00–0:20 | Cold start | API `Online`; simulation `Stopped`; AI service `Available` or `Unavailable`; model `Not installed`; core `Not loaded`. Nothing has been downloaded, generated or deployed. |
-| 0:20–0:50 | Colony controls: 2 vehicles, 6 orders, seed `20260922` → **Deploy Fleet**, **Generate Orders** | The city view draws the road graph, the depot, the blocks and two robots. The revision counter advances once per command. |
+| 0:20–0:50 | Colony controls: 2 vehicles, 6 orders → **Deploy Fleet**, **Generate Orders** | The city view draws the road graph, the depot, the blocks and two robots. The revision counter advances once per command. |
 | 0:50–1:30 | **Optimize Routes** | Routes appear, the KPI cards fill in (economic cost, planned distance, unassigned orders), and the renderer badge next to *City view* shows this machine's draw calls and triangles. Hover the badge for the full reading. |
 | 1:30–2:10 | **Start Simulation**, switch speed, **Pause Simulation**, then right-drag one robot onto another road node | The clock advances while running; the frame-rate part of the badge appears only while animating. The claw drop publishes a new revision and the plan recomputes once. |
 | 2:10–2:50 | **Arm closure tool**, left-drag across a road, then **Reopen road** | The preview turns green on a valid edge and red when no road is close enough. The closure blocks both directions, the affected vehicles and orders are listed, and the KPI delta is visible in the same revision. |
 | 2:50–3:40 | AI copilot: **Install Qwen Core** (first run only), **Activate AI core**, ask a question, decide the proposal, **Build shift report** → **Download report (Markdown)** | The progress bar advances *while* the download runs and reports Ollama's own status text. After completion the panel shows `Model Installed`, the activation button becomes enabled, and the answer states the revision it is grounded on plus the measured latency. |
-| 3:40–4:30 | **Reset Colony**, then deploy the same seed again | The same scenario comes back: same vehicles, same orders, same plan. The copilot proposals of the discarded scenario are no longer confirmable. |
+| 3:40–4:30 | **Reset Colony**, then deploy 2 vehicles and 6 orders again | A brand-new execution: different vehicles, different orders and its own plan, because the server drew a fresh generation seed. The copilot proposals of the discarded execution are no longer confirmable. |
 
 If the model is already in the volume, skip the download in the 2:50 step: the panel
 reports `Installed` as soon as the page loads, and **Activate AI core** is enabled without

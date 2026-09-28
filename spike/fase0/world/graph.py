@@ -1,14 +1,14 @@
-"""Grafo vial local: snap, bloqueo de aristas y caminos minimos.
+"""Local road graph: snap, edge blocking and shortest paths.
 
-Especificacion: `docs/contracts/world-graph-rules.md`.
+Specification: `docs/contracts/world-graph-rules.md`.
 
-Reglas que este modulo hace cumplir:
+Rules this module enforces:
 
-- `blockedEdgeIds` es la unica fuente de verdad del bloqueo y se aplica en ambos
-  sentidos;
-- el snap es determinista: gana la distancia minima y, en empate, el identificador
-  lexicograficamente menor;
-- un par de nodos sin camino devuelve `None`, nunca coste cero.
+- `blockedEdgeIds` is the single source of truth for blocking and applies in both
+  directions;
+- the snap is deterministic: the minimum distance wins and, on a tie, the
+  lexicographically smaller identifier;
+- a pair of nodes with no path returns `None`, never zero cost.
 """
 
 from __future__ import annotations
@@ -61,7 +61,7 @@ class PathResult:
 
 
 class RoadGraph:
-    """Grafo inmutable con bloqueo dinamico de aristas."""
+    """Immutable graph with dynamic edge blocking."""
 
     def __init__(self, nodes: Mapping[str, RoadNode], edges: Mapping[str, RoadEdge]) -> None:
         self._nodes = dict(nodes)
@@ -115,7 +115,7 @@ class RoadGraph:
     def depot_node_id(self) -> str:
         depots = [node_id for node_id, node in self._nodes.items() if node.kind == "DEPOT"]
         if len(depots) != 1:
-            raise ValueError(f"se esperaba exactamente un DEPOT, hay {len(depots)}")
+            raise ValueError(f"expected exactly one DEPOT, found {len(depots)}")
         return depots[0]
 
     def delivery_node_ids(self) -> tuple[str, ...]:

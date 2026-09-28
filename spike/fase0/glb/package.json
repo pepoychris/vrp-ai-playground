@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "description": "Prueba tecnica de Fase 0: cargar un GLB y seleccionarlo con Raycaster. No forma parte del producto.",
+  "description": "Phase 0 technical spike: load a GLB and select it with Raycaster. It is not part of the product.",
   "scripts": {
     "verify": "node verify_glb_node.mjs",
     "serve": "python -m http.server 4173 --directory ."

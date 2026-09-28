@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://roboroute.local/contracts/envelopes.schema.json",
-  "title": "Envelopes de comando, respuesta, error y respuestas de IA",
-  "description": "Envelopes congelados en la Fase 0. Toda mutacion lleva commandId y scenarioRevision; toda mutacion devuelve el snapshot atomico completo de la nueva revision.",
+  "title": "Command, response, error and AI response envelopes",
+  "description": "Envelopes frozen in Phase 0. Every mutation carries commandId and scenarioRevision; every mutation returns the complete atomic snapshot of the new revision.",
   "$defs": {
     "commandEnvelope": {
       "type": "object",
       "title": "Envelope de comando",
-      "description": "Campos comunes de todo comando que muta estado. Cada endpoint anade los suyos.",
+          "description": "Fields common to every state-mutating command. Each endpoint adds its own.",
       "required": ["commandId", "scenarioRevision"],
       "additionalProperties": true,
       "properties": {
@@ -42,17 +42,17 @@
         },
         "rebased": {
           "type": "boolean",
-          "description": "true cuando la revision base del cliente no era la vigente y el servidor aplico el comando sobre una mas reciente."
+          "description": "true when the client's base revision was not the current one and the server applied the command on a newer one."
         },
         "replayed": {
           "type": "boolean",
-          "description": "true cuando se devuelve el resultado guardado de un commandId ya procesado, sin volver a mutar."
+          "description": "true when the stored result of an already processed commandId is returned without mutating again."
         }
       }
     },
     "positionSnapResult": {
       "type": "object",
-      "title": "Resultado del snap de garra",
+      "title": "Claw snap result",
       "required": [
         "requestedWorldPoint",
         "snappedNodeId",
@@ -92,7 +92,7 @@
     },
     "barrierPlacementResult": {
       "type": "object",
-      "title": "Resultado de colocar una barrera",
+      "title": "Barrier placement result",
       "required": [
         "barrierId",
         "blockedEdgeId",
@@ -132,7 +132,7 @@
     },
     "successResponse": {
       "type": "object",
-      "title": "Respuesta de mutacion",
+      "title": "Mutation response",
       "required": [
         "scenarioId",
         "scenarioRevision",
@@ -169,7 +169,7 @@
           "$ref": "scenario-revision.schema.json"
         },
         "result": {
-          "description": "Objeto especifico del endpoint. Las formas conocidas son positionSnap y barrierPlacement.",
+        "description": "Endpoint-specific object. The known shapes are positionSnap and barrierPlacement.",
           "oneOf": [
             {
               "$ref": "#/$defs/positionSnapResult"
@@ -213,7 +213,7 @@
         "AI_OUTPUT_INVALID",
         "INTERNAL_ERROR"
       ],
-      "description": "Catalogo cerrado de codigos de error del contrato v1."
+      "description": "Closed catalogue of contract v1 error codes."
     },
     "errorResponse": {
       "type": "object",
@@ -235,7 +235,7 @@
             },
             "details": {
               "type": "object",
-              "description": "Contexto adicional del error, especifico de cada codigo."
+      "description": "Extra error context, specific to each code."
             },
             "scenarioRevision": {
               "oneOf": [
@@ -266,7 +266,7 @@
     },
     "installJob": {
       "type": "object",
-      "title": "Trabajo de instalacion del modelo",
+      "title": "Model installation job",
       "required": ["jobId", "state", "modelName", "startedAt"],
       "additionalProperties": false,
       "properties": {
@@ -281,7 +281,7 @@
         "modelName": {
           "type": "string",
           "const": "qwen3:4b",
-          "description": "Fijado por el backend. El navegador no puede cambiarlo."
+          "description": "Fixed by the backend. The browser cannot change it."
         },
         "startedAt": {
           "$ref": "common.schema.json#/$defs/timestamp"
@@ -300,7 +300,7 @@
     },
     "aiStatus": {
       "type": "object",
-      "title": "Estado del nucleo de IA",
+      "title": "AI core status",
       "required": [
         "serviceAvailable",
         "modelInstalled",
@@ -311,7 +311,7 @@
       "properties": {
         "serviceAvailable": {
           "type": "boolean",
-          "description": "Ollama responde a traves de la red interna del stack."
+      "description": "Ollama answers over the stack's internal network."
         },
         "modelInstalled": {
           "type": "boolean",
@@ -319,7 +319,7 @@
         },
         "modelLoaded": {
           "type": "boolean",
-          "description": "qwen3:4b esta cargado en memoria tras POST /api/ai/activate."
+          "description": "qwen3:4b is loaded in memory after POST /api/ai/activate."
         },
         "modelName": {
           "type": "string",
@@ -344,11 +344,11 @@
         "DELAY_VEHICLE",
         "REQUEST_REOPTIMIZATION"
       ],
-      "description": "Propuestas que el modelo puede sugerir. Ninguna se aplica sin confirmacion humana."
+      "description": "Proposals the model may suggest. None is applied without human confirmation."
     },
     "aiProposal": {
       "type": "object",
-      "title": "Propuesta de accion sugerida por la IA",
+      "title": "Action proposal suggested by the AI",
       "required": ["proposalId", "kind", "summary", "payload", "status"],
       "additionalProperties": false,
       "properties": {
@@ -384,7 +384,7 @@
     },
     "aiChatResponse": {
       "type": "object",
-      "title": "Respuesta de chat",
+      "title": "Chat response",
       "required": [
         "answer",
         "usedRevision",
@@ -397,7 +397,7 @@
         "answer": {
           "type": "string",
           "minLength": 1,
-          "description": "Respuesta en espanol basada exclusivamente en el snapshot validado."
+          "description": "Answer in English based exclusively on the validated snapshot."
         },
         "usedRevision": {
           "$ref": "common.schema.json#/$defs/scenarioRevisionNumber"
@@ -406,7 +406,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "description": "Ruta de campo del snapshot, p. ej. kpis.economicCostCents."
+          "description": "Snapshot field path, e.g. kpis.economicCostCents."
           }
         },
         "proposal": {
@@ -430,7 +430,7 @@
     },
     "aiReportResponse": {
       "type": "object",
-      "title": "Informe de turno",
+      "title": "Shift report",
       "required": [
         "scenarioRevision",
         "generatedAt",
@@ -452,7 +452,7 @@
         },
         "report": {
           "type": "object",
-          "description": "Informe estructurado validado contra JSON Schema antes de responder."
+      "description": "Structured report validated against the JSON Schema before answering."
         },
         "schemaVersion": {
           "type": "string",

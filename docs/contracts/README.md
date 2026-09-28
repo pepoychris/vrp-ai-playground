@@ -1,121 +1,120 @@
-# Contratos de RoboRoute Nexus
+# RoboRoute Nexus contracts
 
-Este directorio congela lo mínimo necesario para empezar a construir sin renegociar
-nombres, unidades ni revisiones a mitad de fase. Es la referencia normativa del
-contrato congelado en la Fase 0, y sigue siendo la fuente de verdad mientras el
-producto evoluciona.
+This directory freezes the minimum needed to start building without renegotiating
+names, units or revisions halfway through a phase. It is the normative reference for the
+contract frozen in Phase 0, and it remains the source of truth while the product
+evolves.
 
-## Contenido
+## Contents
 
-| Archivo | Contenido |
+| File | Contents |
 |---|---|
-| `versions.md` | Registro de versiones aprobadas, fuentes oficiales y política de pinning. |
-| `world-graph-rules.md` | Reglas de coordenadas mundo/grafo, identificadores estables y bloqueo de aristas. |
-| `rest-sse.md` | Contrato REST/SSE normativo: endpoints, envelopes de comando/revisión/error y estados. |
-| `endpoints.json` | Lista congelada legible por máquina de los endpoints (es la fuente de verdad que usan los tests de cobertura). |
-| `schemas/*.schema.json` | JSON Schema 2020-12 de cada entidad, envelope y evento. |
-| `examples/*.json` | Un ejemplo válido por esquema o por variante de envelope/evento. |
+| `versions.md` | Log of approved versions, official sources and pinning policy. |
+| `world-graph-rules.md` | World/graph coordinate rules, stable identifiers and edge blocking. |
+| `rest-sse.md` | Normative REST/SSE contract: endpoints, command/revision/error envelopes and states. |
+| `endpoints.json` | Frozen machine-readable list of the endpoints (the source of truth used by the coverage tests). |
+| `schemas/*.schema.json` | JSON Schema 2020-12 for each entity, envelope and event. |
+| `examples/*.json` | One valid example per schema or per envelope/event variant. |
 
-## Estado del contrato
+## Contract status
 
-- Versión: **contrato v1**, congelado el **2026-09-22**.
-- Cambios posteriores en nombres de campo, unidades o semántica de revisión requieren
-  subir `contractVersion` en `endpoints.json`, actualizar el esquema y el ejemplo
-  correspondiente, y anotar la decisión. Un cambio de contrato nunca se hace de
-  forma implícita dentro de una fase de implementación.
-- Los esquemas no describen pantallas, estilos ni estado de React: describen datos.
+- Version: **contract v1**, frozen on **2026-09-22**.
+- Later changes to field names, units or revision semantics require bumping
+  `contractVersion` in `endpoints.json`, updating the corresponding schema and example,
+  and recording the decision. A contract change is never made implicitly inside an
+  implementation phase.
+- The schemas do not describe screens, styles or React state: they describe data.
 
-## Cómo se validan
+## How they are validated
 
 ```bash
 python spike/fase0/tools/validate_contracts.py
 ```
 
-El validador:
+The validator:
 
-1. carga todos los esquemas y comprueba que son JSON Schema 2020-12 válidos;
-2. resuelve las referencias cruzadas entre esquemas por `$id`;
-3. resuelve la clave de composición `$exampleRef` (véase abajo);
-4. valida cada ejemplo contra el esquema declarado en su tabla de mapeo;
-5. comprueba que la lista congelada de `endpoints.json` no tiene duplicados y que
-   cada endpoint declarado aparece en `rest-sse.md`.
+1. loads every schema and checks that they are valid JSON Schema 2020-12;
+2. resolves the cross-schema references by `$id`;
+3. resolves the `$exampleRef` composition key (see below);
+4. validates every example against the schema declared in its mapping table;
+5. checks that the frozen list in `endpoints.json` has no duplicates and that every
+   declared endpoint appears in `rest-sse.md`.
 
-Sin `jsonschema` instalado, el validador solo comprueba JSON válido y refs internas.
-La instalación de la dependencia se documenta en `spike/fase0/README.md`.
+Without `jsonschema` installed, the validator only checks valid JSON and internal refs.
+Installing the dependency is documented in `spike/fase0/README.md`.
 
-## Convención de composición de ejemplos (`$exampleRef`)
+## Example composition convention (`$exampleRef`)
 
-Algunos envelopes y eventos incrustan un `ScenarioRevision` completo. Para no
-duplicar ese objeto en varios ficheros, un ejemplo puede escribir:
+Some envelopes and events embed a complete `ScenarioRevision`. To avoid duplicating
+that object across several files, an example may write:
 
 ```json
 { "$exampleRef": "scenario-revision.example.json" }
 ```
 
-El validador sustituye ese objeto por el contenido del ejemplo referenciado
-(recursivamente, con detección de ciclos) antes de validar. La salida validada es
-siempre el objeto ya materializado, de modo que la composición no relaja la
-validación. Esta clave es una convención de la Fase 0, no forma parte del contrato
-REST: nunca se envía por HTTP.
+The validator replaces that object with the contents of the referenced example
+(recursively, with cycle detection) before validating. The validated output is always
+the already materialised object, so the composition does not relax validation. This key
+is a Phase 0 convention and is not part of the REST contract: it is never sent over
+HTTP.
 
-## Unidades y precisión (resumen)
+## Units and precision (summary)
 
-La regla completa está en `world-graph-rules.md`; el resumen operativo es:
+The complete rule is in `world-graph-rules.md`; the operational summary is:
 
-| Magnitud | Unidad y tipo | Ejemplo de campo |
+| Quantity | Unit and type | Example field |
 |---|---|---|
-| Distancia | metros, número | `distanceMeters` |
-| Tiempo | segundos, entero | `driveSeconds` |
-| Dinero | céntimos de euro, entero | `economicCostCents` |
-| Peso | kilogramos, número | `weightKilograms` |
-| Volumen | metros cúbicos, número | `volumeCubicMeters` |
-| Velocidad | km/h, número | `speedLimitKph` |
-| Proporción | porcentaje 0–100, número | `loadUtilizationPercent` |
-| Objetivo del solver | unidades enteras sin unidad física, entero | `objectiveCost` |
+| Distance | meters, number | `distanceMeters` |
+| Time | seconds, integer | `driveSeconds` |
+| Money | euro cents, integer | `economicCostCents` |
+| Weight | kilograms, number | `weightKilograms` |
+| Volume | cubic meters, number | `volumeCubicMeters` |
+| Speed | km/h, number | `speedLimitKph` |
+| Ratio | percentage 0–100, number | `loadUtilizationPercent` |
+| Solver objective | unitless integer units, integer | `objectiveCost` |
 
-`objectiveCost` **nunca** se presenta como euros: refleja la escala interna del
-optimizador. El coste económico se calcula aparte y es el único que se muestra al
-usuario.
+`objectiveCost` is **never** presented as euros: it reflects the internal scale of the
+optimizer. The economic cost is computed separately and is the only one shown to the
+user.
 
-## Coste económico determinista
+## Deterministic economic cost
 
-El contrato separa dos magnitudes que no se mezclan:
+The contract separates two quantities that are never mixed:
 
-- **objetivo del solver**: suma de costes de arco y penalizaciones en unidades
-  internas enteras (`objectiveCost`). No es dinero y no se muestra como euros.
-- **coste económico**: solo depende de la solución ya calculada y se expresa en
-  céntimos enteros (`economicCostCents`).
+- **solver objective**: the sum of arc costs and penalties in internal integer units
+  (`objectiveCost`). It is not money and is never shown as euros.
+- **economic cost**: it depends only on the already computed solution and is expressed
+  in whole euro cents (`economicCostCents`).
 
 ```text
 economicCostCents =
-    costes fijos de vehículos activos
-  + distancia × coste/km de cada vehículo
-  + tiempo de conducción × coste/minuto de cada vehículo
-  + retraso × penalización/minuto
-  + pedidos no asignados × penalización por pedido
+    fixed costs of active vehicles
+  + distance × cost/km of each vehicle
+  + driving time × cost/minute of each vehicle
+  + delay × penalty/minute
+  + unassigned orders × penalty per order
 ```
 
-Reglas de cálculo:
+Computation rules:
 
-1. Cada sumando se redondea a céntimos enteros antes de sumar; el total es la suma de
-   los sumandos redondeados, no el redondeo de la suma.
-2. "Vehículo activo" es el que tiene al menos una parada en el plan vigente. Un
-   vehículo desplegado sin paradas no suma coste fijo.
-3. Valores de referencia usados por el ejemplo dorado y por el validador de la
-   Fase 0: `DELAY_PENALTY_CENTS_PER_MINUTE = 25` y
-   `UNASSIGNED_ORDER_PENALTY_CENTS = 1500`. La Fase 5 puede ajustarlos, pero
-   cualquier cambio obliga a actualizar el ejemplo dorado y el validador en el mismo
-   cambio.
+1. Every addend is rounded to whole cents before adding; the total is the sum of the
+   rounded addends, not the rounding of the sum.
+2. An "active vehicle" is one with at least one stop in the current plan. A deployed
+   vehicle with no stops adds no fixed cost.
+3. Reference values used by the golden example and by the Phase 0 validator:
+   `DELAY_PENALTY_CENTS_PER_MINUTE = 25` and
+   `UNASSIGNED_ORDER_PENALTY_CENTS = 1500`. Phase 5 may adjust them, but any change
+   forces the golden example and the validator to be updated in the same change.
 
-## Implementación de referencia
+## Reference implementation
 
-`spike/fase0/` contiene la implementación mínima que cumple estos contratos y las
-pruebas que la respaldan: conversión mundo/grafo, snap, bloqueo de aristas, caminos
-mínimos, descarte de resultados obsoletos, VRP mínimo con OR-Tools y carga de un GLB.
-No es producto: la Fase 3 y la Fase 5 lo reimplementan dentro del backend.
+`spike/fase0/` contains the minimal implementation that satisfies these contracts and
+the tests that back it: world/graph conversion, snap, edge blocking, shortest paths,
+discarding stale results, a minimal VRP with OR-Tools and a GLB load. It is not the
+product: Phase 3 and Phase 5 reimplement it inside the backend.
 
-## Fuera del alcance de estos contratos
+## Out of scope for these contracts
 
-Autenticación, multiusuario, mapas externos, latitud/longitud, generación de datos,
-persistencia concreta en SQLite, elección de librería de estado en React y modelos
-GLB finales. La Fase 0 no implementa pantallas ni backend productivo.
+Authentication, multi-user, external maps, latitude/longitude, data generation,
+concrete SQLite persistence, choice of React state library and final GLB models.
+Phase 0 implements no screens and no production backend.

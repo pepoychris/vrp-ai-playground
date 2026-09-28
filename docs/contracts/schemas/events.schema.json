@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://roboroute.local/contracts/events.schema.json",
   "title": "Eventos SSE",
-  "description": "Payloads de los dos flujos SSE. El campo type discrimina la variante. Los eventos de simulacion van atados a una revision y llevan su propio tick; no crean revisiones.",
+  "description": "Payloads of the two SSE streams. The type field discriminates the variant. Simulation events are bound to a revision and carry their own tick; they do not create revisions.",
   "oneOf": [
     {
       "$ref": "#/$defs/scenarioSnapshotEvent"
@@ -44,7 +44,7 @@
         "eventId": {
           "type": "string",
           "pattern": "^[0-9]+:[0-9]+$",
-          "description": "Identificador del evento, con formato {scenarioRevision}:{eventSeq}. Es el valor que el navegador reenvia en Last-Event-ID."
+        "description": "Event identifier, formatted {scenarioRevision}:{eventSeq}. It is the value the browser sends back in Last-Event-ID."
         },
         "eventSeq": {
           "type": "integer",
@@ -387,7 +387,7 @@
               "type": "null"
             }
           ],
-          "description": "null: la instalacion del modelo no depende de una revision del escenario."
+      "description": "null: model installation does not depend on a scenario revision."
         },
         "emittedAt": {
           "$ref": "common.schema.json#/$defs/timestamp"
@@ -424,11 +424,11 @@
                   "type": "null"
                 }
               ],
-              "description": "null mientras el backend no pueda calcular el progreso."
+      "description": "null while the backend cannot compute the progress."
             },
             "statusText": {
               "type": "string",
-              "description": "Estado traducido del stream de Ollama; el contrato no fija claves internas de Ollama."
+      "description": "State translated from the Ollama stream; the contract does not fix Ollama's internal keys."
             },
             "error": {
               "oneOf": [

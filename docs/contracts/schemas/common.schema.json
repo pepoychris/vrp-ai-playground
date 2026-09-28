@@ -1,17 +1,17 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://roboroute.local/contracts/common.schema.json",
-  "title": "Tipos comunes del contrato RoboRoute Nexus",
-  "description": "Definiciones compartidas por el resto de esquemas. Unidades explicitas: metros, segundos, kilogramos, metros cubicos, km/h, porcentaje y centimos de euro. El objetivo del solver se expresa aparte, en unidades sin unidad fisica.",
+  "title": "Shared types of the RoboRoute Nexus contract",
+  "description": "Definitions shared by the remaining schemas. Explicit units: meters, seconds, kilograms, cubic meters, km/h, percentage and euro cents. The solver objective is expressed separately, in the model's own unitless scale.",
   "$defs": {
     "meters": {
       "type": "number",
-      "description": "Distancia o longitud en metros (m)."
+        "description": "Distance or length in meters (m)."
     },
     "nonNegativeMeters": {
       "type": "number",
       "minimum": 0,
-      "description": "Distancia o longitud en metros (m), no negativa."
+        "description": "Distance or length in meters (m), non-negative."
     },
     "positiveMeters": {
       "type": "number",
@@ -21,7 +21,7 @@
     "seconds": {
       "type": "integer",
       "minimum": 0,
-      "description": "Duracion en segundos (s) desde el inicio del escenario (t0)."
+        "description": "Duration in seconds (s) since the start of the scenario (t0)."
     },
     "milliseconds": {
       "type": "integer",
@@ -30,7 +30,7 @@
     },
     "euroCents": {
       "type": "integer",
-      "description": "Importe en centimos de euro (EUR). Entero: el dinero nunca se representa con decimales binarios."
+        "description": "Amount in euro cents (EUR). Integer: money is never represented with binary decimals."
     },
     "kilograms": {
       "type": "number",
@@ -40,12 +40,12 @@
     "cubicMeters": {
       "type": "number",
       "minimum": 0,
-      "description": "Volumen en metros cubicos (m3)."
+      "description": "Volume in cubic metres (m3)."
     },
     "kilometersPerHour": {
       "type": "number",
       "exclusiveMinimum": 0,
-      "description": "Velocidad en kilometros por hora (km/h)."
+        "description": "Speed in kilometers per hour (km/h)."
     },
     "percent": {
       "type": "number",
@@ -55,11 +55,11 @@
     },
     "objectiveUnits": {
       "type": "integer",
-      "description": "Coste interno del optimizador en unidades enteras propias del modelo. NO es dinero y no se muestra como euros."
+        "description": "Internal optimizer cost in the model's own integer units. It is NOT money and is never shown as euros."
     },
     "point3d": {
       "type": "object",
-      "description": "Punto en el mundo local de Three.js (plano XZ, Y hacia arriba), en metros. Nunca latitud/longitud.",
+      "description": "Point in the local Three.js world (XZ plane, Y up), in meters. Never latitude/longitude.",
       "required": ["x", "y", "z"],
       "additionalProperties": false,
       "properties": {
@@ -69,7 +69,7 @@
         },
         "y": {
           "type": "number",
-          "description": "Cota en metros. Vale 0 en toda la ciudad del MVP."
+        "description": "Elevation in meters. It is 0 across the whole city."
         },
         "z": {
           "type": "number",
@@ -80,82 +80,82 @@
     "scenarioId": {
       "type": "string",
       "format": "uuid",
-      "description": "Identificador del escenario (UUID v4)."
+        "description": "Scenario identifier (UUID v4)."
     },
     "commandId": {
       "type": "string",
       "format": "uuid",
-      "description": "Identificador del comando (UUID v4). Repetirlo no vuelve a mutar el estado."
+        "description": "Command identifier (UUID v4). Repeating it does not mutate the state again."
     },
     "nodeId": {
       "type": "string",
       "pattern": "^N-[0-9]{3}$",
-      "description": "Identificador estable de nodo vial, p. ej. N-001."
+        "description": "Stable road node identifier, e.g. N-001."
     },
     "edgeId": {
       "type": "string",
       "pattern": "^E-N[0-9]{3}-N[0-9]{3}$",
-      "description": "Identificador estable de arista con par canonico: primero el nodeId menor. Nunca E-N002-N001 si N-001 < N-002."
+        "description": "Stable edge identifier with a canonical pair: the lower nodeId comes first. Never E-N002-N001 when N-001 < N-002."
     },
     "vehicleId": {
       "type": "string",
       "pattern": "^R-0[1-6]$",
-      "description": "Identificador de vehiculo robot, R-01 a R-06."
+      "description": "Robot vehicle identifier, R-01 to R-06."
     },
     "orderId": {
       "type": "string",
       "pattern": "^O-[0-9]{3}$",
-      "description": "Identificador de pedido, p. ej. O-001."
+        "description": "Order identifier, e.g. O-001."
     },
     "barrierId": {
       "type": "string",
       "pattern": "^B-[0-9]{1,3}$",
-      "description": "Identificador de barrera. El MVP admite 3 barreras activas simultaneas."
+      "description": "Barrier identifier. The MVP allows 2 simultaneous active barriers."
     },
     "timestamp": {
       "type": "string",
       "format": "date-time",
-      "description": "Fecha y hora ISO-8601 en UTC con sufijo Z."
+        "description": "ISO-8601 date and time in UTC with a Z suffix."
     },
     "scenarioRevisionNumber": {
       "type": "integer",
       "minimum": 0,
-      "description": "Numero de revision del escenario. Monotono creciente; se incrementa solo con cambios de estructura, plan o KPIs."
+        "description": "Scenario revision number. Monotonically increasing; it only grows with structural, plan or KPI changes."
     },
     "tick": {
       "type": "integer",
       "minimum": 0,
-      "description": "Contador de la simulacion dentro de la revision vigente. No crea revisiones nuevas."
+      "description": "Simulation counter inside the current revision. It does not create new revisions."
     },
     "cityId": {
       "type": "string",
       "pattern": "^[a-z0-9-]{3,32}$",
-      "description": "Identificador de la ciudad ficticia, p. ej. robot-city."
+        "description": "Fictional city identifier, e.g. robot-city."
     },
     "graphVersion": {
       "type": "integer",
       "minimum": 1,
-      "description": "Version del dataset de grafo. Dentro de un escenario el grafo es inmutable."
+        "description": "Graph dataset version. Inside a scenario the graph is immutable."
     },
     "vehicleStatus": {
       "type": "string",
       "enum": ["AVAILABLE", "EN_ROUTE", "DELAYED", "BLOCKED", "FINISHED"],
-      "description": "Estado operativo del vehiculo: disponible, en ruta, retrasado, bloqueado o finalizado."
+        "description": "Operational vehicle state: available, en route, delayed, blocked or finished."
     },
     "orderStatus": {
       "type": "string",
       "enum": ["PENDING", "ASSIGNED", "DELIVERED", "DELAYED", "UNASSIGNED"],
-      "description": "Estado operativo del pedido."
+        "description": "Operational order state."
     },
     "priority": {
       "type": "string",
       "enum": ["LOW", "NORMAL", "URGENT"],
-      "description": "Prioridad del pedido. URGENT tiene penalizacion por abandono estrictamente mayor que NORMAL y LOW."
+        "description": "Order priority. URGENT has a strictly higher abandonment penalty than NORMAL and LOW."
     },
     "scenarioStatus": {
       "type": "string",
       "enum": ["IDLE", "READY", "OPTIMIZING", "RUNNING", "PAUSED"],
-      "description": "Estado global del escenario."
+        "description": "Global scenario state."
     },
     "solverOutcome": {
       "type": "string",
@@ -166,12 +166,12 @@
         "INFEASIBLE",
         "NO_SOLUTION"
       ],
-      "description": "Resultado devuelto por el optimizador, traducido desde el estado de OR-Tools. La UI muestra 'mejores rutas encontradas'; OPTIMAL describe el estado del solver, no una promesa de optimalidad al usuario."
+        "description": "Outcome returned by the optimizer, translated from the OR-Tools state. The UI shows 'best routes found'; OPTIMAL describes the solver state, not a promise of optimality to the user."
     },
     "unassignedReason": {
       "type": "string",
       "enum": ["NO_CAPACITY", "TIME_WINDOW", "UNREACHABLE", "DROPPED_BY_PENALTY"],
-      "description": "Motivo por el que un pedido queda sin asignar."
+        "description": "Reason why an order is left unassigned."
     },
     "interventionKind": {
       "type": "string",
@@ -189,12 +189,12 @@
         "PROPOSAL_REJECTED",
         "RESET"
       ],
-      "description": "Tipo de intervencion que produjo la revision actual."
+        "description": "Intervention type that produced the current revision."
     },
     "snapRejectionCode": {
       "type": "string",
       "enum": ["SNAP_OUT_OF_RADIUS", "SNAP_NO_VALID_EDGE"],
-      "description": "Motivo de rechazo de un snap de garra o de barrera."
+      "description": "Rejection reason for a claw or barrier snap."
     }
   }
 }

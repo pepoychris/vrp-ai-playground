@@ -1,4 +1,4 @@
-"""Ida y vuelta mundo/grafo y geometria XZ (reglas de world-graph-rules.md)."""
+"""World/graph round trips and XZ geometry (rules of world-graph-rules.md)."""
 
 from __future__ import annotations
 
@@ -99,7 +99,7 @@ class SegmentProjectionTests(unittest.TestCase):
 
 class TravelTimeTests(unittest.TestCase):
     def test_travel_seconds_matches_the_golden_example(self) -> None:
-        # 840 m a 36 km/h son 84 s; es el driveSeconds del ejemplo dorado.
+        # 840 m at 36 km/h is 84 s; it is the driveSeconds of the golden example.
         self.assertAlmostEqual(travel_seconds(840.0, 36.0), 84.0, places=6)
 
     def test_travel_seconds_rejects_zero_speed(self) -> None:

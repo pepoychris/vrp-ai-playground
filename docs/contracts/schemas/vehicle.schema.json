@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://roboroute.local/contracts/vehicle.schema.json",
   "title": "Vehicle",
-  "description": "Vehiculo robot de la flota. Maximo 6 por escenario.",
+  "description": "Robot vehicle of the fleet. At most 6 per scenario.",
   "type": "object",
   "required": [
     "vehicleId",
@@ -27,12 +27,12 @@
     "capacityKilograms": {
       "type": "number",
       "exclusiveMinimum": 0,
-      "description": "Capacidad de carga en kilogramos (kg). Siempre mayor que cero."
+        "description": "Load capacity in kilograms (kg). Always greater than zero."
     },
     "capacityCubicMeters": {
       "type": "number",
       "exclusiveMinimum": 0,
-      "description": "Capacidad de volumen en metros cubicos (m3)."
+      "description": "Volume capacity in cubic metres (m3)."
     },
     "loadKilograms": {
       "$ref": "common.schema.json#/$defs/kilograms"
@@ -64,7 +64,7 @@
           "type": "null"
         }
       ],
-      "description": "Nodo actual del vehiculo en el grafo. null solo mientras el vehiculo no se ha colocado."
+        "description": "Current vehicle node in the graph. null only while the vehicle has not been placed."
     },
     "status": {
       "$ref": "common.schema.json#/$defs/vehicleStatus"
@@ -74,7 +74,7 @@
       "items": {
         "$ref": "common.schema.json#/$defs/orderId"
       },
-      "description": "Pedidos asignados en el ultimo plan valido."
+        "description": "Orders assigned in the latest valid plan."
     }
   }
 }

@@ -1,4 +1,4 @@
-"""Reglas de descarte de resultados obsoletos (rest-sse.md, seccion 4)."""
+"""Rules for discarding stale results (rest-sse.md, section 4)."""
 
 from __future__ import annotations
 

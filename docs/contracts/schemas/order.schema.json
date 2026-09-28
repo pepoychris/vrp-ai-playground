@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://roboroute.local/contracts/order.schema.json",
   "title": "Order",
-  "description": "Pedido de ultima milla. Se coloca siempre en un nodo con kind DELIVERY alcanzable desde el deposito.",
+  "description": "Last-mile order. It is always placed on a node with kind DELIVERY reachable from the depot.",
   "type": "object",
   "required": [
     "orderId",
@@ -27,12 +27,12 @@
     "weightKilograms": {
       "type": "number",
       "exclusiveMinimum": 0,
-      "description": "Peso del pedido en kilogramos (kg)."
+        "description": "Order weight in kilograms (kg)."
     },
     "volumeCubicMeters": {
       "type": "number",
       "exclusiveMinimum": 0,
-      "description": "Volumen del pedido en metros cubicos (m3)."
+        "description": "Order volume in cubic meters (m3)."
     },
     "priority": {
       "$ref": "common.schema.json#/$defs/priority"
@@ -49,12 +49,12 @@
           "$ref": "common.schema.json#/$defs/seconds"
         }
       },
-      "description": "Ventana horaria en segundos desde t0. Debe cumplirse startSeconds < endSeconds."
+        "description": "Time window in seconds since t0. startSeconds < endSeconds must hold."
     },
     "serviceSeconds": {
       "type": "integer",
       "minimum": 1,
-      "description": "Tiempo de servicio en el punto de entrega, en segundos."
+        "description": "Service time at the delivery point, in seconds."
     },
     "status": {
       "$ref": "common.schema.json#/$defs/orderStatus"
@@ -79,7 +79,7 @@
           "type": "null"
         }
       ],
-      "description": "Posicion dentro de la ruta del vehiculo asignado, empezando en 0."
+        "description": "Position inside the route of the assigned vehicle, starting at 0."
     }
   }
 }

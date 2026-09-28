@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://roboroute.local/contracts/road-edge.schema.json",
   "title": "RoadEdge",
-  "description": "Tramo de carretera entre dos nodos. No tiene campo blocked: la lista blockedEdgeIds de ScenarioRevision es la unica fuente de verdad del bloqueo.",
+  "description": "Road segment between two nodes. It has no blocked field: the blockedEdgeIds list of ScenarioRevision is the single source of truth for blocking.",
   "type": "object",
   "required": [
     "edgeId",
@@ -25,7 +25,7 @@
     },
     "bidirectional": {
       "type": "boolean",
-      "description": "true en todas las aristas del MVP: bloquear la arista bloquea ambos sentidos."
+        "description": "true on every edge: blocking the edge blocks both directions."
     },
     "lengthMeters": {
       "$ref": "common.schema.json#/$defs/positiveMeters"
@@ -39,7 +39,7 @@
       "items": {
         "$ref": "common.schema.json#/$defs/point3d"
       },
-      "description": "Solo presentacion: suaviza la carretera visible. No se usa para calcular distancias ni rutas."
+        "description": "Presentation only: it smooths the visible road. It is not used to compute distances or routes."
     }
   }
 }

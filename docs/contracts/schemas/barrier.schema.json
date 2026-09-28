@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://roboroute.local/contracts/barrier.schema.json",
   "title": "Barrier",
-  "description": "Barrera robotica colocada sobre una arista real del grafo. Maximo 3 activas por escenario.",
+  "description": "Robotic barrier placed on a real graph edge. At most 2 active per scenario.",
   "type": "object",
   "required": ["barrierId", "blockedEdgeId", "position", "placedAtRevision"],
   "additionalProperties": false,

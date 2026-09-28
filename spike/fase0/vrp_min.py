@@ -1,17 +1,17 @@
-"""Prueba tecnica: VRP minimo con OR-Tools sobre el grafo del contrato.
+"""Technical spike: minimal VRP with OR-Tools over the contract graph.
 
-Objetivo de la Fase 0: comprobar que OR-Tools devuelve una solucion para un escenario
-pequeno, que respeta la capacidad y que deja fuera un pedido imposible en lugar de
-bloquearse. No calcula el VRP de produccion (eso es la Fase 5) y **no afirma
-optimalidad**: informa del estado que devuelve el solver.
+Phase 0 goal: check that OR-Tools returns a solution for a small scenario, that it
+respects capacity and that it leaves an impossible order out instead of stalling. It
+does not compute the production VRP (that is Phase 5) and it **does not claim
+optimality**: it reports the state the solver returns.
 
-Diferencias conscientes con el plan del contrato, a decidir en la Fase 5:
+Deliberate differences from the contract plan, to be decided in Phase 5:
 
-- este spike modela un CVRP clasico, que cierra el ciclo en el deposito; el
-  `RoutePlan` del contrato termina en la ultima parada y no incluye el regreso;
-- la escala del objetivo aqui son metros; la escala definitiva se fija en la Fase 5.
+- this spike models a classic CVRP, which closes the cycle at the depot; the contract
+  `RoutePlan` ends at the last stop and does not include the return trip;
+- the objective scale here is meters; the final scale is fixed in Phase 5.
 
-Ejecucion:
+Run it with:
     python spike/fase0/vrp_min.py
 
 Requiere `ortools` (ver spike/fase0/README.md).
@@ -34,13 +34,13 @@ GOLDEN_SCENARIO = (
 )
 TIME_LIMIT_SECONDS = 2
 DEPOT_NODE_ID = "N-001"
-# Escala interna del modelo: el objetivo se declara en unidades propias, nunca euros.
+# Internal model scale: the objective is declared in its own units, never euros.
 METERS_PER_UNIT = 1
 DROP_PENALTY_UNITS = 100_000
 URGENT_MULTIPLIER = 3
 
-# Pedidos de la prueba: el tercero pesa mas que la capacidad del unico vehiculo, asi
-# que el solver debe abandonarlo con penalizacion.
+# Spike orders: the third one is heavier than the capacity of the only vehicle, so the
+# solver has to abandon it with a penalty.
 ORDERS = [
     {"order_id": "O-001", "node_id": "N-006", "demand_kg": 12, "priority": "URGENT", "service_s": 120},
     {"order_id": "O-002", "node_id": "N-007", "demand_kg": 10, "priority": "NORMAL", "service_s": 90},
@@ -56,11 +56,11 @@ def load_scenario() -> dict:
 
 
 def routing_status_names(routing_enums_pb2: object) -> dict[int, str]:
-    """Nombres de estado leidos del descriptor de la propia libreria.
+    """Status names read from the library's own descriptor.
 
-    OR-Tools 9.15.6755 no expone constantes Python para el estado de busqueda, pero su
-    descriptor si publica el enum `RoutingSearchStatus.Value`, asi que los nombres se
-    leen de ahi en lugar de escribirlos a mano.
+    OR-Tools 9.15.6755 exposes no Python constants for the search status, but its
+    descriptor does publish the `RoutingSearchStatus.Value` enum, so the names are read
+    from there instead of being written by hand.
     """
     message = getattr(routing_enums_pb2, "RoutingSearchStatus", None)
     if message is None:
@@ -91,7 +91,7 @@ def solve() -> dict:
 
     scenario = load_scenario()
     graph = RoadGraph.from_scenario(scenario)
-    # Escenario sin barreras: la prueba aisla el solver del estado de bloqueo.
+    # Scenario with no barriers: the spike isolates the solver from the blocking state.
     blocked: frozenset[str] = frozenset()
 
     stops = [DEPOT_NODE_ID] + [order["node_id"] for order in ORDERS]
@@ -105,7 +105,7 @@ def solve() -> dict:
         to_node = manager.IndexToNode(to_index)
         distance = matrix[(stops[from_node], stops[to_node])]
         if distance is None:
-            # Inalcanzable no es coste cero: se penaliza tan fuerte que el solver lo evita.
+            # Unreachable is not zero cost: it is penalised hard enough that the solver avoids it.
             return 10_000_000
         return int(round(distance / METERS_PER_UNIT))
 
@@ -152,7 +152,7 @@ def solve() -> dict:
     if solution is None:
         summary["route"] = None
         summary["droppedOrders"] = [order["order_id"] for order in ORDERS]
-        summary["note"] = "sin solucion dentro del limite; se reporta el estado del solver"
+        summary["note"] = "no solution within the limit; the solver status is reported"
         return summary
 
     route: list[str] = []
@@ -185,8 +185,8 @@ def solve() -> dict:
             "driveSeconds": total_distance / (VEHICLE_SPEED_KPH / 3.6),
             "objectiveCost": total_cost,
             "note": (
-                "objetivo en unidades internas del modelo; no es dinero y no implica "
-                "garantia de optimalidad"
+                "objective in the model's internal units; it is not money and it does not "
+                "imply a guarantee of optimality"
             ),
         }
     )
@@ -196,10 +196,10 @@ def solve() -> dict:
 def main() -> int:
     try:
         summary = solve()
-    except ImportError as exc:  # pragma: no cover - depende del entorno
-        print(f"BLOQUEO: falta la dependencia ortools ({exc})", file=sys.stderr)
+    except ImportError as exc:  # pragma: no cover - depends on the environment
+        print(f"BLOCKED: the ortools dependency is missing ({exc})", file=sys.stderr)
         print(
-            "Instala con: pip install -r spike/fase0/requirements-phase0.txt",
+            "Install it with: pip install -r spike/fase0/requirements-phase0.txt",
             file=sys.stderr,
         )
         return 3
@@ -208,31 +208,31 @@ def main() -> int:
 
     failures: list[str] = []
     if summary["route"] is None:
-        failures.append("el solver no devolvio ninguna solucion")
+        failures.append("the solver returned no solution")
     else:
         if summary["loadKilograms"] > VEHICLE_CAPACITY_KG:
             failures.append(
-                f"carga {summary['loadKilograms']} kg supera la capacidad {VEHICLE_CAPACITY_KG} kg"
+                f"load {summary['loadKilograms']} kg exceeds the capacity {VEHICLE_CAPACITY_KG} kg"
             )
         if "O-003" not in summary["droppedOrders"]:
-            failures.append("O-003 (40 kg) deberia quedar sin asignar por capacidad")
-        # Ciclo cerrado en el deposito: N-001 -> N-007 -> N-006 -> N-001 son 1200 m.
+            failures.append("O-003 (40 kg) should be left unassigned because of capacity")
+        # Closed cycle at the depot: N-001 -> N-007 -> N-006 -> N-001 is 1200 m.
         if abs(summary["distanceMeters"] - 1200.0) > 1e-6:
             failures.append(
-                f"distancia esperada 1200 m (ida y vuelta al deposito) para el escenario "
-                f"sin barreras, obtenida {summary['distanceMeters']}"
+                f"expected 1200 m (round trip to the depot) for the scenario with no "
+                f"barriers, got {summary['distanceMeters']}"
             )
         if set(summary["deliveredOrders"]) != {"O-001", "O-002"}:
             failures.append(
-                f"se esperaban O-001 y O-002 entregados, obtenidos {summary['deliveredOrders']}"
+                f"expected O-001 and O-002 delivered, got {summary['deliveredOrders']}"
             )
 
     if failures:
-        print("\nRESULTADO: FALLO", file=sys.stderr)
+        print("\nRESULT: FAIL", file=sys.stderr)
         for failure in failures:
             print(f"  - {failure}", file=sys.stderr)
         return 1
-    print("\nRESULTADO: OK")
+    print("\nRESULT: OK")
     return 0
 
 
