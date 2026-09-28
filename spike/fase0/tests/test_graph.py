@@ -1,4 +1,4 @@
-"""Snap, bloqueo de aristas y caminos minimos sobre el ejemplo dorado del contrato."""
+"""Snap, edge blocking and shortest paths over the contract's golden example."""
 
 from __future__ import annotations
 
@@ -67,7 +67,7 @@ class RoadGraphTests(unittest.TestCase):
         self.assertAlmostEqual(snap.distance_meters, 5.0, places=6)
 
     def test_nearest_edge_excludes_blocked_candidates(self) -> None:
-        # Empate a 60 m entre tres aristas: gana el edgeId lexicograficamente menor.
+        # A 60 m tie between three edges: the lexicographically smaller edgeId wins.
         snap = self.graph.nearest_edge(
             GraphPoint(x=300.0, z=0.0), max_radius=100.0, excluded_edge_ids=self.blocked
         )
@@ -76,7 +76,7 @@ class RoadGraphTests(unittest.TestCase):
         self.assertNotIn(snap.identifier, self.blocked)
         self.assertEqual(snap.identifier, "E-N001-N002")
 
-        # Sin empate: el candidato mas cercano no bloqueado es el que gana.
+        # No tie: the nearest unblocked candidate wins.
         closest = self.graph.nearest_edge(
             GraphPoint(x=310.0, z=0.0), max_radius=100.0, excluded_edge_ids=self.blocked
         )

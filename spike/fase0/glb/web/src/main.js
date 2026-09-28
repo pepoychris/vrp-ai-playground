@@ -1,5 +1,5 @@
-// Prueba tecnica de Fase 0: cargar el GLB, seleccionarlo con Raycaster y publicar el
-// resultado en window.__spikeStatus para poder comprobarlo desde el navegador.
+// Phase 0 technical spike: load the GLB, select it with Raycaster and publish the
+// result on window.__spikeStatus so it can be checked from the browser.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -58,10 +58,10 @@ canvas.addEventListener('pointerdown', (event) => {
   if (hit) {
     spikeStatus.objectName = hit.object.name;
     updateStatus(
-      `Seleccionado: ${hit.object.name}\nDistancia al rayo: ${hit.distance.toFixed(2)}\nGLB cargado correctamente.`,
+      `Selected: ${hit.object.name}\nRay distance: ${hit.distance.toFixed(2)}\nGLB loaded successfully.`,
     );
   } else {
-    updateStatus('Sin objeto bajo el puntero.\nGLB cargado correctamente.');
+    updateStatus('No object under the pointer.\nGLB loaded successfully.');
   }
 });
 
@@ -89,13 +89,13 @@ new GLTFLoader().load(
     spikeStatus.meshCount = meshCount;
     spikeStatus.vertexCount = vertexCount;
     updateStatus(
-      `GLB cargado: ${meshCount} mesh, ${vertexCount} vertices.\nHaz clic sobre el cubo para seleccionarlo.`,
+      `GLB loaded: ${meshCount} mesh, ${vertexCount} vertices.\nClick the cube to select it.`,
     );
     render();
   },
   undefined,
   (error) => {
-    spikeStatus.error = String(error && error.message ? error.message : error);
-    updateStatus(`Error al cargar el GLB: ${spikeStatus.error}`);
+  spikeStatus.error = String(error && error.message ? error.message : error);
+  updateStatus(`Error loading the GLB: ${spikeStatus.error}`);
   },
 );

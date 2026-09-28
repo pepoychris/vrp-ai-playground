@@ -1,10 +1,10 @@
-"""Coordenadas mundo Three.js <-> grafo local.
+"""Three.js world <-> local graph coordinates.
 
-Especificacion: `docs/contracts/world-graph-rules.md`.
+Specification: `docs/contracts/world-graph-rules.md`.
 
-- El mundo es local, plano XZ, Y hacia arriba, en metros.
-- La conversion no intercambia ejes ni escala.
-- Las distancias logicas se miden en XZ.
+- The world is local, flat on XZ, Y up, in meters.
+- The conversion swaps no axes and applies no scale.
+- Logical distances are measured on XZ.
 """
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ SNAP_EDGE_MAX_RADIUS_M = 12.0
 
 @dataclass(frozen=True)
 class GraphPoint:
-    """Punto en coordenadas del grafo: x/z sobre el suelo, y es la cota."""
+    """Graph-space point: x/z on the ground, y is the elevation."""
 
     x: float
     z: float
@@ -32,7 +32,7 @@ class GraphPoint:
 
 @dataclass(frozen=True)
 class SegmentProjection:
-    """Proyeccion de un punto sobre un segmento en el plano XZ."""
+    """Projection of a point onto a segment in the XZ plane."""
 
     point: GraphPoint
     t: float
@@ -40,32 +40,32 @@ class SegmentProjection:
 
 
 def graph_to_world(point: GraphPoint) -> tuple[float, float, float]:
-    """Devuelve la tupla (x, y, z) que Three.js espera para `Vector3`."""
+    """Return the (x, y, z) tuple Three.js expects for `Vector3`."""
     return (point.x, point.y, point.z)
 
 
 def world_to_graph(x: float, y: float, z: float) -> GraphPoint:
-    """Convierte un punto de mundo Three.js en punto de grafo."""
+    """Convert a Three.js world point into a graph point."""
     return GraphPoint(x=x, y=y, z=z)
 
 
 def point_from_mapping(payload: Mapping[str, float]) -> GraphPoint:
-    """Construye un `GraphPoint` desde un objeto `{x, y, z}` del contrato."""
+    """Build a `GraphPoint` from a contract `{x, y, z}` object."""
     return GraphPoint(x=float(payload["x"]), y=float(payload["y"]), z=float(payload["z"]))
 
 
 def point_to_mapping(point: GraphPoint) -> dict[str, float]:
-    """Serializa un `GraphPoint` al formato `{x, y, z}` del contrato."""
+    """Serialise a `GraphPoint` into the contract `{x, y, z}` shape."""
     return {"x": point.x, "y": point.y, "z": point.z}
 
 
 def distance_xz(a: GraphPoint, b: GraphPoint) -> float:
-    """Distancia en el plano XZ, en metros. Ignora la cota `y`."""
+    """Distance in the XZ plane, in meters. It ignores the elevation `y`."""
     return hypot(a.x - b.x, a.z - b.z)
 
 
 def project_onto_segment_xz(point: GraphPoint, start: GraphPoint, end: GraphPoint) -> SegmentProjection:
-    """Proyecta `point` sobre el segmento `start`-`end` con `t` acotado a [0, 1]."""
+    """Project `point` onto the `start`-`end` segment with `t` clamped to [0, 1]."""
     dx = end.x - start.x
     dz = end.z - start.z
     length_squared = dx * dx + dz * dz
@@ -87,7 +87,7 @@ def project_onto_segment_xz(point: GraphPoint, start: GraphPoint, end: GraphPoin
 
 
 def travel_seconds(distance_meters: float, speed_kph: float) -> float:
-    """Tiempo de conduccion en segundos a partir de metros y km/h."""
+    """Drive time in seconds from meters and km/h."""
     if speed_kph <= 0:
-        raise ValueError("speed_kph debe ser estrictamente positivo")
+        raise ValueError("speed_kph must be strictly positive")
     return distance_meters / (speed_kph / 3.6)

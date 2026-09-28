@@ -1,7 +1,7 @@
-"""Implementacion de referencia de las reglas mundo/grafo de la Fase 0.
+"""Reference implementation of the Phase 0 world/graph rules.
 
-Es material de prueba tecnica, no codigo de produccion: la Fase 3 y la Fase 5
-reimplementan estas funciones dentro del backend. La especificacion normativa vive en
+It is technical spike material, not production code: Phase 3 and Phase 5 reimplement
+these functions inside the backend. The normative specification lives in
 `docs/contracts/world-graph-rules.md`.
 """
 

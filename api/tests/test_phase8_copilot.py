@@ -36,14 +36,14 @@ from api.tests.support import (
 GROUNDED_ANSWER = json.dumps(
     {
         "answer": (
-            "La ruta de R-01 se recalculo tras la intervencion. El coste economico del "
-            "plan vigente es el que aparece en kpis.economicCostCents."
+            "The R-01 route was recalculated after the intervention. The economic cost of "
+            "the current plan is the one reported in kpis.economicCostCents."
         ),
         "references": [
             "kpis.economicCostCents",
             "routePlan.vehicles[0].distanceMeters",
-            "kpis.metricaInventada",
-            "vehiculos[7].estado",
+            "kpis.inventedMetric",
+            "vehicles[7].status",
         ],
     }
 )
@@ -55,7 +55,7 @@ def command_id() -> str:
 
 async def ready_scenario(app: Any, *, vehicles: int = 2, orders: int = 6) -> dict[str, Any]:
     """Create, populate and optimise one scenario through the public API."""
-    created = await asgi_post(app, "/api/scenarios", json={"seed": 20260922})
+    created = await asgi_post(app, "/api/scenarios", json={})
     scenario_id = created.json()["scenarioId"]
     await asgi_post(
         app, f"/api/scenarios/{scenario_id}/vehicles/generate", json={"count": vehicles}
@@ -91,7 +91,7 @@ class ChatTests(unittest.IsolatedAsyncioTestCase):
                 "scenarioId": snapshot["scenarioId"],
                 "commandId": command_id(),
                 "scenarioRevision": snapshot["scenarioRevision"],
-                "messages": [{"role": "user", "content": "¿por que cambio la ruta de R-01?"}],
+                "messages": [{"role": "user", "content": "why did the R-01 route change?"}],
             },
         )
 
@@ -125,7 +125,7 @@ class ChatTests(unittest.IsolatedAsyncioTestCase):
                 "scenarioId": snapshot["scenarioId"],
                 "commandId": command_id(),
                 "scenarioRevision": snapshot["scenarioRevision"],
-                "messages": [{"role": "user", "content": "resume el plan"}],
+                "messages": [{"role": "user", "content": "summarise the plan"}],
             },
         )
 
@@ -282,7 +282,7 @@ class ChatTests(unittest.IsolatedAsyncioTestCase):
     async def test_hidden_reasoning_is_never_returned(self) -> None:
         fake = loaded_fake(
             chat_replies=[GROUNDED_ANSWER],
-            chat_thinking="primero cuento las barreras y luego divido entre dos",
+            chat_thinking="first I count the barriers and then I divide by two",
         )
         app, _ = build_ai_app(fake)
         snapshot = await ready_scenario(app)
@@ -350,7 +350,7 @@ class ChatTests(unittest.IsolatedAsyncioTestCase):
                 "scenarioId": snapshot["scenarioId"],
                 "commandId": command_id(),
                 "scenarioRevision": snapshot["scenarioRevision"],
-                "messages": [{"role": "user", "content": "¿por que cambio la ruta de R-01?"}],
+                "messages": [{"role": "user", "content": "why did the R-01 route change?"}],
             },
         )
 
@@ -378,7 +378,7 @@ class ProposalGateTests(unittest.IsolatedAsyncioTestCase):
             chat_replies=[
                 json.dumps(
                     {
-                        "answer": "Propongo retirar un robot del plan.",
+                        "answer": "I propose removing one robot from the plan.",
                         "references": ["kpis.economicCostCents"],
                         "proposal": proposal,
                     }
@@ -394,7 +394,7 @@ class ProposalGateTests(unittest.IsolatedAsyncioTestCase):
                 "scenarioId": snapshot["scenarioId"],
                 "commandId": command_id(),
                 "scenarioRevision": snapshot["scenarioRevision"],
-                "messages": [{"role": "user", "content": "¿que hago con R-01?"}],
+                "messages": [{"role": "user", "content": "what should I do with R-01?"}],
             },
         )
         return app, snapshot, response.json()
@@ -403,7 +403,7 @@ class ProposalGateTests(unittest.IsolatedAsyncioTestCase):
         app, snapshot, chat = await self.scenario_with_proposal(
             {
                 "kind": "SET_VEHICLE_UNAVAILABLE",
-                "summary": "Retirar R-01 del plan por bateria baja.",
+                "summary": "Remove R-01 from the plan because of low battery.",
                 "payload": {"vehicleId": "R-01"},
             }
         )
@@ -501,8 +501,8 @@ class ProposalGateTests(unittest.IsolatedAsyncioTestCase):
         app, snapshot, chat = await self.scenario_with_proposal(
             {
                 "kind": "REQUEST_REOPTIMIZATION",
-                "summary": "Recalcular la mision.",
-                "payload": {"reason": "capacidad justa"},
+                "summary": "Recompute the mission.",
+                "payload": {"reason": "fair capacity"},
             }
         )
         proposal_id = chat["proposal"]["proposalId"]
@@ -564,8 +564,8 @@ class ProposalGateTests(unittest.IsolatedAsyncioTestCase):
         app, snapshot, chat = await self.scenario_with_proposal(
             {
                 "kind": "REQUEST_REOPTIMIZATION",
-                "summary": "Recalcular.",
-                "payload": {"reason": "capacidad"},
+                "summary": "Recompute.",
+                "payload": {"reason": "capacity"},
             }
         )
         path = f"/api/ai/proposals/{chat['proposal']['proposalId']}/confirm"
@@ -592,7 +592,7 @@ class ProposalGateTests(unittest.IsolatedAsyncioTestCase):
             }
         )
 
-        self.assertEqual("Propongo retirar un robot del plan.", chat["answer"])
+        self.assertEqual("I propose removing one robot from the plan.", chat["answer"])
         self.assertIsNone(chat["proposal"], "an ungrounded suggestion must not survive")
 
     async def test_taking_the_last_available_robot_out_of_service_is_dropped(self) -> None:
@@ -600,7 +600,7 @@ class ProposalGateTests(unittest.IsolatedAsyncioTestCase):
             chat_replies=[
                 json.dumps(
                     {
-                        "answer": "Retiro el unico robot.",
+                        "answer": "I am taking the only robot out of service.",
                         "references": [],
                         "proposal": {
                             "kind": "SET_VEHICLE_UNAVAILABLE",
@@ -641,10 +641,10 @@ class ReportTests(unittest.IsolatedAsyncioTestCase):
             chat_replies=[
                 json.dumps(
                     {
-                        "summary": "Turno estable con el plan vigente.",
-                        "highlights": ["La flota cubre los pedidos alcanzables."],
+                        "summary": "Stable shift on the current plan.",
+                        "highlights": ["The fleet covers the reachable orders."],
                         "risks": [],
-                        "recommendations": ["Revisar los pedidos sin asignar."],
+                        "recommendations": ["Review the unassigned orders."],
                     }
                 )
             ]
@@ -671,9 +671,9 @@ class ReportTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(snapshot["kpis"]["distanceTotalMeters"], metrics["distanceTotalMeters"])
         self.assertEqual(snapshot["kpis"]["ordersUnassigned"], metrics["ordersUnassigned"])
         self.assertEqual(len(snapshot["vehicles"]), metrics["vehicleCount"])
-        self.assertEqual("Turno estable con el plan vigente.", payload["report"]["narrative"]["summary"])
-        self.assertIn(f"# Informe de turno - revision {snapshot['scenarioRevision']}", payload["markdown"])
-        self.assertIn("Coste economico", payload["markdown"])
+        self.assertEqual("Stable shift on the current plan.", payload["report"]["narrative"]["summary"])
+        self.assertIn(f"# Shift report - revision {snapshot['scenarioRevision']}", payload["markdown"])
+        self.assertIn("Economic cost", payload["markdown"])
         self.assertIn(MODEL_NAME, payload["markdown"])
         if self.validator is None:
             self.skipTest("jsonschema is not installed; install api/requirements-dev.txt")
@@ -704,7 +704,7 @@ class ReportTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(THINK, body["think"])
 
     async def test_a_malformed_report_is_a_502(self) -> None:
-        fake = loaded_fake(chat_replies=['{"summary": "solo el resumen"}'])
+        fake = loaded_fake(chat_replies=['{"summary": "only the summary"}'])
         app, _ = build_ai_app(fake)
         snapshot = await ready_scenario(app)
 
@@ -783,7 +783,6 @@ class PureHelperTests(unittest.TestCase):
             "scenarioId": "s",
             "scenarioRevision": 4,
             "status": "READY",
-            "seed": 1,
             "vehicles": [
                 {
                     "vehicleId": "R-01",
@@ -837,7 +836,6 @@ class PureHelperTests(unittest.TestCase):
             "scenarioRevision": 5,
             "generatedAt": "2026-09-22T09:12:30.100Z",
             "status": "READY",
-            "seed": 1,
             "planAvailable": True,
             "metrics": {
                 "vehicleCount": 2,
@@ -866,7 +864,7 @@ class PureHelperTests(unittest.TestCase):
             "unassignedOrders": [{"orderId": "O-003", "reason": "UNREACHABLE"}],
             "closures": [{"barrierId": "B-1", "blockedEdgeId": "E-N002-N007"}],
             "narrative": {
-                "summary": "El cierre encarecio el plan.",
+                "summary": "The closure made the plan more expensive.",
                 "highlights": ["d"],
                 "risks": [],
                 "recommendations": ["e"],
@@ -875,11 +873,11 @@ class PureHelperTests(unittest.TestCase):
 
         markdown = report_markdown(report)
 
-        self.assertIn("Comparacion A/B", markdown)
-        self.assertIn("BARRIER_PLACED frente a la revision 4", markdown)
+        self.assertIn("A/B comparison of the last intervention", markdown)
+        self.assertIn("Intervention: BARRIER_PLACED against revision 4", markdown)
         self.assertIn("240.0 m", markdown)
-        self.assertIn("O-003 sin asignar: UNREACHABLE", markdown)
-        self.assertIn("Cierre B-1 sobre E-N002-N007", markdown)
+        self.assertIn("O-003 unassigned: UNREACHABLE", markdown)
+        self.assertIn("Closure B-1 on E-N002-N007", markdown)
 
 
 if __name__ == "__main__":

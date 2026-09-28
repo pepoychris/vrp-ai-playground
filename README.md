@@ -40,12 +40,12 @@ The project is deliberately self-contained. The browser renders a fictional road
 
 ```mermaid
 flowchart LR
-  browser[React + Three.js<br/>3D control tower] -->|same-origin HTTP / SSE| api[FastAPI API]
-  api --> graph[Local road graph<br/>Dijkstra / A*]
-  api --> solver[OR-Tools<br/>bounded VRP]
-  api --> sim[Simulation clock<br/>closures + claw]
-  api --> db[(SQLite volume)]
-  api -->|internal network only| ollama[Ollama<br/>qwen3:4b]
+  browser["React and Three.js: 3D control tower"] -->|"same-origin HTTP and SSE"| api["FastAPI API"]
+  api --> roadgraph["Local road graph: Dijkstra and A-star"]
+  api --> solver["OR-Tools: bounded VRP"]
+  api --> sim["Simulation clock: closures and claw"]
+  api --> db[("SQLite volume")]
+  api -->|"internal network only"| ollama["Ollama: qwen3:4b"]
 ```
 
 ### The operator loop
@@ -129,29 +129,29 @@ The backend fixes the model name and inference policy. The browser cannot select
 
 ```mermaid
 flowchart TD
-  ask[Operator question] --> snapshot[Visible scenario snapshot]
-  snapshot --> prompt[Server-side prompt<br/>fixed model + temperature]
-  prompt --> model[Ollama<br/>qwen3:4b, internal network only]
-  model --> parse[JSON parsed and validated]
-  parse -->|rejects unknown fields| refused[Answer refused]
-  parse --> grounded[Answer grounded on the revision]
-  grounded --> answer[Panel shows the answer<br/>plus the fields it read]
-  grounded --> proposal[Optional proposal]
-  proposal -->|human confirms| apply[Scenario command<br/>through the revision guard]
-  proposal -->|human rejects| drop[No action executed]
+  ask["Operator question"] --> snapshot["Visible scenario snapshot"]
+  snapshot --> prompt["Server-side prompt: fixed model and temperature"]
+  prompt --> model["Ollama: qwen3:4b, internal network only"]
+  model --> parse["JSON parsed and validated"]
+  parse -->|"rejects unknown fields"| refused["Answer refused"]
+  parse --> grounded["Answer grounded on the revision"]
+  grounded --> answer["Panel shows the answer plus the fields it read"]
+  grounded --> proposal["Optional proposal"]
+  proposal -->|"human confirms"| apply["Scenario command through the revision guard"]
+  proposal -->|"human rejects"| drop["No action executed"]
 ```
 
 ```mermaid
 flowchart LR
-  subgraph cannot[The model never does this]
-    c1[Compute distances or costs]
-    c2[Replace OR-Tools]
-    c3[Apply an intervention on its own]
+  subgraph model_never["The model never does this"]
+    c1["Compute distances or costs"]
+    c2["Replace OR-Tools"]
+    c3["Apply an intervention on its own"]
   end
-  subgraph can[It only does this]
-    y1[Explain a route or an incident]
-    y2[Summarise the plan in words]
-    y3[Draft a report narrative]
+  subgraph model_only["It only does this"]
+    y1["Explain a route or an incident"]
+    y2["Summarise the plan in words"]
+    y3["Draft a report narrative"]
   end
 ```
 

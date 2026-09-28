@@ -1,12 +1,12 @@
-"""Genera el GLB de prueba de la Fase 0 (un cubo, sin texturas ni dependencias).
+"""Generate the Phase 0 fixture GLB (a cube, with no textures and no dependencies).
 
-El asset es determinista y se puede regenerar:
+The asset is deterministic and can be regenerated:
 
     python spike/fase0/glb/tools/make_fixture_glb.py
 
-Se escribe glTF 2.0 binario valido (un chunk JSON y un chunk BIN de un unico buffer
-con POSITION, NORMAL e indices). No se usa ninguna libreria: solo la estructura
-descrita en https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html
+It writes valid binary glTF 2.0 (one JSON chunk and one BIN chunk of a single buffer
+with POSITION, NORMAL and indices). No library is used: only the structure described in
+https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html
 """
 
 from __future__ import annotations
@@ -47,7 +47,7 @@ def build_geometry() -> tuple[bytes, bytes, bytes, int]:
 def build_glb() -> bytes:
     position_bytes, normal_bytes, index_bytes, vertex_count = build_geometry()
     binary = position_bytes + normal_bytes + index_bytes
-    # Los bufferView de acceso a atributos deben empezar en offset multiplo de 4.
+    # Attribute accessor bufferViews must start at an offset that is a multiple of 4.
     while len(binary) % 4:
         binary += b"\x00"
 

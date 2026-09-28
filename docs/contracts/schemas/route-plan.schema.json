@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://roboroute.local/contracts/route-plan.schema.json",
   "title": "RoutePlan",
-  "description": "Mejores rutas encontradas por el optimizador para una revision concreta. No afirma optimalidad: solverOutcome y objectiveIsProvenOptimal describen lo que devolvio el solver.",
+  "description": "Best routes found by the optimizer for a specific revision. It does not claim optimality: solverOutcome and objectiveIsProvenOptimal describe what the solver returned.",
   "type": "object",
   "required": [
     "scenarioRevision",
@@ -27,14 +27,14 @@
       "type": "integer",
       "minimum": 1,
       "maximum": 10,
-      "description": "Limite temporal aplicado a la busqueda. El MVP usa 1 o 2 segundos."
+      "description": "Time limit applied to the search. The MVP uses 1 or 2 seconds."
     },
     "solverOutcome": {
       "$ref": "common.schema.json#/$defs/solverOutcome"
     },
     "objectiveIsProvenOptimal": {
       "type": "boolean",
-      "description": "true solo si el solver demuestra optimalidad dentro del limite. La UI nunca lo presenta como garantia de optimalidad."
+        "description": "true only if the solver proves optimality within the limit. The UI never presents it as a guarantee of optimality."
     },
     "objectiveCost": {
       "$ref": "common.schema.json#/$defs/objectiveUnits"
@@ -67,7 +67,7 @@
           "minimum": 0
         }
       },
-      "description": "Descomposicion fisica del objetivo. La escala interna del modelo se fija en la Fase 5."
+        "description": "Physical decomposition of the objective. The model's internal scale is fixed in Phase 5."
     },
     "vehicles": {
       "type": "array",
@@ -85,7 +85,7 @@
   "$defs": {
     "vehicleRoute": {
       "type": "object",
-      "title": "Ruta de un vehiculo",
+      "title": "Route of one vehicle",
       "required": [
         "vehicleId",
         "nodeSequence",
@@ -107,14 +107,14 @@
           "items": {
             "$ref": "common.schema.json#/$defs/nodeId"
           },
-          "description": "Secuencia exacta de nodos. Una ruta sin paradas es [nodeIdDelDeposito]."
+        "description": "Exact node sequence. A route with no stops is [depotNodeId]."
         },
         "edgeSequence": {
           "type": "array",
           "items": {
             "$ref": "common.schema.json#/$defs/edgeId"
           },
-          "description": "Aristas recorridas, en el mismo orden que los pares de nodeSequence. Vacia si no hay desplazamiento."
+        "description": "Edges traversed, in the same order as the nodeSequence pairs. Empty when there is no travel."
         },
         "stops": {
           "type": "array",
@@ -138,7 +138,7 @@
     },
     "stop": {
       "type": "object",
-      "title": "Parada de entrega",
+      "title": "Delivery stop",
       "required": [
         "orderId",
         "nodeId",
@@ -171,7 +171,7 @@
     },
     "unassignedOrder": {
       "type": "object",
-      "title": "Pedido sin asignar",
+      "title": "Unassigned order",
       "required": ["orderId", "reason"],
       "additionalProperties": false,
       "properties": {

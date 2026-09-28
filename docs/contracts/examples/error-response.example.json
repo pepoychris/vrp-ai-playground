@@ -1,7 +1,7 @@
 {
   "error": {
     "code": "SNAP_OUT_OF_RADIUS",
-    "message": "El punto de suelta esta a 31.4 m del nodo valido mas cercano.",
+      "message": "The drop point is 31.4 m away from the nearest valid node.",
     "details": {
       "distanceMeters": 31.4,
       "maxRadiusMeters": 12

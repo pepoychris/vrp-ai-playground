@@ -1,5 +1,5 @@
 {
-  "answer": "La distancia de R-01 subio de 600 m a 840 m. La barrera B-1 bloquea la arista E-N002-N007, el acceso directo al muelle sur, y el plan vigente la rodea por N-005 y N-006. El coste economico subio 20 centimos y no hay pedidos nuevos sin asignar.",
+  "answer": "The R-01 distance rose from 600 m to 840 m. Barrier B-1 blocks edge E-N002-N007, the direct access to the south dock, and the current plan routes around it through N-005 and N-006. The economic cost rose by 20 cents and there are no new unassigned orders.",
   "usedRevision": 5,
   "references": [
     "routePlan.vehicles[0].distanceMeters",
@@ -10,10 +10,10 @@
   "proposal": {
     "proposalId": "prop-2026-09-22-0001",
     "kind": "REQUEST_REOPTIMIZATION",
-    "summary": "Recalcular la mision marcando O-003 como no asignable por capacidad.",
+    "summary": "Recompute the mission marking O-003 as unassignable due to capacity.",
     "payload": {
       "orderIds": ["O-003"],
-      "reason": "capacidad insuficiente de la flota actual"
+      "reason": "insufficient capacity in the current fleet"
     },
     "status": "PENDING",
     "revisionToApply": 5
