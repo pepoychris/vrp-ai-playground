@@ -1,7 +1,7 @@
 {
   "contractVersion": 1,
   "frozenAt": "2026-09-22",
-  "sourceOfTruth": "MVP_ROBOROUTE_ULTIMA_MILLA.md#8-contrato-mínimo-de-api",
+  "sourceOfTruth": "docs/contracts/rest-sse.md",
   "endpoints": [
     {
       "id": 1,

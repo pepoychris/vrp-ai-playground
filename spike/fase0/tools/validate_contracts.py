@@ -6,8 +6,9 @@ Comprueba tres cosas:
 1. que cada esquema es JSON Schema 2020-12 valido y sus `$ref` cruzados resuelven;
 2. que cada ejemplo valida contra el esquema declarado en `EXAMPLES` (resolviendo
    antes la clave de composicion `$exampleRef`, con fragmento JSON Pointer opcional);
-3. coherencia semantica del ejemplo dorado y cobertura del contrato REST frente a la
-   seccion 8 del MVP.
+3. coherencia semantica del ejemplo dorado y cobertura del contrato REST: la lista
+   congelada de `docs/contracts/endpoints.json` es la fuente de verdad y cada endpoint
+   declarado tiene que aparecer en `docs/contracts/rest-sse.md`.
 
 Sin `jsonschema` instalado, los pasos 1 y 2 se saltan y el script termina con codigo
 2 para que nadie confunda una validacion parcial con una validacion completa.
@@ -20,7 +21,6 @@ from __future__ import annotations
 
 import json
 import math
-import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -31,7 +31,6 @@ SCHEMAS_DIR = CONTRACTS_DIR / "schemas"
 EXAMPLES_DIR = CONTRACTS_DIR / "examples"
 ENDPOINTS_FILE = CONTRACTS_DIR / "endpoints.json"
 REST_CONTRACT_FILE = CONTRACTS_DIR / "rest-sse.md"
-MVP_FILE = REPO_ROOT / "MVP_ROBOROUTE_ULTIMA_MILLA.md"
 
 # Parametros de coste de referencia del MVP. Son configurables en la Fase 5, pero el
 # ejemplo dorado de la Fase 0 se valida contra estos valores concretos.
@@ -40,7 +39,7 @@ UNASSIGNED_ORDER_PENALTY_CENTS = 1500
 
 LENGTH_TOLERANCE_M = 1e-6
 CENT_TOLERANCE = 1e-9
-MAX_BARRIERS = 3
+MAX_BARRIERS = 2
 EDGE_ALTITUDE_IGNORED = ("x", "z")
 
 DRAFT_URL = "https://json-schema.org/draft/2020-12/schema"
@@ -605,42 +604,22 @@ def check_event_consistency(materialized: dict[str, Any], result: CheckResult) -
         )
 
 
-def mvp_endpoints() -> list[str]:
-    text = MVP_FILE.read_text(encoding="utf-8")
-    match = re.search(r"```http\n(.*?)```", text, re.DOTALL)
-    if not match:
-        raise RuntimeError("no se encontro el bloque http de la seccion 8 del MVP")
-    signatures = []
-    for line in match.group(1).splitlines():
-        stripped = line.strip()
-        parts = stripped.split()
-        if len(parts) >= 2 and parts[0] in {"GET", "POST", "PATCH", "PUT", "DELETE"}:
-            signatures.append(f"{parts[0]} {parts[1]}")
-    return signatures
-
-
 def check_endpoint_coverage(result: CheckResult) -> None:
+    # `endpoints.json` is the frozen source of truth for the endpoint list. The MVP
+    # planning document that used to be the reference is gone, so the machine-readable
+    # contract now drives the check instead of a hand-copied HTTP block.
     declared = load_json(ENDPOINTS_FILE)
     declared_signatures = [
         f"{endpoint['method']} {endpoint['path']}" for endpoint in declared["endpoints"]
     ]
-    mvp = mvp_endpoints()
 
     result.expect(
         len(declared_signatures) == len(set(declared_signatures)),
         "endpoints.json sin duplicados",
     )
-    result.expect(
-        sorted(declared_signatures) == sorted(mvp),
-        "endpoints.json coincide con la seccion 8 del MVP",
-        "faltan: "
-        + ", ".join(sorted(set(mvp) - set(declared_signatures)))
-        + " | sobran: "
-        + ", ".join(sorted(set(declared_signatures) - set(mvp))),
-    )
 
     rest_text = REST_CONTRACT_FILE.read_text(encoding="utf-8")
-    for signature in mvp:
+    for signature in declared_signatures:
         method, path = signature.split(" ", 1)
         candidates = [path]
         for prefix in ("/api/scenarios", "/api/ai"):

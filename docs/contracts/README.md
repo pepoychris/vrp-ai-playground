@@ -1,8 +1,9 @@
 # Contratos de RoboRoute Nexus
 
 Este directorio congela lo mínimo necesario para empezar a construir sin renegociar
-nombres, unidades ni revisiones a mitad de fase. Es la referencia normativa de la
-Fase 0 del MVP (`MVP_ROBOROUTE_ULTIMA_MILLA.md`).
+nombres, unidades ni revisiones a mitad de fase. Es la referencia normativa del
+contrato congelado en la Fase 0, y sigue siendo la fuente de verdad mientras el
+producto evoluciona.
 
 ## Contenido
 
@@ -10,8 +11,8 @@ Fase 0 del MVP (`MVP_ROBOROUTE_ULTIMA_MILLA.md`).
 |---|---|
 | `versions.md` | Registro de versiones aprobadas, fuentes oficiales y política de pinning. |
 | `world-graph-rules.md` | Reglas de coordenadas mundo/grafo, identificadores estables y bloqueo de aristas. |
-| `rest-sse.md` | Contrato REST/SSE de la sección 8 del MVP, envelopes de comando/revisión/error y estados. |
-| `endpoints.json` | Lista legible por máquina de los endpoints del MVP (la usan los tests de cobertura). |
+| `rest-sse.md` | Contrato REST/SSE normativo: endpoints, envelopes de comando/revisión/error y estados. |
+| `endpoints.json` | Lista congelada legible por máquina de los endpoints (es la fuente de verdad que usan los tests de cobertura). |
 | `schemas/*.schema.json` | JSON Schema 2020-12 de cada entidad, envelope y evento. |
 | `examples/*.json` | Un ejemplo válido por esquema o por variante de envelope/evento. |
 
@@ -36,8 +37,8 @@ El validador:
 2. resuelve las referencias cruzadas entre esquemas por `$id`;
 3. resuelve la clave de composición `$exampleRef` (véase abajo);
 4. valida cada ejemplo contra el esquema declarado en su tabla de mapeo;
-5. comprueba que `endpoints.json` cubre exactamente los endpoints de la sección 8
-   del MVP y que cada uno aparece en `rest-sse.md`.
+5. comprueba que la lista congelada de `endpoints.json` no tiene duplicados y que
+   cada endpoint declarado aparece en `rest-sse.md`.
 
 Sin `jsonschema` instalado, el validador solo comprueba JSON válido y refs internas.
 La instalación de la dependencia se documenta en `spike/fase0/README.md`.
@@ -78,7 +79,7 @@ usuario.
 
 ## Coste económico determinista
 
-El MVP separa dos magnitudes que no se mezclan:
+El contrato separa dos magnitudes que no se mezclan:
 
 - **objetivo del solver**: suma de costes de arco y penalizaciones en unidades
   internas enteras (`objectiveCost`). No es dinero y no se muestra como euros.
