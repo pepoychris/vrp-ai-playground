@@ -1,6 +1,6 @@
 # RoboRoute Nexus
 
-RoboRoute Nexus is a portfolio-grade last-mile control tower: a low-poly 3D city, a bounded vehicle-routing solver, a live fleet simulation, road-closure interventions, and a local AI copilot that explains the current operation.
+RoboRoute Nexus is a last-mile control tower: a low-poly 3D city, a bounded vehicle-routing solver, a live fleet simulation, road-closure interventions, and a local AI copilot that explains the current operation.
 
 The project is deliberately self-contained. The browser renders a fictional road graph with Three.js; FastAPI owns scenario state and optimisation; OR-Tools produces the plan; Ollama runs `qwen3:4b` locally when the operator asks for it.
 
