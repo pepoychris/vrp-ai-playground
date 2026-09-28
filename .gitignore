@@ -27,6 +27,25 @@ out/
 coverage/
 test-results/
 
+# Playwright: traces, videos and the screenshots captured as review evidence
+playwright-report/
+blob-report/
+frontend/e2e/.artifacts/
+frontend/e2e/screenshots/
+
+# Design references supplied with the frontend task. They are inputs to the visual
+# direction, not repository content, so they stay out of every commit.
+/Landing futurista con flota robótica.png
+/Dashboard de optimización y mapa de rutas.png
+/Constructor de escenarios con recomendaciones IA.png
+
+# CodeGraph's index is a machine-local database (see AGENTS.md).
+.codegraph/
+
+# The demo pipeline's live capture frames. They are transient inputs to the GIF build,
+# produced by tools/demos/capture_*.mjs and removed once assets/demos is rebuilt.
+tools/demos/.frames/
+
 # Environment files - real configuration and secrets are never committed
 .env
 .env.*

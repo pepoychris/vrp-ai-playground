@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RoboRoute Nexus</title>
+    <meta
+      name="description"
+      content="RoboRoute Nexus is a 3D last-mile control tower: OR-Tools route optimisation, a low-poly city you can operate, road closures that re-plan the shift, and a local Qwen copilot that explains it. Docker Compose quick start, two GIF demos and the frozen API contracts."
+    />
+    <meta name="theme-color" content="#04070f" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="canonical" href="https://pepoychris.github.io/vrp-ai-playground/" />
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <meta name="apple-mobile-web-app-title" content="RoboRoute Nexus" />
+    <meta property="og:title" content="RoboRoute Nexus" />
+    <meta
+      property="og:description"
+      content="Route intelligence for the last mile: OR-Tools optimisation, a 3D city you can operate and a local Qwen copilot."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="assets/screenshots/landing.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="stylesheet" href="site.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="topbar">
+      <div class="topbar__inner">
+        <a class="brand" href="#top">
+          <span class="brand__mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+              <path d="M6 8.5h12a1.5 1.5 0 0 1 1.5 1.5v7A1.5 1.5 0 0 1 18 18.5H6A1.5 1.5 0 0 1 4.5 17v-7A1.5 1.5 0 0 1 6 8.5Z" />
+              <path d="M12 4.5v4M8.5 8.5v-2M15.5 8.5v-2" />
+              <circle cx="9.4" cy="13.4" r="1.4" />
+              <circle cx="14.6" cy="13.4" r="1.4" />
+              <path d="M9.5 16.4h5" />
+            </svg>
+          </span>
+          <span class="brand__text">
+            <span class="brand__name">RoboRoute</span>
+            <span class="brand__name brand__name--accent">Nexus</span>
+          </span>
+        </a>
+
+        <nav class="topbar__nav" aria-label="Sections">
+          <a href="#capabilities">Product</a>
+          <a href="#demos">Demos</a>
+          <a href="#run">Run it</a>
+          <a href="#ai">AI flow</a>
+          <a href="#architecture">Architecture</a>
+          <a href="#api">API</a>
+        </nav>
+
+        <a class="topbar__cta" href="https://github.com/pepoychris/vrp-ai-playground">
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+            <path
+              d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.49v-1.7c-2.78.62-3.37-1.37-3.37-1.37-.45-1.19-1.11-1.5-1.11-1.5-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.89 1.57 2.34 1.12 2.91.85.09-.66.35-1.12.63-1.38-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05a9.3 9.3 0 0 1 5 0c1.9-1.33 2.74-1.05 2.74-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.8-4.57 5.06.36.32.68.94.68 1.9v2.82c0 .27.18.6.69.49A10.06 10.06 0 0 0 22 12.25C22 6.58 17.52 2 12 2Z"
+            />
+          </svg>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero" id="top" aria-labelledby="hero-heading">
+        <img
+          class="hero__bg"
+          src="assets/screenshots/hero-city.png"
+          alt=""
+          aria-hidden="true"
+          width="1633"
+          height="989"
+          decoding="async"
+        />
+        <div class="hero__scrim" aria-hidden="true"></div>
+        <div class="hero__inner">
+          <p class="eyebrow">AI-powered route optimisation</p>
+          <h1 id="hero-heading" class="hero__title">
+            <span>RoboRoute</span>
+            <span class="hero__title--accent">Nexus</span>
+          </h1>
+          <p class="hero__tagline">Route intelligence for the last mile.</p>
+          <p class="hero__lede">
+            A 3D control tower that solves a vehicle routing problem with OR-Tools, draws the
+            plan on a deterministic low-poly city, lets you close a road and re-plan, and
+            explains every revision with a language model running on your own machine.
+          </p>
+          <div class="hero__actions">
+            <a class="btn btn--primary btn--lg" href="#run">
+              <svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path d="M4 20 20 4M20 4h-7M20 4v7" />
+                <circle cx="6.5" cy="17.5" r="2.2" />
+              </svg>
+              Run the stack
+            </a>
+            <a class="btn btn--outline btn--lg" href="#demos">
+              <svg class="btn__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M8 5.5v13l11-6.5z" />
+              </svg>
+              Watch the demos
+            </a>
+          </div>
+          <ul class="hero__meta" role="list">
+            <li>Runs offline after the model download</li>
+            <li>No API key, no cloud account</li>
+            <li>Ollama never exposed publicly</li>
+          </ul>
+        </div>
+
+        <div class="hero__hint">
+          <p class="hero__hint-label">Run a shift</p>
+          <ol class="hero__hint-steps" role="list">
+            <li><span class="num">01</span><strong>Configure</strong> Deploy a fleet and generate orders</li>
+            <li><span class="num">02</span><strong>Optimize</strong> Run the solver on the plan</li>
+            <li><span class="num">03</span><strong>Operate</strong> Run the fleet and close a road</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="section" id="capabilities" aria-labelledby="capabilities-heading">
+        <div class="wrap">
+          <header class="section__head">
+            <p class="eyebrow">What it does</p>
+            <h2 id="capabilities-heading">One city, one depot, a plan you can operate</h2>
+            <p class="section__lede">
+              Every surface is driven by the frozen REST/SSE contract: the same revision the
+              solver produced is the revision the copilot reads.
+            </p>
+          </header>
+
+          <ul class="cards" role="list">
+            <li class="card">
+              <span class="card__icon card__icon--cyan" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <path d="M4 20 20 4" />
+                  <circle cx="5.5" cy="18.5" r="2" /><circle cx="18.5" cy="5.5" r="2" />
+                  <path d="M10 4h10v10" />
+                </svg>
+              </span>
+              <h3>Bounded optimisation</h3>
+              <p>
+                OR-Tools solves the routing problem from the deployed fleet and the generated
+                orders, then reports distance, drive time, delay, unassigned orders and the
+                economic cost behind the revision.
+              </p>
+            </li>
+            <li class="card">
+              <span class="card__icon card__icon--violet" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <path d="M12 21 3 16.5V7.5L12 3l9 4.5v9z" />
+                  <path d="M3 7.5 12 12l9-4.5M12 12v9" />
+                </svg>
+              </span>
+              <h3>Deterministic city</h3>
+              <p>
+                63 nodes, 110 road edges, 48 blocks and 137 buildings generated from a versioned
+                local dataset and drawn with Three.js in an isometric operational view.
+              </p>
+            </li>
+            <li class="card">
+              <span class="card__icon card__icon--green" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <path d="M8 5v14M16 5v14M5 8h14M5 16h14" />
+                </svg>
+              </span>
+              <h3>Operable simulation</h3>
+              <p>
+                Start, pause and change speed. The robots drive the plan while the clock
+                advances, and the renderer reports real draw calls, triangles and frame rate.
+              </p>
+            </li>
+            <li class="card">
+              <span class="card__icon card__icon--coral" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <path d="M5 12h14M12 5v14" />
+                  <circle cx="12" cy="12" r="8.5" stroke-dasharray="3 3" />
+                </svg>
+              </span>
+              <h3>Road closures</h3>
+              <p>
+                Arm the closure tool and drag across a road to block it in both directions.
+                The map paints it coral, lists the affected vehicles and orders, and re-plans.
+              </p>
+            </li>
+            <li class="card">
+              <span class="card__icon card__icon--violet" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1" />
+                  <circle cx="12" cy="12" r="3.4" />
+                </svg>
+              </span>
+              <h3>Local AI copilot</h3>
+              <p>
+                Install <code>qwen3:4b</code> on demand with streamed progress, activate it,
+                ask about the revision on screen and get an answer that cites the fields it
+                used.
+              </p>
+            </li>
+            <li class="card">
+              <span class="card__icon card__icon--cyan" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <path d="M6 4h9l4 4v12H6z" /><path d="M9 12h7M9 16h5M9 8h3" />
+                </svg>
+              </span>
+              <h3>Shift report</h3>
+              <p>
+                Build a Markdown shift report from deterministic metrics plus an AI narrative,
+                including the before/after comparison of the last intervention, then download
+                it for sharing.
+              </p>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section section--demos" id="demos" aria-labelledby="demos-heading">
+        <div class="wrap">
+          <header class="section__head">
+            <p class="eyebrow">Two demos</p>
+            <h2 id="demos-heading">Watch the product run, then watch the copilot work</h2>
+            <p class="section__lede">
+              Both clips are Playwright captures of the running stack. The fleet, the routes,
+              the closures and the copilot panel are the shipped components talking to the
+              real API, the real solver and the local Qwen model.
+            </p>
+          </header>
+
+          <article class="demo" id="demo-execution" aria-labelledby="demo-execution-heading">
+            <header class="demo__head">
+              <span class="demo__badge">Demo 1</span>
+              <div>
+                <h3 id="demo-execution-heading">A shift in execution</h3>
+                <p>
+                  Land, deploy a fleet, generate orders, optimise, run the clock, close a road
+                  and reopen it. The solver, the simulation and the renderer are the real
+                  services.
+                </p>
+              </div>
+            </header>
+
+            <figure class="demo__figure">
+              <img
+                class="demo__media"
+                src="assets/demos/roboroute-execution.gif"
+                width="960"
+                height="600"
+                alt="Screen recording of RoboRoute Nexus: the landing page opens the control deck, a two-robot fleet and six orders are generated, OR-Tools publishes glowing routes, the robots drive the plan at x4 while the tick counter advances, a road is closed with the barrier tool and painted coral, the scenario re-plans, and the road is reopened."
+                decoding="async"
+                loading="lazy"
+              />
+              <figcaption class="demo__caption">
+                <h4><span class="step-num">01</span> Fleet, routes, closures, re-plan</h4>
+                <p>
+                  Captured at 1440 × 900 against the Compose stack at x4: the tick counter,
+                  the coral barrier ribbon and the revision counter are real product output.
+                </p>
+              </figcaption>
+            </figure>
+          </article>
+
+          <article class="demo" id="demo-copilot" aria-labelledby="demo-copilot-heading">
+            <header class="demo__head">
+              <span class="demo__badge demo__badge--violet">Demo 2</span>
+              <div>
+                <h3 id="demo-copilot-heading">Chatting with the copilot, and the report it writes</h3>
+                <p>
+                  Activate the local core, ask a grounded question about the live revision,
+                  read the validated answer with the fields it used, build the shift report,
+                  download the Markdown and open the file.
+                </p>
+              </div>
+            </header>
+
+            <figure class="demo__figure">
+              <img
+                class="demo__media"
+                src="assets/demos/roboroute-ai-report.gif"
+                width="960"
+                height="600"
+                alt="Screen recording of the RoboRoute Nexus copilot: the panel reports the local service and the installed model, the operator activates the Qwen core, asks why the robots took these routes, the grounded answer arrives with the revision and the fields it read, the shift report is built, downloaded as Markdown and opened to show its plan-metrics table."
+                decoding="async"
+                loading="lazy"
+              />
+              <figcaption class="demo__caption">
+                <h4><span class="step-num">02</span> Ask, report, open</h4>
+                <p>
+                  Recorded on the real copilot panel with the local model installed: the
+                  answer, the grounded fields and the report narrative were generated by
+                  <code>qwen3:4b</code> on the recording machine, and the last frames show the
+                  downloaded <code>.md</code> file opened.
+                </p>
+              </figcaption>
+            </figure>
+          </article>
+
+          <p class="demo__footnote">
+            Regenerate both clips with the scripts in <code>tools/demos/</code>; the
+            <a href="https://github.com/pepoychris/vrp-ai-playground/blob/develop/tools/demos/README.md">runbook</a>
+            documents the exact commands, and the capture frames are transient by design.
+          </p>
+        </div>
+      </section>
+
+      <section class="section" id="run" aria-labelledby="run-heading">
+        <div class="wrap">
+          <header class="section__head">
+            <p class="eyebrow">Quick start</p>
+            <h2 id="run-heading">Bring it up, then run a shift</h2>
+            <p class="section__lede">
+              Docker Desktop with Compose v2 and a browser are the only prerequisites. The
+              first AI install also needs Internet access once, to download the model.
+            </p>
+          </header>
+
+          <div class="run">
+            <div class="run__main">
+              <h3 class="run__heading">1. Start the stack</h3>
+              <pre class="code"><code>git clone https://github.com/pepoychris/vrp-ai-playground.git
+cd vrp-ai-playground
+docker compose up --build</code></pre>
+              <p class="run__note">
+                Open <a href="http://localhost:8080">http://localhost:8080</a>. The API health
+                endpoint is <a href="http://localhost:8000/health">http://localhost:8000/health</a>.
+                The stack starts idle by design: API online, simulation stopped, model not
+                installed, no scenario created.
+              </p>
+
+              <h3 class="run__heading">2. See it working, click by click</h3>
+              <ol class="steps" role="list">
+                <li>
+                  <span class="num">01</span>
+                  <div>
+                    <strong>Start Optimizing</strong>
+                    <p>Leaves the landing screen and opens the control deck with the empty city.</p>
+                  </div>
+                </li>
+                <li>
+                  <span class="num">02</span>
+                  <div>
+                    <strong>Fleet &rarr; Deploy Fleet</strong>
+                    <p>Choose the vehicle count (two robots is the shortest path) and deploy them.</p>
+                  </div>
+                </li>
+                <li>
+                  <span class="num">03</span>
+                  <div>
+                    <strong>Generate Orders</strong>
+                    <p>Six orders is enough to make the plan interesting; they appear on the map.</p>
+                  </div>
+                </li>
+                <li>
+                  <span class="num">04</span>
+                  <div>
+                    <strong>Optimize Routes</strong>
+                    <p>OR-Tools solves it and the glowing routes, KPIs and route table fill in.</p>
+                  </div>
+                </li>
+                <li>
+                  <span class="num">05</span>
+                  <div>
+                    <strong>Start Simulation</strong>
+                    <p>The robots drive the plan. Raise the speed to x4 to watch the clock move.</p>
+                  </div>
+                </li>
+                <li>
+                  <span class="num">06</span>
+                  <div>
+                    <strong>Arm the closure tool, drag across a road</strong>
+                    <p>The road turns coral, the panel lists affected vehicles and the scenario re-plans.</p>
+                  </div>
+                </li>
+                <li>
+                  <span class="num">07</span>
+                  <div>
+                    <strong>Analytics &rarr; AI copilot</strong>
+                    <p>Install Qwen Core if needed, activate it, ask a question and build the shift report.</p>
+                  </div>
+                </li>
+              </ol>
+
+              <h3 class="run__heading">3. Run it without Docker</h3>
+              <p class="run__note">Backend, from the repository root:</p>
+              <pre class="code"><code>python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r api\requirements-dev.txt
+.\.venv\Scripts\python.exe -m uvicorn api.app.main:app --reload --port 8000</code></pre>
+              <p class="run__note">Frontend, from a second terminal:</p>
+              <pre class="code"><code>cd frontend
+npm ci
+npm run dev</code></pre>
+              <p class="run__note">
+                Vite serves the UI at <a href="http://localhost:5173">http://localhost:5173</a>
+                and proxies <code>/health</code> and <code>/api</code> to port 8000.
+              </p>
+            </div>
+
+            <aside class="run__side" aria-labelledby="run-services-heading">
+              <h3 class="run__heading" id="run-services-heading">Services</h3>
+              <table>
+                <caption>Published by <code>compose.yaml</code></caption>
+                <thead>
+                  <tr><th scope="col">Service</th><th scope="col">Port</th><th scope="col">Role</th></tr>
+                </thead>
+                <tbody>
+                  <tr><th scope="row">frontend</th><td><code>8080</code></td><td>Static bundle + same-origin proxy</td></tr>
+                  <tr><th scope="row">api</th><td><code>8000</code></td><td>FastAPI, SQLite volume, OR-Tools</td></tr>
+                  <tr><th scope="row">ollama</th><td>internal</td><td><code>qwen3:4b</code>, never published</td></tr>
+                </tbody>
+              </table>
+              <p class="run__note">
+                <code>docker compose down</code> stops the stack. Named volumes keep SQLite and
+                the model between runs; remove them only for a clean reset.
+              </p>
+              <ul class="checks" role="list">
+                <li>No authentication, single operator</li>
+                <li>Ollama reachable on the Compose network only</li>
+                <li>Scenario state persisted in a SQLite volume</li>
+              </ul>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="architecture" aria-labelledby="architecture-heading">
+        <div class="wrap">
+          <header class="section__head">
+            <p class="eyebrow">Architecture</p>
+            <h2 id="architecture-heading">Three containers, one published origin</h2>
+            <p class="section__lede">
+              The browser talks to one origin. The frontend proxies to the API, and only the
+              API may reach the model runtime.
+            </p>
+          </header>
+
+          <div class="stack">
+            <ol class="stack__column" role="list">
+              <li class="node node--cyan">
+                <span class="node__tag">Browser</span>
+                <h3>React + Three.js control deck</h3>
+                <p>Landing page, deck, 3D city, copilot panel. Same-origin HTTP and SSE only.</p>
+              </li>
+              <li class="node node--violet">
+                <span class="node__tag">edge network</span>
+                <h3>frontend :8080</h3>
+                <p>Serves the built bundle and proxies <code>/api</code> and <code>/health</code>.</p>
+              </li>
+              <li class="node node--blue">
+                <span class="node__tag">backend network</span>
+                <h3>api :8000</h3>
+                <p>Scenario state, road graph, OR-Tools solver, simulation clock, AI orchestration.</p>
+              </li>
+              <li class="node node--coral">
+                <span class="node__tag">backend network</span>
+                <h3>ollama (no published port)</h3>
+                <p>Fixed <code>qwen3:4b</code> runtime, cloud disabled, model stored in a volume.</p>
+              </li>
+            </ol>
+
+            <div class="stack__side">
+              <h3 class="run__heading">One revision, one truth</h3>
+              <ol class="flow" role="list">
+                <li><strong>Command</strong> A mutation returns the new scenario revision.</li>
+                <li><strong>Event</strong> The same revision is streamed to the browser over SSE.</li>
+                <li><strong>Render</strong> The city, the KPIs and the tables read that revision.</li>
+                <li><strong>Explain</strong> The copilot receives the snapshot it is grounded on.</li>
+                <li><strong>Gate</strong> An AI proposal only mutates the scenario after confirmation.</li>
+              </ol>
+              <p class="run__note">
+                Optimisation is bounded on purpose: <code>OR_TOOLS_MAX_TIME_SECONDS</code> caps
+                solver wall-clock, and the cost model is deterministic so two identical shifts
+                produce the same plan.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="ai" aria-labelledby="ai-heading">
+        <div class="wrap">
+          <header class="section__head">
+            <p class="eyebrow">Local AI</p>
+            <h2 id="ai-heading">Install on demand, activate, ask, report</h2>
+            <p class="section__lede">
+              The backend fixes the model name and the inference policy. The browser cannot
+              select an arbitrary model and never talks to Ollama directly.
+            </p>
+          </header>
+
+          <ol class="lifecycle" role="list">
+            <li class="step step--cyan">
+              <span class="step__num">01</span>
+              <h3>Install Qwen Core</h3>
+              <p>
+                Starts the on-demand pull and streams progress through
+                <code>/api/ai/model/install/events</code>. Nothing is downloaded until the
+                operator asks.
+              </p>
+            </li>
+            <li class="step step--violet">
+              <span class="step__num">02</span>
+              <h3>Activate AI core</h3>
+              <p>
+                Preloads <code>qwen3:4b</code> with the approved context and temperature
+                settings; the panel shows when the core is loaded.
+              </p>
+            </li>
+            <li class="step step--green">
+              <span class="step__num">03</span>
+              <h3>Ask the copilot</h3>
+              <p>
+                Sends the visible scenario snapshot plus the question. The answer is validated
+                and tagged with the revision it used, together with any suggested action.
+              </p>
+            </li>
+            <li class="step step--coral">
+              <span class="step__num">04</span>
+              <h3>Build and download the report</h3>
+              <p>
+                Combines deterministic metrics with an AI narrative and exports the shift
+                report as Markdown, including the A/B comparison against the previous plan.
+              </p>
+            </li>
+          </ol>
+
+          <div class="boundary">
+            <h3 class="run__heading">What the model never does</h3>
+            <ul class="boundary__grid" role="list">
+              <li>It does not calculate distances or replace OR-Tools.</li>
+              <li>It does not apply an action without explicit confirmation.</li>
+              <li>It does not answer about a revision other than the one on screen.</li>
+              <li>It is never reachable from outside the Compose network.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="api" aria-labelledby="api-heading">
+        <div class="wrap">
+          <header class="section__head">
+            <p class="eyebrow">Contracts</p>
+            <h2 id="api-heading">The frozen API surface</h2>
+            <p class="section__lede">
+              The contract in <code>docs/contracts/</code> is the normative source of truth for
+              the REST/SSE surface, the data shapes and the cost semantics.
+            </p>
+          </header>
+
+          <div class="api">
+            <table>
+              <caption>Representative endpoints, grouped by the flow they serve</caption>
+              <thead>
+                <tr><th scope="col">Flow</th><th scope="col">Endpoint</th><th scope="col">Purpose</th></tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row" rowspan="2">Scenario</th><td><code>POST /api/scenarios</code></td><td>Create the shift the deck drives</td></tr>
+                <tr><td><code>GET /api/scenarios/{id}/events</code></td><td>SSE stream of scenario revisions</td></tr>
+                <tr><th scope="row" rowspan="3">Plan</th><td><code>POST /api/scenarios/{id}/vehicles/generate</code></td><td>Deploy the fleet</td></tr>
+                <tr><td><code>POST /api/scenarios/{id}/orders/generate</code></td><td>Generate delivery orders</td></tr>
+                <tr><td><code>POST /api/scenarios/{id}/optimize</code></td><td>OR-Tools route plan and KPIs</td></tr>
+                <tr><th scope="row" rowspan="3">Operate</th><td><code>POST /api/scenarios/{id}/simulation/start</code></td><td>Run the clock</td></tr>
+                <tr><td><code>POST /api/scenarios/{id}/barriers</code></td><td>Close a road in both directions</td></tr>
+                <tr><td><code>DELETE /api/scenarios/{id}/barriers/{barrierId}</code></td><td>Reopen the road and re-plan</td></tr>
+                <tr><th scope="row" rowspan="4">Copilot</th><td><code>GET /api/ai/status</code></td><td>Service availability, install state, core state</td></tr>
+                <tr><td><code>POST /api/ai/model/install</code> + <code>/events</code></td><td>Pull the model, stream progress</td></tr>
+                <tr><td><code>POST /api/ai/chat</code></td><td>Grounded answer, revision tag, proposal</td></tr>
+                <tr><td><code>POST /api/ai/reports/shift</code></td><td>Markdown shift report</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="docs">
+            <h3 class="run__heading">Documentation map</h3>
+            <ul class="doclinks" role="list">
+              <li>
+                <a href="docs/contracts/README.md">
+                  <strong>Contracts</strong>
+                  <span>REST/SSE endpoints, JSON schemas and golden examples.</span>
+                </a>
+              </li>
+              <li>
+                <a href="docs/contracts/rest-sse.md">
+                  <strong>REST/SSE reference</strong>
+                  <span>Every route, envelope and error shape.</span>
+                </a>
+              </li>
+              <li>
+                <a href="docs/contracts/world-graph-rules.md">
+                  <strong>World graph rules</strong>
+                  <span>How the city and the road graph are defined.</span>
+                </a>
+              </li>
+              <li>
+                <a href="docs/agent-orchestration.md">
+                  <strong>Agent workflow</strong>
+                  <span>How the phases were planned, reviewed and delivered.</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="verification" aria-labelledby="verification-heading">
+        <div class="wrap">
+          <header class="section__head">
+            <p class="eyebrow">Verification</p>
+            <h2 id="verification-heading">Everything on this page is checkable</h2>
+            <p class="section__lede">
+              Contracts, solver behaviour, the simulation, the barriers and the copilot panel
+              all carry their own tests.
+            </p>
+          </header>
+
+          <div class="verify">
+            <pre class="code"><code>.\.venv\Scripts\python.exe -m unittest discover -s api/tests -t .
+python spike/fase0/tools/validate_contracts.py
+
+cd frontend
+npm run build
+npm test
+npm run test:e2e</code></pre>
+            <ul class="verify__list" role="list">
+              <li><strong>Contracts</strong> Schema validation against the golden examples.</li>
+              <li><strong>API</strong> Python unittest suites for the solver, clock, barriers and copilot.</li>
+              <li><strong>Frontend</strong> Vitest units plus a Playwright run over the delivered flows.</li>
+              <li><strong>Visual</strong> The Playwright suite records the screenshots used on this page.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="limitations" aria-labelledby="limitations-heading">
+        <div class="wrap">
+          <header class="section__head">
+            <p class="eyebrow">Scope</p>
+            <h2 id="limitations-heading">What this is not</h2>
+            <p class="section__lede">
+              An offline-first demonstration of a last-mile control tower, not a production
+              dispatch system.
+            </p>
+          </header>
+
+          <ul class="limits" role="list">
+            <li>No authentication or multi-user permissions.</li>
+            <li>No GPS, geocoding, live traffic or weather.</li>
+            <li>No mobile client and no RAG/vector store.</li>
+            <li>The city is a fictional dataset; fixture assets are procedural stand-ins.</li>
+            <li>The copilot explains and proposes; it never drives the solver.</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="wrap footer__inner">
+        <div class="footer__brand">
+          <span class="brand__mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+              <path d="M6 8.5h12a1.5 1.5 0 0 1 1.5 1.5v7A1.5 1.5 0 0 1 18 18.5H6A1.5 1.5 0 0 1 4.5 17v-7A1.5 1.5 0 0 1 6 8.5Z" />
+              <path d="M12 4.5v4M8.5 8.5v-2M15.5 8.5v-2" />
+              <circle cx="9.4" cy="13.4" r="1.4" />
+              <circle cx="14.6" cy="13.4" r="1.4" />
+              <path d="M9.5 16.4h5" />
+            </svg>
+          </span>
+          <div>
+            <p class="footer__name">RoboRoute Nexus</p>
+            <p class="footer__note">Route intelligence for the last mile.</p>
+          </div>
+        </div>
+
+        <nav class="footer__nav" aria-label="Footer">
+          <a href="https://github.com/pepoychris/vrp-ai-playground">Repository</a>
+          <a href="README.md">README</a>
+          <a href="docs/contracts/README.md">Contracts</a>
+          <a href="frontend/docs/">Runbooks</a>
+          <a href="#top">Back to top</a>
+        </nav>
+      </div>
+    </footer>
+
+    <script src="site.js" defer></script>
+  </body>
+</html>
