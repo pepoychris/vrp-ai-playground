@@ -4,7 +4,13 @@ RoboRoute Nexus is a portfolio-grade last-mile control tower: a low-poly 3D city
 
 The project is deliberately self-contained. The browser renders a fictional road graph with Three.js; FastAPI owns scenario state and optimisation; OR-Tools produces the plan; Ollama runs `qwen3:4b` locally when the operator asks for it.
 
-[Open the project site](https://pepoychris.github.io/vrp-ai-playground/) · [Run the demos](docs/index.html) · [Read the contracts](docs/contracts/README.md)
+[Open the project site](https://pepoychris.github.io/vrp-ai-playground/) · [Read the contracts](docs/contracts/README.md)
+
+![RoboRoute Nexus control tower](assets/screenshots/landing.png)
+
+![Execution demo](assets/demos/roboroute-execution.gif)
+
+![AI copilot and report demo](assets/demos/roboroute-ai-report.gif)
 
 ## What you can do
 
@@ -16,18 +22,54 @@ The project is deliberately self-contained. The browser renders a fictional road
 - Ask a grounded local copilot about the visible scenario.
 - Build and download a Markdown shift report. AI proposals never mutate the scenario without human confirmation.
 
+## Product surfaces
+
+| Landing | Live city |
+| --- | --- |
+| ![RoboRoute landing](assets/screenshots/landing.png) | ![Live route plan](assets/screenshots/optimized-fleet.png) |
+
+| Road closure | Reopened road |
+| --- | --- |
+| ![Road closures](assets/screenshots/road-closures.png) | ![Road reopened](assets/screenshots/road-reopened.png) |
+
+| Running clock | Scenario builder |
+| --- | --- |
+| ![Simulation running](assets/screenshots/simulation-running.png) | ![Scenario builder](assets/screenshots/scenario-builder.png) |
+
 ## Architecture
 
-```text
-Browser (React + Three.js)
-          │ same-origin HTTP/SSE
-          ▼
-FastAPI API ── SQLite volume
-     │
-     ├── local road graph + shortest paths
-     ├── OR-Tools bounded VRP solver
-     ├── simulation clock and interventions
-     └── Ollama (qwen3:4b, internal Docker network only)
+```mermaid
+flowchart LR
+  browser[React + Three.js<br/>3D control tower] -->|same-origin HTTP / SSE| api[FastAPI API]
+  api --> graph[Local road graph<br/>Dijkstra / A*]
+  api --> solver[OR-Tools<br/>bounded VRP]
+  api --> sim[Simulation clock<br/>closures + claw]
+  api --> db[(SQLite volume)]
+  api -->|internal network only| ollama[Ollama<br/>qwen3:4b]
+```
+
+### The operator loop
+
+```mermaid
+sequenceDiagram
+  actor Operator
+  participant UI as React + Three.js
+  participant API as FastAPI
+  participant Solver as OR-Tools
+  participant AI as Local Qwen
+  Operator->>UI: Deploy fleet + generate orders
+  UI->>API: Create scenario commands
+  API->>Solver: Optimise with constraints
+  Solver-->>API: Route plan + KPIs
+  API-->>UI: Atomic scenario revision
+  Operator->>UI: Start, pause or close a road
+  UI->>API: Intervention command
+  API->>Solver: Re-plan blocked graph
+  Operator->>UI: Ask why the route changed
+  UI->>API: Grounded snapshot + question
+  API->>AI: Fixed model, validated context
+  AI-->>API: Answer / proposal / report narrative
+  API-->>UI: Human-confirmed result + Markdown report
 ```
 
 | Layer | Technology |
@@ -85,6 +127,34 @@ Vite serves the UI at [http://localhost:5173](http://localhost:5173) and proxies
 
 The backend fixes the model name and inference policy. The browser cannot select an arbitrary model and never talks to Ollama directly.
 
+```mermaid
+flowchart TD
+  ask[Operator question] --> snapshot[Visible scenario snapshot]
+  snapshot --> prompt[Server-side prompt<br/>fixed model + temperature]
+  prompt --> model[Ollama<br/>qwen3:4b, internal network only]
+  model --> parse[JSON parsed and validated]
+  parse -->|rejects unknown fields| refused[Answer refused]
+  parse --> grounded[Answer grounded on the revision]
+  grounded --> answer[Panel shows the answer<br/>plus the fields it read]
+  grounded --> proposal[Optional proposal]
+  proposal -->|human confirms| apply[Scenario command<br/>through the revision guard]
+  proposal -->|human rejects| drop[No action executed]
+```
+
+```mermaid
+flowchart LR
+  subgraph cannot[The model never does this]
+    c1[Compute distances or costs]
+    c2[Replace OR-Tools]
+    c3[Apply an intervention on its own]
+  end
+  subgraph can[It only does this]
+    y1[Explain a route or an incident]
+    y2[Summarise the plan in words]
+    y3[Draft a report narrative]
+  end
+```
+
 1. **Install Qwen Core** starts the on-demand pull and streams progress through `/api/ai/model/install/events`.
 2. **Activate AI core** preloads `qwen3:4b` with the approved context and temperature settings.
 3. **Ask the copilot** sends the visible scenario snapshot plus the question. The answer is validated and tagged with the revision it used.
@@ -94,10 +164,23 @@ The model explains routes and incidents; it does not calculate distances, replac
 
 ## Documentation map
 
-- [Project site and demos](docs/index.html) — visual overview, exact run guide and two interactive walkthroughs.
+- [Project site and demos](https://pepoychris.github.io/vrp-ai-playground/) — visual overview, exact run guide and two GIF walkthroughs.
 - [API and data contracts](docs/contracts/README.md) — REST/SSE endpoints, schemas and examples.
 - [Frontend runbooks](frontend/docs/) — city, routing, simulation, barriers, AI and verification notes.
 - [Visual identity](frontend/docs/visual-identity.md) — palette, typography, lighting and asset budgets.
+
+Both GIFs are real captures of the running stack, not mock-ups. The pipeline lives in
+[`tools/demos`](tools/demos/README.md):
+
+```powershell
+# with the stack up (docker compose up) and the frontend built
+node tools/demos/capture_execution.mjs    # deck: deploy, optimise, run, close, reopen
+node tools/demos/capture_copilot.mjs      # copilot: activate, ask, answer, report
+\.venv\Scripts\python.exe tools/demos/build_gifs.py
+```
+
+The capture frames are transient; only the composed GIFs and the derived landing hero are
+committed.
 
 ## Verification
 

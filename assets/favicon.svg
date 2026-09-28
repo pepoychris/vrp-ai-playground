@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="RoboRoute Nexus">
+  <defs>
+    <linearGradient id="shell" x1="8" y1="4" x2="56" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0b1730" />
+      <stop offset="1" stop-color="#04070f" />
+    </linearGradient>
+    <linearGradient id="body" x1="12" y1="22" x2="52" y2="50" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#22d3ee" />
+      <stop offset="0.55" stop-color="#4facfe" />
+      <stop offset="1" stop-color="#8b5cf6" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#shell)" />
+  <rect x="1.5" y="1.5" width="61" height="61" rx="12.5" fill="none" stroke="#22d3ee" stroke-opacity="0.35" stroke-width="1.5" />
+  <g fill="none" stroke="url(#body)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M33 18v-5" />
+    <circle cx="33" cy="11.5" r="2.6" fill="url(#body)" stroke="none" />
+    <rect x="14.5" y="23" width="35" height="22.5" rx="7.5" />
+    <path d="M21.5 23v-4.5M42.5 23v-4.5" />
+  </g>
+  <g fill="#04070f">
+    <circle cx="25" cy="33.5" r="3.4" />
+    <circle cx="39" cy="33.5" r="3.4" />
+  </g>
+  <g fill="none" stroke="#22d3ee" stroke-width="2.6" stroke-linecap="round" stroke-opacity="0.7">
+    <path d="M26.5 40.5h13" />
+  </g>
+</svg>
