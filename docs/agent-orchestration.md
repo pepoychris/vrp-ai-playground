@@ -16,6 +16,16 @@ comments, checklists, and status updates. New workflow text must not use Spanish
 labels or phase names, and existing workflow wording should be translated whenever it
 is edited.
 
+## Project-completion interview PDF trigger
+
+When the user says that the PDF is required to finish or close the project (including
+wording such as “I need the PDF to consider the project finished”), treat that as an
+explicit completion deliverable. Automatically generate or update the stable
+three-page interview brief at `output/pdf/roboroute-nexus-interview-brief.pdf`.
+Render and visually inspect every page, verify the page count and output path, and
+include the PDF in the completion gate before reporting the project complete. The
+project must not be marked complete while this artifact is missing or unverified.
+
 - One `phase_implementer` handles one cohesive packet of related MVP work.
 - MVP phases are strictly sequential: implementation, review/correction, focused
   verification, and remote delivery for one numbered phase must finish before the
@@ -23,6 +33,24 @@ is edited.
   they share files or runtime primitives.
 - The packet contains the exact scope, files, acceptance criteria, non-goals, and
   focused verification commands; unrelated project content is omitted.
+- Any user-facing UI, visual, layout, interaction, or `frontend/` change is a
+  frontend task and must include a `REFERENCE IMAGES` field in the packet. The
+  field lists absolute image paths or URLs and the thematic cues to extract. When a
+  net-new visual direction has no references, implementation waits until the
+  orchestrator obtains them.
+- Frontend implementation agents inspect all supplied references, use them as
+  thematic inspiration rather than copying protected assets, and report the
+  selected cues plus intentional deviations.
+- Playwright is mandatory for frontend browser verification. The phase must add or
+  update a Playwright scenario for the changed flow, run it against the real app,
+  exercise the primary interaction, fail on unexpected page/console errors, and
+  capture desktop and relevant responsive screenshots. The screenshots are reviewed
+  as part of the phase gate.
+- A frontend phase cannot pass focused verification or remote delivery without a
+  successful Playwright run and visual screenshot review. Unit tests, type checks,
+  and build checks remain required as separate gates. If no Playwright command or
+  configuration exists yet, the phase adds the smallest pinned setup using the
+  approved `@playwright/test` version before changing the UI.
 - A single `phase_reviewer` runs only after the whole phase is implemented. It reviews
   the complete diff once and does not edit files.
 - Any findings are grouped into one correction request to the implementing agent,
